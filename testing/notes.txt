@@ -1,0 +1,17 @@
+ITCM RAM:		0x0000 0000 - 0x0000 3FFF ( 16 KB)
+System Memory:	0x0010 0000 - 0x0010 EDBF (~64 KB)
+Flash ITCM:		0x0020 0000 - 0x003F FFFF (  2 MB)
+Flash AXIM:		0x0800 0000 - 0x081F FFFF (  2 MB) [same memory]
+Option Bytes:	0x1FFF 0000 - 0x1FFF 001F ( 32  B)
+DTCM:			0x2000 0000 - 0x2001 FFFF (128 KB)
+SRAM1:			0x2002 0000 - 0x2007 BFFF (368 KB)
+SRAM2:			0x2007 C000 - 0x2007 FFFF ( 16 KB)
+
+
+Compiler Args:
+
+Assembler Args:
+-mcpu=cortex-m7
+
+Linker Args:
+
