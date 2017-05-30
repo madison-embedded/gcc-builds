@@ -4,10 +4,12 @@
 
 **For microcontroller projects built with the GNU toolchain.**
 
+## Project State
+
 This project is approaching stability. The following action items remain before it can be considered stable:
 
   * Boilerplated Makefile to support Windows/Unix/OSX usage
-  * Multi-target file structure with make `XXXXX\_config` (or other) target configuration options
+  * Multi-target file structure with make `XXXXX_config` (or other) target configuration options
   * Compiler arguments sorted out and linker scripts minified (if possible)
   * Thorough, multi-platform development instructions
 
