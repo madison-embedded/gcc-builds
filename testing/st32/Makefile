@@ -9,6 +9,7 @@ FLAGS := -std=gnu99 $(INCLUDES) -c -Wall -Wextra -Wno-unused-parameter -Wno-miss
 
 OBJECTS += $(SRC_DIR)/main.o
 OBJECTS += $(SYS_DIR)/startup_stm32f767xx.o
+#OBJECTS += $(SYS_DIR)/startupV2.o
 OBJECTS += $(SYS_DIR)/system_stm32f7xx.o
 
 LD_SCRIPT = script.ld

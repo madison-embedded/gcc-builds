@@ -3,4 +3,5 @@
 *.bin
 *.elf
 *.hex
+*.swp
 

@@ -1,7 +1,6 @@
 	.syntax unified
 	.cpu cortex-m7
-	.fpu softvfp
-	.thumb
+	.arch armv7-m
 
 	.global g_pfnVectors
 	.global Default_Handler
@@ -239,6 +238,7 @@ g_pfnVectors:
 	def_irq_handler	PendSV_Handler
 	def_irq_handler	SysTick_Handler
 	def_irq_handler	WWDG_IRQHandler
+
 	def_irq_handler PVD_IRQHandler      
 	def_irq_handler TAMP_STAMP_IRQHandler            
 	def_irq_handler RTC_WKUP_IRQHandler                  
