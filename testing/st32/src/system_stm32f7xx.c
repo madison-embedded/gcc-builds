@@ -7,12 +7,12 @@
 /* Default value of the External oscillator in Hz */
 #if !defined  (HSE_VALUE) 
 #define HSE_VALUE	((uint32_t)8000000)
-#endif /* HSE_VALUE */
+#endif
 
 /* Value of the Internal oscillator in Hz*/
 #if !defined  (HSI_VALUE)
 #define HSI_VALUE	((uint32_t)16000000) 
-#endif /* HSI_VALUE */
+#endif
 
 uint32_t SystemCoreClock = 16000000;
 const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
@@ -44,36 +44,34 @@ void SystemCoreClockUpdate(void) {
 	tmp = RCC->CFGR & RCC_CFGR_SWS;	/* Get SYSCLK source */
 
 	switch (tmp) {
+		
+		/* HSI used as system clock source */
+		case RCC_CFGR_SWS_HSI: 
+			SystemCoreClock = HSI_VALUE;
+			break;
+		
+		/* HSE used as system clock source */
+		case RCC_CFGR_SWS_HSE:
+			SystemCoreClock = HSE_VALUE; 
+			break;
+		
+		/* PLL used as system clock source */
+		case RCC_CFGR_SWS_PLL:  
 
-	/* HSI used as system clock source */
-	case 0x00: SystemCoreClock = HSI_VALUE; break;
-
-	/* HSE used as system clock source */
-	case 0x04: SystemCoreClock = HSE_VALUE; break;
-
-	case 0x08:  /* PLL used as system clock source */
-
-		/* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N
-		   SYSCLK = PLL_VCO / PLL_P */    
-		pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) >> 22;
-		pllm = RCC->PLLCFGR & RCC_PLLCFGR_PLLM;
-      
-		/* HSE used as PLL clock source */
-		if (pllsource != 0)
-			pllvco = (HSE_VALUE / pllm) *
-			((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
-
-		/* HSI used as PLL clock source */
-		else
-			pllvco = (HSI_VALUE / pllm) *
-			((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);      
-
-		pllp = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLP) >> 16) + 1 ) * 2;
-		SystemCoreClock = pllvco / pllp;
-		break;
-
-	default: SystemCoreClock = HSI_VALUE; break;
-
+			/* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N
+			 * SYSCLK = PLL_VCO / PLL_P */    
+			pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) >> RCC_PLLCFGR_PLLSRC_Pos;
+			pllm = RCC->PLLCFGR & RCC_PLLCFGR_PLLM;
+			
+			/* determine which clock source was used */
+			pllvco = ((pllsource ? HSE_VALUE : HSI_VALUE) / pllm) *
+				((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos);
+			
+			pllp = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLP) >> RCC_PLLCFGR_PLLP_Pos) + 1) * 2;
+			SystemCoreClock = pllvco / pllp;
+			break;
+		
+		default: SystemCoreClock = HSI_VALUE; break;
 	}
 
 	/* Compute HCLK frequency */
