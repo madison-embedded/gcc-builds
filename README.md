@@ -1,6 +1,8 @@
 # gcc-builds
 
-For microcontroller projects built with the GNU toolchain.
+*Contributors: Vaughn Kottler*
+
+**For microcontroller projects built with the GNU toolchain.**
 
 This project is approaching stability. The following action items remain before it can be considered stable:
 
@@ -16,8 +18,6 @@ The following features would be nice to have:
   * Git commit conventions established
   * Commenting & code style conventions established
   * Separate documentation repository established
-
-*Contributors: Vaughn Kottler*
 
 ## Processors Supported
 
