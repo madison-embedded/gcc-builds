@@ -3,5 +3,7 @@
 *.bin
 *.elf
 *.hex
+*.map
+*.axf
 *.swp
 
