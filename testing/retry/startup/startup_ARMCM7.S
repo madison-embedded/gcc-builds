@@ -1,3 +1,35 @@
+/* File: startup_ARMCM7.S
+ * Purpose: startup file for Cortex-M7 devices. Should use with
+ *   GCC for ARM Embedded Processors
+ * Version: V2.0
+ * Date: 01 August 2014
+ *
+/* Copyright (c) 2011 - 2014 ARM LIMITED
+
+   All rights reserved.
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   - Neither the name of ARM nor the names of its contributors may be used
+     to endorse or promote products derived from this software without
+     specific prior written permission.
+   *
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+   ---------------------------------------------------------------------------*/
 	.syntax	unified
 	.arch	armv7e-m
 
@@ -220,114 +252,6 @@ Default_Handler:
 	def_irq_handler	DebugMon_Handler
 	def_irq_handler	PendSV_Handler
 	def_irq_handler	SysTick_Handler
-	def_irq_handler	WWDG_IRQHandler
-
-	def_irq_handler PVD_IRQHandler      
-	def_irq_handler TAMP_STAMP_IRQHandler            
-	def_irq_handler RTC_WKUP_IRQHandler                  
-	def_irq_handler FLASH_IRQHandler         
-	def_irq_handler RCC_IRQHandler      
-	def_irq_handler EXTI0_IRQHandler         
-	def_irq_handler EXTI1_IRQHandler         
-	def_irq_handler EXTI2_IRQHandler         
-	def_irq_handler EXTI3_IRQHandler         
-	def_irq_handler EXTI4_IRQHandler         
-	def_irq_handler DMA1_Stream0_IRQHandler               
-	def_irq_handler DMA1_Stream1_IRQHandler               
-	def_irq_handler DMA1_Stream2_IRQHandler               
-	def_irq_handler DMA1_Stream3_IRQHandler               
-	def_irq_handler DMA1_Stream4_IRQHandler              
-	def_irq_handler DMA1_Stream5_IRQHandler               
-	def_irq_handler DMA1_Stream6_IRQHandler               
-	def_irq_handler ADC_IRQHandler      
-	def_irq_handler CAN1_TX_IRQHandler   
-	def_irq_handler CAN1_RX0_IRQHandler                  
-	def_irq_handler CAN1_RX1_IRQHandler                  
-	def_irq_handler CAN1_SCE_IRQHandler                  
-	def_irq_handler EXTI9_5_IRQHandler   
-	def_irq_handler TIM1_BRK_TIM9_IRQHandler            
-	def_irq_handler TIM1_UP_TIM10_IRQHandler            
-	def_irq_handler TIM1_TRG_COM_TIM11_IRQHandler      
-	def_irq_handler TIM1_CC_IRQHandler   
-	def_irq_handler TIM2_IRQHandler            
-	def_irq_handler TIM3_IRQHandler            
-	def_irq_handler TIM4_IRQHandler            
-	def_irq_handler I2C1_EV_IRQHandler   
-	def_irq_handler I2C1_ER_IRQHandler   
-	def_irq_handler I2C2_EV_IRQHandler   
-	def_irq_handler I2C2_ER_IRQHandler   
-	def_irq_handler SPI1_IRQHandler            
-	def_irq_handler SPI2_IRQHandler            
-	def_irq_handler USART1_IRQHandler      
-	def_irq_handler USART2_IRQHandler      
-	def_irq_handler USART3_IRQHandler      
-	def_irq_handler EXTI15_10_IRQHandler               
-	def_irq_handler RTC_Alarm_IRQHandler               
-	def_irq_handler OTG_FS_WKUP_IRQHandler         
-	def_irq_handler TIM8_BRK_TIM12_IRQHandler         
-	def_irq_handler TIM8_UP_TIM13_IRQHandler            
-	def_irq_handler TIM8_TRG_COM_TIM14_IRQHandler      
-	def_irq_handler TIM8_CC_IRQHandler   
-	def_irq_handler DMA1_Stream7_IRQHandler               
-	def_irq_handler FMC_IRQHandler            
-	def_irq_handler SDMMC1_IRQHandler            
-	def_irq_handler TIM5_IRQHandler            
-	def_irq_handler SPI3_IRQHandler            
-	def_irq_handler UART4_IRQHandler         
-	def_irq_handler UART5_IRQHandler         
-	def_irq_handler TIM6_DAC_IRQHandler                  
-	def_irq_handler TIM7_IRQHandler            
-	def_irq_handler DMA2_Stream0_IRQHandler               
-	def_irq_handler DMA2_Stream1_IRQHandler               
-	def_irq_handler DMA2_Stream2_IRQHandler               
-	def_irq_handler DMA2_Stream3_IRQHandler               
-	def_irq_handler DMA2_Stream4_IRQHandler               
-	def_irq_handler ETH_IRQHandler   
-	def_irq_handler ETH_WKUP_IRQHandler   
-	def_irq_handler CAN2_TX_IRQHandler   
-	def_irq_handler CAN2_RX0_IRQHandler                  
-	def_irq_handler CAN2_RX1_IRQHandler                  
-	def_irq_handler CAN2_SCE_IRQHandler                  
-	def_irq_handler OTG_FS_IRQHandler      
-	def_irq_handler DMA2_Stream5_IRQHandler               
-	def_irq_handler DMA2_Stream6_IRQHandler               
-	def_irq_handler DMA2_Stream7_IRQHandler               
-	def_irq_handler USART6_IRQHandler      
-	def_irq_handler I2C3_EV_IRQHandler   
-	def_irq_handler I2C3_ER_IRQHandler   
-	def_irq_handler OTG_HS_EP1_OUT_IRQHandler         
-	def_irq_handler OTG_HS_EP1_IN_IRQHandler            
-	def_irq_handler OTG_HS_WKUP_IRQHandler         
-	def_irq_handler OTG_HS_IRQHandler      
-	def_irq_handler DCMI_IRQHandler            
-	def_irq_handler RNG_IRQHandler            
-	def_irq_handler FPU_IRQHandler                  
-	def_irq_handler UART7_IRQHandler                  
-	def_irq_handler UART8_IRQHandler                  
-	def_irq_handler SPI4_IRQHandler            
-	def_irq_handler SPI5_IRQHandler            
-	def_irq_handler SPI6_IRQHandler            
-	def_irq_handler SAI1_IRQHandler            
-	def_irq_handler LTDC_IRQHandler            
-	def_irq_handler LTDC_ER_IRQHandler            
-	def_irq_handler DMA2D_IRQHandler            
-	def_irq_handler SAI2_IRQHandler            
-	def_irq_handler QUADSPI_IRQHandler            
-	def_irq_handler LPTIM1_IRQHandler            
-	def_irq_handler CEC_IRQHandler            
-	def_irq_handler I2C4_EV_IRQHandler            
-	def_irq_handler I2C4_ER_IRQHandler            
-	def_irq_handler SPDIF_RX_IRQHandler            
-	def_irq_handler DFSDM1_FLT0_IRQHandler            
-	def_irq_handler DFSDM1_FLT1_IRQHandler            
-	def_irq_handler DFSDM1_FLT2_IRQHandler            
-	def_irq_handler DFSDM1_FLT3_IRQHandler            
-	def_irq_handler SDMMC2_IRQHandler            
-	def_irq_handler CAN3_TX_IRQHandler            
-	def_irq_handler CAN3_RX0_IRQHandler            
-	def_irq_handler CAN3_RX1_IRQHandler            
-	def_irq_handler CAN3_SCE_IRQHandler            
-	def_irq_handler JPEG_IRQHandler            
-	def_irq_handler MDIOS_IRQHandler            
+	def_irq_handler	DEF_IRQHandler
 
 	.end
