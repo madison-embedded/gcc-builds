@@ -1,14 +1,7 @@
-/* Linker script to configure memory regions. 
- * Need modifying for a specific board. 
- *   FLASH.ORIGIN: starting address of flash
- *   FLASH.LENGTH: length of flash
- *   RAM.ORIGIN: starting address of RAM bank 0
- *   RAM.LENGTH: length of RAM bank 0
- */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x0, LENGTH = 0x20000 /* 128K */
-  RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 0x2000 /* 8K */
+RAM (rwx)	: ORIGIN = 0x20000000, LENGTH = 0x80000		/* 128K */
+FLASH (rx)	: ORIGIN = 0x00200000, LENGTH = 0x200000	/* 2048K */
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -50,8 +43,8 @@ SECTIONS
 		KEEP(*(.isr_vector))
 		*(.text*)
 
-		KEEP(*(.init))
-		KEEP(*(.fini))
+		*(.init)
+		*(.fini)
 
 		/* .ctors */
 		*crtbegin.o(.ctors)
@@ -69,7 +62,7 @@ SECTIONS
 
 		*(.rodata*)
 
-		KEEP(*(.eh_frame*))
+		*(.eh_frame*)
 	} > FLASH
 
 	.ARM.extab : 
@@ -132,25 +125,25 @@ SECTIONS
 		. = ALIGN(4);
 		/* preinit data */
 		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP(*(.preinit_array))
+		*(.preinit_array)
 		PROVIDE_HIDDEN (__preinit_array_end = .);
 
 		. = ALIGN(4);
 		/* init data */
 		PROVIDE_HIDDEN (__init_array_start = .);
-		KEEP(*(SORT(.init_array.*)))
-		KEEP(*(.init_array))
+		*(SORT(.init_array.*))
+		*(.init_array)
 		PROVIDE_HIDDEN (__init_array_end = .);
 
 
 		. = ALIGN(4);
 		/* finit data */
 		PROVIDE_HIDDEN (__fini_array_start = .);
-		KEEP(*(SORT(.fini_array.*)))
-		KEEP(*(.fini_array))
+		*(SORT(.fini_array.*))
+		*(.fini_array)
 		PROVIDE_HIDDEN (__fini_array_end = .);
 
-		KEEP(*(.jcr*))
+		*(.jcr)
 		. = ALIGN(4);
 		/* All data end */
 		__data_end__ = .;
