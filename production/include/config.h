@@ -1,6 +1,8 @@
 #ifndef _CONFIG__H
 #define _CONFIG__H
 
+#include <stdint.h>
+
 #ifndef HSE_VALUE 
 #define HSE_VALUE	((uint32_t)8000000)
 #endif

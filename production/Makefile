@@ -25,6 +25,7 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 # Objects
 OBJECTS += common/main.o 
 OBJECTS += $(PROC_DIR)/start.o
+OBJECTS += $(PROC_DIR)/system_init.o
 
 CPUDIR := include/proc
 ###############################################################################
@@ -53,7 +54,7 @@ clean:
 	rm -f *.bin *.map *.elf $(CPUDIR)
 	find . -name '*.o' -delete
 
-install:
+install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
 ###############################################################################
 
