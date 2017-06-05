@@ -7,6 +7,8 @@ PROJECT=e2c
 .DEFAULT_GOAL := $(PROJECT).bin
 PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
+DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main
+CORE=CM$(CORTEX_M)
 ###############################################################################
 
 
@@ -14,7 +16,7 @@ INCLUDES=-I include -I include/cmsis
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
 ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
-CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(INCLUDES) -Wall -Os -flto -ffunction-sections -fdata-sections
+CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -Os -flto -ffunction-sections -fdata-sections
 
 # Linker Settings
 LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
@@ -32,12 +34,7 @@ CPUDIR := include/proc
 
 
 ###############################################################################
-# Rules
-$(OBJECTS): | $(CPUDIR)
-
-$(CPUDIR):
-	ln -s ../$(PROC_DIR) $@
-
+# Source Rules
 %.o: %.S
 	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
@@ -50,11 +47,20 @@ $(PROJECT).elf: $(OBJECTS)
 $(PROJECT).bin: $(PROJECT).elf
 	$(TOOLCHAIN)objcopy -O binary $< $@
 
+# Project Rules
+$(OBJECTS): | $(CPUDIR)
+
+$(CPUDIR):
+	ln -s ../$(PROC_DIR) $@
+
 clean: 
 	rm -f *.bin *.map *.elf $(CPUDIR)
 	find . -name '*.o' -delete
 
 install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
+
+%_config:
+	@echo $@
 ###############################################################################
 
