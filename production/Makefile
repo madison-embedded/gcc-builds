@@ -56,7 +56,7 @@ $(PROJECT).bin: $(PROJECT).elf
 	$(TOOLCHAIN)objcopy -O binary $< $@
 
 clean: 
-	rm -f $(NAME)*.bin *.map *.o $(CPUDIR)
+	rm -f *.bin *.map *.elf $(CPUDIR)
 	find . -name '*.o' -delete
 ###############################################################################
 
