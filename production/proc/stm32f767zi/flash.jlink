@@ -1,0 +1,3 @@
+loadbin e2c.bin, 0x08000000
+exit
+

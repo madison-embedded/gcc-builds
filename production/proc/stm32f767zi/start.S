@@ -220,6 +220,5 @@ Default_Handler:
 	def_irq_handler	DebugMon_Handler
 	def_irq_handler	PendSV_Handler
 	def_irq_handler	SysTick_Handler
-	def_irq_handler	DEF_IRQHandler
 
 	.end

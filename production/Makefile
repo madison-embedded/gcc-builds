@@ -4,6 +4,7 @@ PROJECT=e2c
 CORTEX_M=7
 CORE=CM$(CORTEX_M)
 PROCESSOR=stm32f767zi
+PROC_DIR=proc/$(PROCESSOR)
 .PHONY: clean
 .DEFAULT_GOAL := $(PROJECT).bin
 ###############################################################################
@@ -23,14 +24,14 @@ ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
 CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(INCLUDES) -Wall -Os -flto -ffunction-sections -fdata-sections
 
 # Linker Settings
-LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -Tproc/$(PROCESSOR)/link.ld
+LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
 ###############################################################################
 
 
 ###############################################################################
 # Objects
 OBJECTS += common/main.o 
-OBJECTS += proc/$(PROCESSOR)/start.o
+OBJECTS += $(PROC_DIR)/start.o
 
 CPUDIR := include/proc
 ###############################################################################
@@ -41,7 +42,7 @@ CPUDIR := include/proc
 $(OBJECTS): | $(CPUDIR)
 
 $(CPUDIR):
-	ln -s ../proc/$(PROCESSOR) $@
+	ln -s ../$(PROC_DIR) $@
 
 %.o: %.S
 	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
@@ -58,5 +59,8 @@ $(PROJECT).bin: $(PROJECT).elf
 clean: 
 	rm -f *.bin *.map *.elf $(CPUDIR)
 	find . -name '*.o' -delete
+
+install:
+	./$(PROC_DIR)/install.sh
 ###############################################################################
 
