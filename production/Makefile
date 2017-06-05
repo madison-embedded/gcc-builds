@@ -1,18 +1,11 @@
+include makefile.conf
+
 ###############################################################################
-# Project Settings
+# Default Settings
 PROJECT=e2c
-CORTEX_M=7
-CORE=CM$(CORTEX_M)
-PROCESSOR=stm32f767zi
-PROC_DIR=proc/$(PROCESSOR)
 .PHONY: clean
 .DEFAULT_GOAL := $(PROJECT).bin
-###############################################################################
-
-
-###############################################################################
-# Configuration Definitions
-DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main -DSTM32F7 -DSTM32F767xx
+PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
 ###############################################################################
 
