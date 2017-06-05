@@ -6,5 +6,5 @@
 *.map
 *.axf
 *.swp
-production/include/proc
+include/proc
 
