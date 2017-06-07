@@ -1,0 +1,12 @@
+Currently having troubles with malloc that came from whatever arm-none-eabi-gcc linked (pcbuffer calls it).
+
+Downloaded and built newlib with recommendations from this guide:
+https://balau82.wordpress.com/2010/12/16/using-newlib-in-arm-bare-metal-programs/
+Got newlib here: https://sourceware.org/newlib/
+
+I built it and put everything that came in the arm-none-eabi folder into the assets folder here.
+
+Next steps would be to add a check for a malloc that returns null and then play with compiler settings until it works, potentially linking the recently built newlib.
+
+This guy seemed to have figured it out: https://stackoverflow.com/questions/10467244/using-newlibs-malloc-in-an-arm-cortex-m3
+

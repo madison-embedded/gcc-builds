@@ -1,0 +1,12 @@
+.;
+thumb;@mthumb
+fpu;@mfloat-abi=hard
+armv6-m;@mthumb@march=armv6s-m
+armv7-m;@mthumb@march=armv7-m
+armv7e-m;@mthumb@march=armv7e-m
+armv7-ar/thumb;@mthumb@march=armv7
+armv7e-m/softfp;@mthumb@march=armv7e-m@mfloat-abi=softfp@mfpu=fpv4-sp-d16
+armv7e-m/fpu;@mthumb@march=armv7e-m@mfloat-abi=hard@mfpu=fpv4-sp-d16
+armv7-ar/thumb/softfp;@mthumb@march=armv7@mfloat-abi=softfp@mfpu=vfpv3-d16
+armv7-ar/thumb/fpu;@mthumb@march=armv7@mfloat-abi=hard@mfpu=vfpv3-d16
+thumb/armv7-ar/fpu/vfpv3-d16/be;@mthumb@march=armv7@mfloat-abi=hard@mfpu=vfpv3-d16@mbig-endian
