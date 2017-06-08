@@ -10,3 +10,5 @@ Next steps would be to add a check for a malloc that returns null and then play 
 
 This guy seemed to have figured it out: https://stackoverflow.com/questions/10467244/using-newlibs-malloc-in-an-arm-cortex-m3
 
+this answer seems most concise
+https://answers.launchpad.net/gcc-arm-embedded/+question/453397
