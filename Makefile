@@ -16,8 +16,8 @@ CORE=CM$(CORTEX_M)
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
 ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
-CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -nostdlib
-# -Os -flto 
+CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections
+# -Os -flto -nostdlib
 
 # Linker Settings
 LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
@@ -64,11 +64,15 @@ $(CPUDIR):
 	ln -s ../$(PROC_DIR) $@
 
 clean: 
-	rm -f *.bin *.map *.elf $(CPUDIR)
+	rm -f *.bin *.map *.elf $(CPUDIR) output.txt
 	find . -name '*.o' -delete
 
 install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
+
+dump: $(PROJECT).bin
+	$(TOOLCHAIN)objdump -D $(PROJECT).elf > output.txt
+	# TODO: automatically open this? Make other rules (i.e. install) create this as well?
 
 %_config:
 	@echo $@

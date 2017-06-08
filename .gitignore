@@ -7,4 +7,5 @@
 *.axf
 *.swp
 include/proc
+output.txt
 
