@@ -18,7 +18,7 @@ CORE=CM$(CORTEX_M)
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
 CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections
-# -Os -flto -nostdlib
+# -Os -flto -nostdlib -lnosys
 
 # Linker Settings
 LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
@@ -53,7 +53,7 @@ CPUDIR := include/proc
 	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
 $(PROJECT).elf: $(OBJECTS)
-	$(TOOLCHAIN)gcc $^ $(CFLAGS) $(LFLAGS) -o $@
+	$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
 
 $(PROJECT).bin: $(PROJECT).elf
 	$(TOOLCHAIN)objcopy -O binary $< $@

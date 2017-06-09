@@ -41,9 +41,9 @@ static int usart_bufferInit(USART_TypeDef* usart) {
 	//case USART2_BASE: break;
 	case USART3_BASE:
 		if (!pc_buffer_init(&usart3_tx, BUFSIZ))
-			return false;
+			return -1;
 		if (!pc_buffer_init(&usart3_rx, BUFSIZ))
-			return false;
+			return -1;
 		break;
 	//case UART4_BASE: break;
 	//case UART5_BASE: break;
