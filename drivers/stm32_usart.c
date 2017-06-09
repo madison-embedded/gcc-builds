@@ -2,28 +2,6 @@
 
 PC_Buffer usart3_tx, usart3_rx;
 
-/* needed to retarget printf */
-/*
-FILE __stdout;
-struct __FILE {
-    int dummy;
-};
-
-int fputc(int ch, FILE *f) {
-	while (pc_buffer_full(&usart3_tx)) {;}
-	pc_buffer_add(&usart3_tx, (char) ch);
-	USB_UART->CR1 |= USART_CR1_TXEIE;
-	return 0;
-}
-
-int fgetc(FILE *f) {
-	int temp;
-	while (pc_buffer_empty(&usart3_rx)) {;}
-	pc_buffer_remove(&usart3_rx, (char*) &temp);
-	return temp;
-}
-*/
-
 static IRQn_Type uart_get_irq_num(USART_TypeDef* usart) {
    switch((uint32_t) usart) {
      case USART1_BASE: return USART1_IRQn;

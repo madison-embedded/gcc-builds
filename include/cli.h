@@ -3,6 +3,7 @@
 
 void printPrompt(void);
 void processCommand(void);
+void _ttywrch(int ch);
 
 #endif
 

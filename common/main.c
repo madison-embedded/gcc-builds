@@ -38,13 +38,14 @@ int main(void) {
 			setGreen(false);
 		}
 
-		//processCommand();
+		processCommand();
 
 		/* Blink Red LED */
 		curr = ticks / 1000;
-		if (curr != prev)
+		if (curr != prev) {
 			(curr % 2) ? 
 				setRed(true) : setRed(false);
+		}
 		prev = curr;
 	}
 }

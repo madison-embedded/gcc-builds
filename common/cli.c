@@ -40,3 +40,26 @@ void processCommand(void) {
 		printPrompt();
 	}
 }
+
+/* needed to retarget printf */
+/*
+FILE __stdout;
+struct __FILE {
+    int dummy;
+};
+
+int fputc(int ch, FILE *f) {
+	while (pc_buffer_full(&usart3_tx)) {;}
+	pc_buffer_add(&usart3_tx, (char) ch);
+	USB_UART->CR1 |= USART_CR1_TXEIE;
+	return 0;
+}
+
+int fgetc(FILE *f) {
+	int temp;
+	while (pc_buffer_empty(&usart3_rx)) {;}
+	pc_buffer_remove(&usart3_rx, (char*) &temp);
+	return temp;
+}
+*/
+
