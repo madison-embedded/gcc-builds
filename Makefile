@@ -7,6 +7,8 @@ PROJECT=e2c
 .DEFAULT_GOAL := $(PROJECT).bin
 PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
+TERMINAL=gnome-terminal
+OBJDUMP_FILE=output.txt
 DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
 ###############################################################################
@@ -15,7 +17,6 @@ CORE=CM$(CORTEX_M)
 ###############################################################################
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
-ARCH_FLAGS=-mthumb -mcpu=cortex-m$(CORTEX_M)
 CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections
 # -Os -flto -nostdlib
 
@@ -60,6 +61,9 @@ $(PROJECT).bin: $(PROJECT).elf
 # Project Rules
 $(OBJECTS): | $(CPUDIR)
 
+$(OBJDUMP_FILE): $(PROJECT).bin
+	$(TOOLCHAIN)objdump -D $(PROJECT).elf > $(OBJDUMP_FILE)
+
 $(CPUDIR):
 	ln -s ../$(PROC_DIR) $@
 
@@ -70,9 +74,11 @@ clean:
 install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
 
-dump: $(PROJECT).bin
-	$(TOOLCHAIN)objdump -D $(PROJECT).elf > output.txt
-	# TODO: automatically open this? Make other rules (i.e. install) create this as well?
+debug: $(PROJECT).bin
+	./$(PROC_DIR)/debug.sh
+
+dump: $(OBJDUMP_FILE)
+	$(TERMINAL) -e "vim $(OBJDUMP_FILE)"
 
 %_config:
 	@echo $@

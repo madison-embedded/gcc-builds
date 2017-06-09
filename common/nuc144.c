@@ -84,7 +84,7 @@ bool board_init(void) {
 	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_TX, 7); /* TODO: define this somewhere? */
 	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_RX, 7); /* TODO: define this somewhere? */
 	init_regs[0] = USART_CR1_RXNEIE;
-	usart_config(USB_UART, HSI_SRC, init_regs, DEBUG_BAUD, true);
+	//usart_config(USB_UART, HSI_SRC, init_regs, DEBUG_BAUD, true);
 
 	return true;
 }
