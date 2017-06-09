@@ -3,6 +3,7 @@
 PC_Buffer usart3_tx, usart3_rx;
 
 /* needed to retarget printf */
+/*
 FILE __stdout;
 struct __FILE {
     int dummy;
@@ -21,6 +22,7 @@ int fgetc(FILE *f) {
 	pc_buffer_remove(&usart3_rx, (char*) &temp);
 	return temp;
 }
+*/
 
 static IRQn_Type uart_get_irq_num(USART_TypeDef* usart) {
    switch((uint32_t) usart) {

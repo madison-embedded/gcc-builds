@@ -19,6 +19,7 @@ typedef struct {
 	uint16_t buffer_SIZE, message_available;
 	char *array;
 } PC_Buffer;
+extern PC_Buffer usart3_tx, usart3_rx;
 /******************************************************************************/
 /******************************************************************************/
 
