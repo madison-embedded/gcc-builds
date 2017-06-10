@@ -9,6 +9,7 @@ void setRed(bool state);
 void setBlue(bool state);
 void setGreen(bool state);
 void setLEDs(bool state);
+void setLED(int index, bool state);
 bool readButton(void);
 
 /*****************************************************************************/

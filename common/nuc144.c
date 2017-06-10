@@ -1,15 +1,9 @@
 #include <stdbool.h>
 #include "gpio.h"
 #include "usart.h"
-#include "timer.h"
 #include "config.h"
 
-/* instantiate UART & button + LEDs no matter what */
-bool board_init(void) {
-	
-	uint32_t init_regs[3] = {0, 0, 0};
-
-	/*************************************************************************/
+void setup_osc(void) {
 
 	/* clear PLL_ON, PLLIS2_ON, PLLSAI_ON, HSE_ON */
 	RCC->CR &= ~(RCC_CR_PLLSAION | RCC_CR_PLLI2SON | RCC_CR_PLLON | RCC_CR_HSEON);
@@ -63,7 +57,14 @@ bool board_init(void) {
 		
 	/* setup SysTick timer, 1ms interrupts */
 	SysTick_Config(SystemCoreClock / 1000);
-	/*************************************************************************/
+}
+
+/* static initializations that don't fail */
+void early_init(void) {
+
+	uint32_t init_regs[3] = {0, 0, 0};
+
+	setup_osc();
 	
 	/* LEDs */
 	gpio_setClock(LED_GPIO, true);
@@ -85,6 +86,10 @@ bool board_init(void) {
 	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_RX, 7); /* TODO: define this somewhere? */
 	init_regs[0] = USART_CR1_RXNEIE;
 	usart_config(USB_UART, HSI_SRC, init_regs, DEBUG_BAUD, true);
+}
+
+/* instantiate UART & button + LEDs no matter what */
+bool board_init(void) {
 
 	return true;
 }
@@ -110,20 +115,16 @@ void setLEDs(bool state) {
 	setGreen(state);
 }
 
-inline bool readButton(void) {
-	return gpio_readPin(GPIOC, BUTTON_PIN);
+void setLED(int index, bool state) {
+	switch (index) {
+		case 0: setRed(state); break;
+		case 1: setBlue(state); break;
+		case 2: setGreen(state); break;
+	}
 }
 
-void fault(void) {
-	
-	setRed(true);
-	
-	while (1) {
-		setBlue(true);
-		delay_ms(1000);
-		setBlue(false);
-		delay_ms(1000);
-	}
+inline bool readButton(void) {
+	return gpio_readPin(GPIOC, BUTTON_PIN);
 }
 
 /* experimenting with oscillator pins
@@ -136,3 +137,4 @@ void fault(void) {
  * gpio_setMode(GPIOA, 8, ALT);
  * gpio_setMode(GPIOC, 9, ALT);
  */
+

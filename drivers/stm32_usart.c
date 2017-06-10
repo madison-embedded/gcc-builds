@@ -165,15 +165,10 @@ void USART3_IRQHandler(void) {
             if (!pc_buffer_full(&usart3_rx)) pc_buffer_add(&usart3_rx, curr);
 			if (!pc_buffer_full(&usart3_tx)) {
 				pc_buffer_add(&usart3_tx, curr);
-				if (curr == '\r') pc_buffer_add(&usart3_tx, '\n');
+				//if (curr == '\r') pc_buffer_add(&usart3_tx, '\n');
 				USART3->CR1 |= USART_CR1_TXEIE;
 			}
         }
-		
-		/* echo character to console */
-		if (!pc_buffer_full(&usart3_tx)) {
-
-		}
 	}
 	
 	/* character ready to be sent */

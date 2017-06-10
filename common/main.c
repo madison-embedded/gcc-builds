@@ -1,17 +1,26 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include "config.h"
 #include "cli.h"
+#include "timer.h"
 
-void print_post_info(void) {
+void fault(void) {
+	
+	setLED(0, true);
 
+	printf("Entered fault!\r\n");
+	printf("TODO: add arguments to this function to trace fault.\r\n");
+	
+	while (1) {
+		setLED(1, true);
+		delay_ms(1000);
+		setLED(1, false);
+		delay_ms(1000);
+	}
 }
 
-bool test_malloc(void) {
-	void *malloc_test;
-	malloc_test = malloc(4);
-	if (!malloc_test) return false;
-	free(malloc_test);
-	return true;
+void print_post_info(void) {
+	printf("SystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock);
+	printPrompt();
 }
 
 int main(void) {
@@ -21,21 +30,18 @@ int main(void) {
 	if (!board_init())
 		fault();
 
-	if (!test_malloc())
-		fault();
-
 	print_post_info();
 
 	while(1) {
 
 		/* Handle Button */
 		if (readButton()) {
-			setBlue(true);
-			setGreen(true);
+			setLED(1, true);
+			setLED(2, true);
 		}
 		else {
-			setBlue(false);
-			setGreen(false);
+			setLED(1, false);
+			setLED(2, false);
 		}
 
 		processCommand();
@@ -44,7 +50,7 @@ int main(void) {
 		curr = ticks / 1000;
 		if (curr != prev) {
 			(curr % 2) ? 
-				setRed(true) : setRed(false);
+				setLED(0, true) : setLED(0, false);
 		}
 		prev = curr;
 	}
