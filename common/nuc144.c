@@ -65,7 +65,11 @@ void early_init(void) {
 	uint32_t init_regs[3] = {0, 0, 0};
 
 	setup_osc();
-	
+
+	/* Disables Caches */
+	//SCB_DisableICache();
+	//SCB_DisableDCache();
+
 	/* LEDs */
 	gpio_setClock(LED_GPIO, true);
 	gpio_setMode(LED_GPIO, GREEN_PIN, OUTPUT);
@@ -90,6 +94,8 @@ void early_init(void) {
 
 /* instantiate UART & button + LEDs no matter what */
 bool board_init(void) {
+
+	early_init();
 
 	return true;
 }

@@ -14,6 +14,15 @@
                                        |(__STM32F7_CMSIS_VERSION_SUB2 << 8 )\
                                        |(__STM32F7_CMSIS_VERSION))
 
+
+inline static void disable_interrupts(void) {
+	asm("cpsid if");
+}
+
+inline static void enable_interrupts(void) {
+	asm("cpsie if");
+}
+
 #if defined(STM32F722xx)
 #include "stm32f722xx.h"
 #elif defined(STM32F723xx)
