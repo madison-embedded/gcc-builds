@@ -14,15 +14,6 @@
                                        |(__STM32F7_CMSIS_VERSION_SUB2 << 8 )\
                                        |(__STM32F7_CMSIS_VERSION))
 
-
-inline static void disable_interrupts(void) {
-	asm("cpsid if");
-}
-
-inline static void enable_interrupts(void) {
-	asm("cpsie if");
-}
-
 #if defined(STM32F722xx)
 #include "stm32f722xx.h"
 #elif defined(STM32F723xx)
@@ -63,12 +54,6 @@ typedef enum
   ENABLE = !DISABLE
 } FunctionalState;
 #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
-
-typedef enum 
-{
-  ERROR = 0, 
-  SUCCESS = !ERROR
-} ErrorStatus;
 
 #define SET_BIT(REG, BIT)     ((REG) |= (BIT))
 #define CLEAR_BIT(REG, BIT)   ((REG) &= ~(BIT))

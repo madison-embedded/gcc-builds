@@ -1,48 +1,55 @@
 #include <stdio.h>
+#include <string.h>
 #include "config.h"
 #include "pcbuffer.h"
+#include "cli.h"
 
 char buffer[BUFSIZ];
-
-int _write(int fd, const void *buf, size_t count) {
-	for (fd = 0; fd < count; fd++) {
-		while (pc_buffer_full(&usart3_tx)) {;}
-		disable_interrupts();
-		pc_buffer_add(&usart3_tx, *((char *) buf++));
-		enable_interrupts();
-	}
-	USB_UART->CR1 |= USART_CR1_TXEIE;
-	return count;
-}
-
-int _read(int fd, const void *buf, size_t count) {
-	for (fd = 0; fd < count; fd++) {
-		while (pc_buffer_empty(&usart3_rx)) {;}
-		disable_interrupts();
-		pc_buffer_remove(&usart3_rx, (char *) buf++);
-		enable_interrupts();
-	}
-	return count;
-}
-
-void _ttywrch(int ch) {
-	while (pc_buffer_full(&usart3_tx)) {;}
-	disable_interrupts();
-	pc_buffer_add(&usart3_tx, (char) ch);
-	enable_interrupts();
-	USB_UART->CR1 |= USART_CR1_TXEIE;
-}
 
 inline void printPrompt(void) {
 	printf("=> ");
 	fflush(stdout);
 }
 
+command_error test1(int argc, char *argv[]) {
+	printf("ran test1\r\n");
+	return SUCCESS;
+}
+
+command_error test2(int argc, char *argv[]) {
+	printf("ran test2\r\n");
+	return SUCCESS;
+}
+
+const command_t commands[] = {
+	COMMAND_ENTRY("test1", "test1 usage", "test1 help", test1)
+	COMMAND_ENTRY("test2", "test2 usage", "test2 help", test2)
+};
+
 void processCommand(void) {
+	unsigned int i;
+	command_error result;
+
 	if (pc_buffer_getMessage(&USB_RX, buffer, BUFSIZ)) {
+
 		if (buffer[0] != '\0') {
-			/* need to pull the characters out of the buffer */
-			printf("Got: %s\r\n", buffer);
+
+			/* need to parse buffer into an array of arguments */
+
+			for (i = 0; i < sizeof(commands)/sizeof(command_t); i++) {
+				if (!strcmp(buffer, commands[i].name)) {
+					result = commands[i].fp(1, (char**) &buffer);
+					if (result == FAIL)
+						printf("%s failed\r\n", buffer);
+					if (result == USAGE)
+						printf("%s usage: %s\r\n", buffer, commands[i].usage);
+					break;
+				}
+			}
+
+			if (i == sizeof(commands)/sizeof(command_t))
+				printf("unknown command: %s\r\n", buffer);
+
 		}
 		printPrompt();
 	}
