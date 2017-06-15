@@ -32,6 +32,8 @@ Without the hand-holding (and bottlenecking!!!) of a licensed IDE or Eclipse por
   * A toolchain argument needs to be omitted
   * An additional target is being created
 
+[Video tutorials](https://www.youtube.com/playlist?list=PLTPrK33wiSskApHw-Tc647bs5f7fbaD24) describing how this project was set up and demonstrating the workflow also exist.
+
 ## Development Boards Supported
 
   * [STM32 Nucleo 144](http://www.st.com/en/evaluation-tools/nucleo-f767zi.html) (STM32F767ZI)
@@ -58,7 +60,13 @@ Without the hand-holding (and bottlenecking!!!) of a licensed IDE or Eclipse por
 
   * TODO: multi-board & processor support.
 
-## Missing Features
+## Action Items
+
+Tasks will be tracked and distributed using GitHub's issue system. Issues in most cases will be assigned to one or more individuals at a time but the system works best with active discussion and participation.
+
+## Missing Build Features
+
+Low priority or not planned.
 
   * Multi-target file structure with make `XXXXX_config` (or other) target configuration options
   * Thorough, multi-platform development instructions
@@ -66,5 +74,4 @@ Without the hand-holding (and bottlenecking!!!) of a licensed IDE or Eclipse por
   * Build timestamp with commit/tag String + Project name banner
   * Git commit conventions established
   * Commenting & code style conventions established
-  * Separate documentation repository established
 
