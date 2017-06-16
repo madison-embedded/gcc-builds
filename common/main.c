@@ -44,7 +44,7 @@ int main(void) {
 			setLED(2, false);
 		}
 
-		processCommand();
+		check_input();
 
 		/* Blink Red LED */
 		curr = ticks / 1000;

@@ -11,24 +11,30 @@ inline void printPrompt(void) {
 	fflush(stdout);
 }
 
-command_error test1(int argc, char *argv[]) {
+command_status test1(int argc, char *argv[]) {
 	printf("ran test1\r\n");
 	return SUCCESS;
 }
+//COMMAND_ENTRY("test1", "test1 usage", "test1 help", test1)
 
-command_error test2(int argc, char *argv[]) {
+command_status test2(int argc, char *argv[]) {
 	printf("ran test2\r\n");
 	return SUCCESS;
 }
+//COMMAND_ENTRY("test2", "test2 usage", "test2 help", test2)
+
+extern const command_t cmd_do_md, cmd_do_mw;
 
 const command_t commands[] = {
-	COMMAND_ENTRY("test1", "test1 usage", "test1 help", test1)
-	COMMAND_ENTRY("test2", "test2 usage", "test2 help", test2)
+	cmd_test1,
+	cmd_test2,
+	//cmd_do_md,
+	//cmd_do_mw
 };
 
-void processCommand(void) {
+void check_input(void) {
 	unsigned int i;
-	command_error result;
+	command_status result;
 
 	if (pc_buffer_getMessage(&USB_RX, buffer, BUFSIZ)) {
 

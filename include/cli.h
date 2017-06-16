@@ -5,31 +5,26 @@ typedef enum {
 	SUCCESS = 0,
 	USAGE,
 	FAIL
-} command_error;
+} command_status;
 
 typedef struct command {
 	const char *name;
 	const char *usage;
 	const char *help;
-	command_error (*fp)(int argc, char *argv[]);
+	command_status (*fp)(int argc, char *argv[]);
 	
 } command_t;
 
-command_error example_command(int argc, char *argv[]);
-
 void printPrompt(void);
-void processCommand(void);
-void _ttywrch(int ch);
+void check_input(void);
 
 #define COMMAND_ENTRY(_name, _usage, _help, _fp) \
-	{\
-	 	.name = _name,\
-		.usage = _usage,\
-		.help = _help,\
-		.fp = _fp\
-	},
-
-extern const command_t commands[];
+const command_t cmd_##_fp = {\
+ 	.name = _name,\
+	.usage = _usage,\
+	.help = _help,\
+	.fp = _fp\
+};
 
 #endif
 
