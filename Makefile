@@ -33,6 +33,7 @@ OBJECTS += common/pcbuffer.o
 
 OBJECTS += common/cli.o
 OBJECTS += common/cmd_mem.o
+OBJECTS += common/cmd_boot.o
 
 OBJECTS += drivers/timer.o
 
