@@ -19,7 +19,10 @@ void fault(void) {
 }
 
 void print_post_info(void) {
-	printf("\rSystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock / 1000);
+	printf("\r----------------------------------------------------------------------\r\n");
+	printf("SystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock / 1000);
+	printf("Use 'help' for a list of commands.\r\n");
+	printf("----------------------------------------------------------------------\r\n");
 	printPrompt();
 }
 

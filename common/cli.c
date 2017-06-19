@@ -5,50 +5,11 @@
 #include "cli.h"
 
 char buffer[BUFSIZ];
-
-inline void printPrompt(void) {
-	printf("=> ");
-	fflush(stdout);
-}
-
-command_status do_help(int argc, char *argv[]) {
-	printf("help not implemented");
-	return SUCCESS;
-}
-
-extern command_status do_md(int argc, char *argv[]);
-extern command_status do_mw(int argc, char *argv[]);
-extern command_status do_boot(int argc, char *argv[]);
-
-const command_t commands[] = {
-	COMMAND_ENTRY("help", "", "", do_help)
-	COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
-	COMMAND_ENTRY("mw", "mw <addr> <value> <count>", "Write data memory contents.", do_mw)
-	COMMAND_ENTRY("boot", "boot <routine>", "Run ", do_boot)
-};
-
-int get_command_index(char *command) {
-	int i;
-
-	printf("num commands: %d\r\n", sizeof(commands)/sizeof(command_t));
-
-	for (i = 0; i < sizeof(commands)/sizeof(command_t); i++) {
-		printf("comparing %s and %s\r\n", command, commands[i].name);
-		if (!strncmp(command, commands[i].name, strlen(commands[i].name))) {
-			printf("found!!\r\n");
-			return i;
-		}
-	}
-
-	printf("function failed\r\n");
-	
-	while(1) {;}
-
-	return -1;
-}
+command_t *commands = (command_t *) &__COMMANDS_START;
 
 void check_input(void) {
-	unsigned int i, args_index = 0, initial_buf_len, command_index;
+	unsigned int i, args_index = 0, initial_buf_len;
+	int command_index;
 	command_status result;
 	char *args[MAX_ARGS];
 
@@ -67,16 +28,8 @@ void check_input(void) {
 				if (args_index >= MAX_ARGS) break;
 			}
 
-			/* temporary */
-			printf("%d arguments given: ", args_index);
-			for (i = 0; i < args_index; i++)
-				printf("%s, ", args[i]);
-			printf("\r\n");
-
-			/* search argv[0] for matching command name */
+			/* search for matching command name */
 			command_index = get_command_index(args[0]);
-
-			printf("%d back\r\n", command_index);
 
 			if (command_index >= 0) {
 				result = commands[command_index].fp(args_index, args);
@@ -91,4 +44,33 @@ void check_input(void) {
 		printPrompt();
 	}
 }
+
+inline void printPrompt(void) {
+	printf("=> ");
+	fflush(stdout);
+}
+
+int get_command_index(char *command) {
+	int i;
+	for (i = 0; i < NUM_COMMANDS; i++)
+		if (!strncmp(command, commands[i].name, strlen(commands[i].name)))
+			return i;
+	return -1;
+}
+
+command_status do_help(int argc, char *argv[]) {
+	int i, command_index;
+	if (argc == 1)
+		for (i = 0; i < NUM_COMMANDS; i++)
+			printf("%s\t- %s\r\n", commands[i].name, commands[i].help);
+	else {
+		command_index = get_command_index(argv[1]);
+		if (command_index >= 0) 
+			printf("%s\r\n", commands[command_index].help);
+		else
+			printf("'%s' not a command\r\n", argv[1]);
+	}
+	return SUCCESS;
+}
+COMMAND_ENTRY("help", "help <command_name>", "Display a command's help message.", do_help)
 

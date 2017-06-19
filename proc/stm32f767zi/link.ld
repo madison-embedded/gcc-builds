@@ -43,6 +43,11 @@ SECTIONS
 		KEEP(*(.isr_vector))
 		*(.text*)
 
+		/* CLI commands section */
+		__COMMANDS_START = .;
+		KEEP(*(.commands))
+		__COMMANDS_END = .;
+
 		*(.init)
 		*(.fini)
 
