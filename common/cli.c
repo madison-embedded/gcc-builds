@@ -39,7 +39,7 @@ void check_input(void) {
 					printf("%s usage: %s\r\n", buffer, commands[command_index].usage);
 			}
 			else
-				printf("unknown command: %s\r\n", buffer);
+				printf("unknown command: '%s' - try 'help'\r\n", buffer);
 		}
 		printPrompt();
 	}
