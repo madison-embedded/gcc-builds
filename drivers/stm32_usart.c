@@ -150,8 +150,12 @@ void USART3_IRQHandler(void) {
 		if (curr == 0x08 || curr == 0x7F) {
             if (!pc_buffer_empty(&usart3_rx)) {
 				usart3_rx.produce_count--;
-				
+
 				/* delete the character in console */
+				if (!pc_buffer_full(&usart3_tx))
+					pc_buffer_add(&usart3_tx, curr);
+				if (!pc_buffer_full(&usart3_tx))
+					pc_buffer_add(&usart3_tx, ' ');
 				if (!pc_buffer_full(&usart3_tx)) {
 					pc_buffer_add(&usart3_tx, curr);
 					USART3->CR1 |= USART_CR1_TXEIE;
