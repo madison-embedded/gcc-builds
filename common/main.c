@@ -3,21 +3,6 @@
 #include "cli.h"
 #include "timer.h"
 
-void fault(void) {
-	
-	setLED(0, true);
-
-	printf("Entered fault!\r\n");
-	printf("TODO: add arguments to this function to trace fault.\r\n");
-	
-	while (1) {
-		setLED(1, true);
-		delay_ms(1000);
-		setLED(1, false);
-		delay_ms(1000);
-	}
-}
-
 void print_post_info(void) {
 	printf("\r----------------------------------------------------------------------\r\n");
 	printf("SystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock / 1000);

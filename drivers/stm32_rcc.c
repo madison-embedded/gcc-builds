@@ -1,10 +1,5 @@
 #include "rcc.h"
 
-/* can be used to roughly keep track of time, implement timeouts and blocking delays */
-/* this 32-bit count overflows after 49.7 days */
-volatile unsigned int ticks = 0;
-void SysTick_Handler(void) { ticks++; }
-
 /* TODO: check if trying to clear system clock source? */
 bool rcc_setClk(clk_src_t clk, bool state) {
 	uint32_t set_mask, ready_mask, result;
