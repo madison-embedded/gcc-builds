@@ -30,6 +30,7 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 OBJECTS += common/main.o 
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
+OBJECTS += common/handlers.o
 
 OBJECTS += common/cli.o
 OBJECTS += common/cmd_mem.o
