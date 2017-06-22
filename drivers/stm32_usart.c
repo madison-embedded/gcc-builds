@@ -139,10 +139,11 @@ int usart_config(USART_TypeDef* usart, USART_CLK_SRC src, uint32_t control[3], u
 
 void USART3_IRQHandler(void) {
 	
-	static char prev = '\0', curr = '\0';
+	static char prev_2 = '\0', prev = '\0', curr = '\0';
 	
 	/* character received */
 	if (USART3->ISR & USART_ISR_RXNE) {
+		prev_2 = prev;
 		prev = curr;
 		curr = USART3->RDR;
 		
@@ -163,8 +164,8 @@ void USART3_IRQHandler(void) {
 			}
 		}
 		
-		/* otherwise add the character */
-        else {
+		/* otherwise add the character, don't allow arrow keys or other escaped characters */
+        else if ((prev != 0x5B && prev_2 != 0x1B) && curr != 0x1B && curr != 0x5B) {
             if (NEWLINE_GUARD) usart3_rx.message_available++;
             if (!pc_buffer_full(&usart3_rx)) pc_buffer_add(&usart3_rx, curr);
 			if (!pc_buffer_full(&usart3_tx)) {
