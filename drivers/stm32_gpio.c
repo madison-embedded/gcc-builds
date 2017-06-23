@@ -116,3 +116,71 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val) {
 	port->AFR[pin / 8] |= val << ((pin % 8) * 4);
 	return 0;
 }
+
+
+/*****************************************************************************/
+/*                        Welcome to Cooper's Code                           */
+/*****************************************************************************/
+/* needs to be tested */
+
+GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin){
+    return port->MODER & 0x3 << (pin*2);
+}
+
+GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin){
+    return port->OSPEEDR & 0x3 << (pin*2);
+}
+
+GPIO_PULLUP_STATE gpio_getPullupState(GPIO_TypeDef* port, uint8_t pin){
+    return port->PUPDR & 0x3 << (pin*2);
+}
+
+bool gpio_getPinState(GPIO_TypeDef* port, uint8_t pin){ 
+    return port->BSRR &  0x1 << pin;
+}
+
+int gpio_getAlternateFunc(GPIO_TypeDef* port, uint8_t pin){
+    return 	port->AFR[pin / 8] & 0xF << ((pin % 8) * 4);
+}
+
+void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio){
+gpio -> pin = pin;
+gpio -> state = gpio_getPinState( port, pin);
+gpio -> mode = gpio_getMode(port, pin);
+gpio -> speed = gpio_getSpeed(port, pin);
+gpio -> pullup = gpio_getPullupState(port, pin);
+}
+
+
+void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
+    printf("Pin %d \t", pin);
+    printf("Port %c \n", port);
+    if (gpio_getMode(port, pin)==OUTPUT)
+        printf("OUTPUTTING %d \t", gpio_getPinState(port, pin));
+    else if(gpio_getMode(port, pin)==INPUT)
+        printf("INPUTTING %d \t", gpio_readPin(port, pin));
+    else if(gpio_getMode(port, pin)==ALT)
+        printf("ALTERNATE TODO \t");
+
+    else if(gpio_getMode(port, pin)==ANALOG)
+        printf("ANALOG TODO \t");
+
+    printf("SPEED %d \t" ,gpio_getSpeed);
+    printf("PULLUP %d\r\n", gpio_getPullupState);
+
+}
+void gpio_printPortInfo(GPIO_TypeDef* port, uint8_t pin){
+    int i;
+    for (i=0; i<16; i++)
+        gpio_printPinInfo(port, i);
+
+}
+void gpio_printAllPinInfo(GPIO_TypeDef* port, uint8_t pin){
+/* TODO not sure best way to iterate through ports*/ 
+
+}
+
+
+
+
+
