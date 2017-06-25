@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 #include "nuc144.h" /* TODO: make this conditional */
-#include "proc/defs.h" /* TODO: should this main processor header file have this generic name or should it be generated ?*/
-
+#include "proc/defs.h" /* TODO: should this main processor header file have this generic name or should it be generated? */
 
 /******************************************************************************/
 /*                           Utility Definitions                              */
@@ -37,6 +36,8 @@ extern volatile unsigned int ticks;
 extern void SystemCoreClockUpdate(void);
 extern const uint8_t AHBPrescTable[16];
 extern const uint8_t APBPrescTable[8];
+#define BOARD "STM32 Nucleo144 F767ZI"
+#define PROCESSOR "STM32F767ZI"
 /******************************************************************************/
 /******************************************************************************/
 

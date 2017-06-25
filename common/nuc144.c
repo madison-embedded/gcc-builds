@@ -39,12 +39,10 @@ void setup_osc(void) {
 	RCC->CFGR |= RCC_CFGR_HPRE_DIV1;		/* AHB prescalar set to 0 */
 		
 	/* enable high-speed external oscillator and PLL */
- 	rcc_setClk(HSE, true);
- 	rcc_setClk(PLL, true);
+ 	rcc_setClk(HSE, true); rcc_setClk(PLL, true);
 		
 	/* switch to PLL as system clock, disable high-speed internal */
-	rcc_changeSysClockSrc(PLL);
- 	rcc_setClk(HSI, false);
+	rcc_changeSysClockSrc(PLL); rcc_setClk(HSI, false);
 		
 	/* update core clock variable */
 	SystemCoreClockUpdate();
