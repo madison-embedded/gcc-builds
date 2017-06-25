@@ -7,10 +7,13 @@ const char *clk_src_strings[] = {
 	"HSI", "HSE", "PLL", "PLLSAI", "PLLI2S", "LSI", "LSE"
 };
 
-/* TODO: check if trying to clear system clock source? */
 bool rcc_setClk(clk_src_t clk, bool state) {
 	uint32_t set_mask, ready_mask, result;
 	__IO uint32_t *reg;
+
+	/* don't try to clear the system clock source */
+	if (clk == rcc_get_SysClockSrc())
+		return false;
 	
 	switch (clk) {
 		
@@ -63,9 +66,9 @@ bool rcc_setClk(clk_src_t clk, bool state) {
 		
 			/* if setting, set bypass bit first */
 			if (state)
-				*reg = (HSE_BYP) ? 
-					(*reg | RCC_CR_HSEBYP) : 
-					(*reg & ~RCC_CR_HSEBYP);
+				*reg = (LSE_BYP) ? 
+					(*reg | RCC_BDCR_LSEBYP) : 
+					(*reg & ~RCC_BDCR_LSEBYP);
 			break;
 			
 		default: return false;
@@ -84,6 +87,9 @@ bool rcc_setClk(clk_src_t clk, bool state) {
 	
 	return true;
 }
+
+int rcc_getHSEBYP(void) { return RCC->CR & RCC_CR_HSEBYP; }
+int rcc_getLSEBYP(void) { return RCC->BDCR & RCC_BDCR_LSEBYP; }
 
 int rcc_getClockState(clk_src_t clk) {
 	switch (clk) {

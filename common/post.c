@@ -9,16 +9,16 @@ void print_post_info(void) {
 	printf("----------------------------------------------------------------------\r\n");
 	for (i = 0; i < NUM_CLK_SRCS; i++) {
 		printf("%s:\t%s", clk_src_strings[i], rcc_getClockState((clk_src_t) i) ? "ON" : "OFF");
-		if (i == HSE) printf("\t(%lu Hz)", HSE_VALUE);
+		if (i == HSE) printf("\t(%lu Hz), bypass %s", HSE_VALUE, rcc_getHSEBYP() ? "on" : "off");
 		if (i == HSI) printf("\t(%lu Hz)", HSI_VALUE);
-		if (i == LSE) printf("\t(%lu Hz)", LSE_VALUE);
+		if (i == LSE) printf("\t(%lu Hz), bypass %s", LSE_VALUE, rcc_getLSEBYP() ? "on" : "off");
 		if (i == PLL) printf("\t(source: %s)", clk_src_strings[rcc_get_PLLClockSrc()]);
 		printf("\r\n");
 	}
 
-	printf("SYSCLK source:\t%s\r\n", clk_src_strings[rcc_get_SysClockSrc()]);
-
-	printf("SystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock / 1000);
+	printf("SYSCLK:\t%lu Hz (source: %s)\r\n", SystemCoreClock, clk_src_strings[rcc_get_SysClockSrc()]);
+	printf("APB1:\t%lu Hz\r\n", APB1_F);
+	printf("APB2:\t%lu Hz\r\n", APB2_F);
 	printf("Use 'help' for a list of commands.\r\n");
 	printf("----------------------------------------------------------------------\r\n\r\n");
 }
