@@ -28,6 +28,7 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 ###############################################################################
 # Global Objects
 OBJECTS += common/main.o 
+OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
 OBJECTS += common/handlers.o

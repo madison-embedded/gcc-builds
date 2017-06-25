@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <stdbool.h>
+#include "proc/defs.h"
 #include "rcc.h"
 
 /* TODO: check if trying to clear system clock source? */
@@ -72,23 +75,58 @@ bool rcc_setClk(clk_src_t clk, bool state) {
 	do {
 		result = (state) ?
 			(*reg & ready_mask) :	/* turn on  = wait for bit to be set	*/
-			~(*reg & ready_mask);	/* turn off = wait for bit to cleared	*/
-	} while(result);
+			!(*reg & ready_mask);	/* turn off = wait for bit to cleared	*/
+	} while(!result);
 	
 	return true;
 }
 
+int rcc_getClockState(clk_src_t clk) {
+	switch (clk) {
+		case HSI: return RCC->CR & RCC_CR_HSIRDY; break;
+		case HSE: return RCC->CR & RCC_CR_HSERDY; break;
+		case PLL: return RCC->CR & RCC_CR_PLLRDY; break;
+		case PLLSAI: return RCC->CR & RCC_CR_PLLSAIRDY; break;
+		case PLLI2S: return RCC->CR & RCC_CR_PLLI2SRDY; break;
+		case LSI: return RCC->CSR & RCC_CSR_LSIRDY; break;
+		case LSE: return RCC->BDCR & RCC_BDCR_LSERDY; break;
+	}
+	return 0;
+}
+
 bool rcc_changeSysClockSrc(clk_src_t clk) {
-	//uint32_t set_mask, ready_mask;
+	uint32_t set_mask, ready_mask;
+
+	if (!rcc_getClockState(clk))
+		return false;
 	
 	switch (clk) {
-		case HSI: break;
-		case HSE: break;
-		case PLL: break;
+		case HSI:
+			set_mask = RCC_CFGR_SW_HSI;
+			ready_mask = RCC_CFGR_SWS_HSI;
+			break;
+		case HSE:
+			set_mask = RCC_CFGR_SW_HSE;
+			ready_mask = RCC_CFGR_SWS_HSE;
+			break;
+		case PLL:
+			set_mask = RCC_CFGR_SW_PLL;
+			ready_mask = RCC_CFGR_SWS_PLL;
+			break;
 		default: return false;
 	}
-	
+	RCC->CFGR |= set_mask;
+	while (!(RCC->CFGR & ready_mask)) {;}
 	return true;
+}
+
+clk_src_t rcc_get_SysClockSrc(void) {
+	switch (RCC->CFGR & RCC_CFGR_SWS_Msk) {
+		case RCC_CFGR_SWS_HSI: return HSI;
+		case RCC_CFGR_SWS_HSE: return HSE;
+		case RCC_CFGR_SWS_PLL: return PLL;
+	}
+	return PLLI2S; /* no good way of indicating error */
 }
 
 void rcc_setPLLs() {

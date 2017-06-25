@@ -1,15 +1,9 @@
 #include <stdio.h>
-#include "config.h"
+//#include "config.h"
 #include "cli.h"
 #include "timer.h"
 
-void print_post_info(void) {
-	printf("\r----------------------------------------------------------------------\r\n");
-	printf("SystemCoreClock: %u kHz\r\n", (unsigned int) SystemCoreClock / 1000);
-	printf("Use 'help' for a list of commands.\r\n");
-	printf("----------------------------------------------------------------------\r\n");
-	printPrompt();
-}
+extern void print_post_info(void);
 
 int main(void) {
 
@@ -19,6 +13,7 @@ int main(void) {
 		fault();
 
 	print_post_info();
+	printPrompt();
 
 	while(1) {
 

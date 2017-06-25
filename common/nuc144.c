@@ -2,14 +2,13 @@
 #include "gpio.h"
 #include "usart.h"
 #include "config.h"
+#include "rcc.h"
 
 void setup_osc(void) {
 
 	/* clear PLL_ON, PLLIS2_ON, PLLSAI_ON, HSE_ON */
-	RCC->CR &= ~(RCC_CR_PLLSAION | RCC_CR_PLLI2SON | RCC_CR_PLLON | RCC_CR_HSEON);
-	
-	/* wait for those to be unlocked */
-	while (RCC->CR & (RCC_CR_PLLSAIRDY | RCC_CR_PLLI2SRDY | RCC_CR_PLLRDY | RCC_CR_HSERDY)) {;}
+ 	rcc_setClk(PLL, false); rcc_setClk(HSE, false);
+	rcc_setClk(PLLI2S, false); rcc_setClk(PLLSAI, false);
 	
 	/* configure PLLs */
 	RCC->PLLCFGR = 0x24003010;	/* set PLL bits to default	*/
@@ -39,18 +38,13 @@ void setup_osc(void) {
 	RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;		/* APB1 (low speed, can't exceed 45 MHz) clock divided by 4 */
 	RCC->CFGR |= RCC_CFGR_HPRE_DIV1;		/* AHB prescalar set to 0 */
 		
-	/* enable high-speed external oscillator */
-	RCC->CR |= RCC_CR_HSEBYP;					/* set HSE_BYP, nucleo 144 uses 8 MHz signal from onboard ST-Link */
-	RCC->CR |= RCC_CR_HSEON;					/* set HSE_ON to enable this clock source */
-	while (!(RCC->CR & (RCC_CR_HSERDY))) {;}	/* poll HSE_RDY */
+	/* enable high-speed external oscillator and PLL */
+ 	rcc_setClk(HSE, true);
+ 	rcc_setClk(PLL, true);
 		
-	/* enable PLL */
-	RCC->CR |= RCC_CR_PLLON;					/* set PLL_ON	*/
-	while (!(RCC->CR & (RCC_CR_PLLRDY))) {;}	/* poll PLL_RDY	*/
-		
-	/* switch to PLL as system clock */
-	RCC->CFGR |= RCC_CFGR_SW_PLL;				/* request switch to PLL		*/
-	while (!(RCC_CFGR_SWS_PLL)) {;}				/* wait for PLL to be source	*/
+	/* switch to PLL as system clock, disable high-speed internal */
+	rcc_changeSysClockSrc(PLL);
+ 	rcc_setClk(HSI, false);
 		
 	/* update core clock variable */
 	SystemCoreClockUpdate();
@@ -89,7 +83,7 @@ void early_init(void) {
 	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_TX, 7); /* TODO: define this somewhere? */
 	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_RX, 7); /* TODO: define this somewhere? */
 	init_regs[0] = USART_CR1_RXNEIE;
-	usart_config(USB_UART, HSI_SRC, init_regs, DEBUG_BAUD, true);
+	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
 }
 
 /* instantiate UART & button + LEDs no matter what */
