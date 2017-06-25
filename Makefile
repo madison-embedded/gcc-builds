@@ -35,6 +35,7 @@ OBJECTS += common/handlers.o
 OBJECTS += common/cli.o
 OBJECTS += common/cmd_mem.o
 OBJECTS += common/cmd_boot.o
+OBJECTS += common/cmd_gpio.o
 
 OBJECTS += drivers/timer.o
 
