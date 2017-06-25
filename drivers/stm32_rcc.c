@@ -3,6 +3,10 @@
 #include "proc/defs.h"
 #include "rcc.h"
 
+const char *clk_src_strings[] = {
+	"HSI", "HSE", "PLL", "PLLSAI", "PLLI2S", "LSI", "LSE"
+};
+
 /* TODO: check if trying to clear system clock source? */
 bool rcc_setClk(clk_src_t clk, bool state) {
 	uint32_t set_mask, ready_mask, result;
@@ -126,7 +130,15 @@ clk_src_t rcc_get_SysClockSrc(void) {
 		case RCC_CFGR_SWS_HSE: return HSE;
 		case RCC_CFGR_SWS_PLL: return PLL;
 	}
-	return PLLI2S; /* no good way of indicating error */
+	return PLLI2S; /* indicatg error */
+}
+
+clk_src_t rcc_get_PLLClockSrc(void) {
+	switch (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) {
+		case RCC_PLLCFGR_PLLSRC_HSE: return HSE;
+		case RCC_PLLCFGR_PLLSRC_HSI: return HSI;
+	}
+	return PLLI2S; /* indicate error */
 }
 
 void rcc_setPLLs() {
