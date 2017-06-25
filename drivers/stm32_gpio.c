@@ -212,7 +212,7 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 }
 
 GPIO_TypeDef * getGpioPort(char portChar){
-    uint32_t port = GPIOA;
+    uint32_t port = (uint32_t) GPIOA;
     portChar -= 'A';
     port += 0x400 * portChar;
     return (GPIO_TypeDef *) port;

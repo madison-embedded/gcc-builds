@@ -7,5 +7,6 @@ void pc_buffer_remove(PC_Buffer *buffer, char *data);
 bool pc_buffer_empty(PC_Buffer *buffer);
 bool pc_buffer_full(PC_Buffer *buffer);
 bool pc_buffer_getMessage(PC_Buffer *buffer, char *message, int maxLength);
+bool pc_buffer_messageAvailable(PC_Buffer *buffer);
 
 #endif

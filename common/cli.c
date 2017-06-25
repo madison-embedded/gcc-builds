@@ -4,7 +4,11 @@
 #include "pcbuffer.h"
 #include "cli.h"
 
-char buffer[BUFSIZ];
+char buffer1[BUFSIZ];
+char buffer2[BUFSIZ];
+char *curr_buffer = buffer1;
+char *prev_buffer = buffer1;
+
 command_t *commands = (command_t *) &__COMMANDS_START;
 
 void check_input(void) {
@@ -13,17 +17,21 @@ void check_input(void) {
 	command_status result;
 	char *args[MAX_ARGS];
 
-	if (pc_buffer_getMessage(&USB_RX, buffer, BUFSIZ)) {
+	if (pc_buffer_messageAvailable(&USB_RX)) {
+		prev_buffer = curr_buffer;
+		curr_buffer = (curr_buffer == buffer1) ? buffer2 : buffer1;
 
-		if (buffer[0] != '\0') {
+		pc_buffer_getMessage(&USB_RX, curr_buffer, BUFSIZ);
+
+		if (curr_buffer[0] != '\0') {
 
 			/* tokenize input for argv */
-			args[args_index++] = &buffer[0];
-			initial_buf_len = strlen(buffer);
+			args[args_index++] = &curr_buffer[0];
+			initial_buf_len = strlen(curr_buffer);
 			for (i = 0; i < initial_buf_len; i++) {
-				if (buffer[i] == ' ') {
-					buffer[i] = '\0';
-					args[args_index++] = &buffer[i + 1];
+				if (curr_buffer[i] == ' ') {
+					curr_buffer[i] = '\0';
+					args[args_index++] = &curr_buffer[i + 1];
 				}
 				if (args_index >= MAX_ARGS) break;
 			}
@@ -34,12 +42,12 @@ void check_input(void) {
 			if (command_index >= 0) {
 				result = commands[command_index].fp(args_index, args);
 				if (result == FAIL)
-					printf("%s failed\r\n", buffer);
+					printf("%s failed\r\n", curr_buffer);
 				if (result == USAGE)
-					printf("%s usage: %s\r\n", buffer, commands[command_index].usage);
+					printf("%s usage: %s\r\n", curr_buffer, commands[command_index].usage);
 			}
 			else
-				printf("unknown command: '%s' - try 'help'\r\n", buffer);
+				printf("unknown command: '%s' - try 'help'\r\n", curr_buffer);
 		}
 		printPrompt();
 	}
