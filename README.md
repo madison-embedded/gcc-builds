@@ -2,7 +2,9 @@
 
 **For microcontroller projects built with the GNU toolchain.**
 
-*Contributors: Vaughn Kottler*
+*Contributors: Vaughn Kottler, Cooper Green*
+
+Note: Try not to commit build changes that introduce errors or warnings! Sometimes `make clean` followed by `make` is necessary to see the output of each compiled source files as subsequent `make`s won't show errors from previously compiled sources.
 
 ## System Prerequisites
 
