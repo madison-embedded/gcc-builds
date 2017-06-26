@@ -17,7 +17,7 @@ CORE=CM$(CORTEX_M)
 ###############################################################################
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
-CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin
+CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os -flto
 # -Os -flto -nostdlib -lnosys
 
 # Linker Settings
