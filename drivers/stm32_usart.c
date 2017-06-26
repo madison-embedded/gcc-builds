@@ -163,6 +163,10 @@ void USART3_IRQHandler(void) {
 				}
 			}
 		}
+
+		/* let CLI handle up arrow for previous command */
+		else if (prev_2 == 0x1B && prev == 0x5B && curr == 'A') upArrowFlag = true;
+		else if (prev_2 == 0x1B && prev == 0x5B && curr == 'B') downArrowFlag = true;
 		
 		/* otherwise add the character, don't allow arrow keys or other escaped characters */
         else if ((prev != 0x5B && prev_2 != 0x1B) && curr != 0x1B && curr != 0x5B) {
