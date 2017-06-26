@@ -1,6 +1,7 @@
 #ifndef _CONFIG__H
 #define _CONFIG__H
 
+#include <stdio.h>
 #include <stdint.h>
 #include "nuc144.h" /* TODO: make this conditional */
 #include "proc/defs.h" /* TODO: should this main processor header file have this generic name or should it be generated? */
@@ -19,6 +20,7 @@ typedef struct {
 	char *array;
 } PC_Buffer;
 extern PC_Buffer usart3_tx, usart3_rx;
+extern int _write(int fd, const void *buf, size_t count);
 /******************************************************************************/
 /******************************************************************************/
 
@@ -30,6 +32,7 @@ extern PC_Buffer usart3_tx, usart3_rx;
 #define DEBUG_BAUD	115200
 #define USB_UART	USART3
 #define USB_RX		usart3_rx
+#define USB_TX		usart3_tx
 extern PC_Buffer	USB_RX;
 extern uint32_t SystemCoreClock;
 extern volatile unsigned int ticks;

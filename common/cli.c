@@ -1,29 +1,62 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "config.h"
 #include "pcbuffer.h"
 #include "cli.h"
 
-char buffer1[BUFSIZ];
-char buffer2[BUFSIZ];
+/* TODO: is the secondary buffer necessary? */
+char buffer1[BUFSIZ], buffer2[BUFSIZ];
 char *curr_buffer = buffer1;
 char *prev_buffer = buffer1;
 
+/* how to print a backspace to the console */
+char backspace[3] = {0x08, ' ', 0x08};
+
+/* flags for up arrow and down arrow behavior */
+volatile bool upArrowFlag = false, downArrowFlag = false;
+bool swapReady = false;
+
+/* reference to command table */
 command_t *commands = (command_t *) &__COMMANDS_START;
 
 void check_input(void) {
 	unsigned int i, args_index = 0, initial_buf_len;
 	int command_index;
 	command_status result;
-	char *args[MAX_ARGS];
+	char *args[MAX_ARGS], temp;
 
-	if (pc_buffer_messageAvailable(&USB_RX)) {
+	/* erase current contents of line */
+	if (upArrowFlag || downArrowFlag) {
+		while (!pc_buffer_empty(&USB_RX)) {
+			__disable_irq();
+			pc_buffer_remove(&USB_RX, &temp);
+			__enable_irq();
+			_write(0, backspace, 3);
+		}
+		downArrowFlag = false;
+	}
+
+	/* go back to previous command */
+	if (upArrowFlag) {
+		if (swapReady) {
+			for (i = 0; i < strlen(curr_buffer); i++)
+				pc_buffer_add(&USB_RX, curr_buffer[i]);
+			printf("%s", curr_buffer);
+			fflush(stdout);
+			swapReady = false;
+		}
+		upArrowFlag = false;
+	}
+
+	else if (pc_buffer_messageAvailable(&USB_RX)) {
 		prev_buffer = curr_buffer;
 		curr_buffer = (curr_buffer == buffer1) ? buffer2 : buffer1;
 
 		pc_buffer_getMessage(&USB_RX, curr_buffer, BUFSIZ);
 
 		if (curr_buffer[0] != '\0') {
+			swapReady = true;
 
 			/* tokenize input for argv */
 			args[args_index++] = &curr_buffer[0];

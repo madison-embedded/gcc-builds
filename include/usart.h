@@ -2,9 +2,12 @@
 #define _UART__H__
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "proc/defs.h"
 #include "config.h"
 #include "pcbuffer.h"
+
+extern volatile bool upArrowFlag, downArrowFlag;
 
 typedef enum {
 	APB1 =		0,
