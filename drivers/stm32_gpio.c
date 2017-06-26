@@ -48,9 +48,6 @@ int gpio_setClock(GPIO_TypeDef* port, bool state) {
 
 int gpio_setMode(GPIO_TypeDef* port, uint8_t pin, GPIO_MODE mode) {
 	if (verify_gpio_port(port) || verify_gpio_mode(mode)
-		|| pin > 15) 
-    printf("port %d, mode %d, pin %d\r\n", verify_gpio_port(port) , verify_gpio_mode(mode), pin );
-	if (verify_gpio_port(port) || verify_gpio_mode(mode)
 		|| pin > 15) return -1;
 	
 	port->MODER &= ~(0x3 << (pin*2));	/* clear mode	*/
@@ -150,66 +147,6 @@ gpio -> pullup = gpio_getPullupState(port, pin);
 }
 
 
-void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
-    printf("Pin: %c%2d \t", getGpioPortChar(port), pin);
-    
-    switch(gpio_getMode(port, pin)){
-        case OUTPUT:
-            printf("outputting %x ", gpio_readPin(port, pin));
-            break;
-        case INPUT:
-            printf("Value %x ", gpio_readPin(port, pin));
-            break;
-        case ALT:
-            printf("alternate TODO ");
-            break;
-        case ANALOG:
-            printf("analog TODO ");
-            break;
-        default:
-            printf("UNKNOWN     ");
-    }
-    printf("\t");
-
-    printf("Speed: ");
-    switch (gpio_getSpeed(port, pin)){
-        case LOW_SPEED:
-            printf("low speed");
-            break;
-        case MEDIUM_SPEED:
-            printf("medium speed");
-            break;
-        case HIGH_SPEED:
-            printf("high speed");
-            break;
-        case VERY_HIGH_SPEED:
-            printf("very high");
-            break;
-        default: 
-            printf("UNKNOWN   ");
-
-    }
-    printf("\t");
-
-    printf("Pullup: ");
-     switch (gpio_getPullupState(port, pin)){
-        case NONE:
-            printf("none");
-            break;
-        case PULL_UP:
-            printf("up");
-            break;
-        case PULL_DOWN:
-            printf("down");
-            break;
-        default: 
-            printf("UNKNOWN");
-
-    }
-     printf("\r\n");
-
-    
-}
 
 GPIO_TypeDef * getGpioPort(char portChar){
     uint32_t port = (uint32_t) GPIOA;

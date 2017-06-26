@@ -4,57 +4,119 @@
 #include "cli.h"
 #include "gpio.h"
 
-command_status gpio(int argc, char *argv[]) {
+void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
+    printf("%c%2d \t", getGpioPortChar(port), pin);
     
-    if (argc < 4) return USAGE;
-    char * func = argv[1];
-    char port = argv[3][0];
-    uint8_t pin;
+    switch(gpio_getMode(port, pin)){
+        case OUTPUT:
+            printf("outputting %x ", gpio_readPin(port, pin));
+            break;
+        case INPUT:
+            printf("Value %x ", gpio_readPin(port, pin));
+            break;
+        case ALT:
+            printf("alternate TODO ");
+            break;
+        case ANALOG:
+            printf("analog TODO ");
+            break;
+        default:
+            printf("UNKNOWN     ");
+    }
+    printf("\t");
 
-    if (strcmp(func, "print") == 0){
-    char * pinOrPort = argv[2];
+    printf("Speed: ");
+    switch (gpio_getSpeed(port, pin)){
+        case LOW_SPEED:
+            printf("low speed");
+            break;
+        case MEDIUM_SPEED:
+            printf("medium speed");
+            break;
+        case HIGH_SPEED:
+            printf("high speed");
+            break;
+        case VERY_HIGH_SPEED:
+            printf("very high");
+            break;
+        default: 
+            printf("UNKNOWN   ");
 
-        if (strcmp(pinOrPort, "pin") == 0){
-            pin = atoi((const char *)&argv[3][1]);
-            if (argc < 4) return USAGE;
-            gpio_printPinInfo(getGpioPort(port), pin);
-        }else if (strcmp(pinOrPort, "port") == 0){
-               int i;
+    }
+    printf("\t");
+
+    printf("Pullup: ");
+     switch (gpio_getPullupState(port, pin)){
+        case NONE:
+            printf("none");
+            break;
+        case PULL_UP:
+            printf("up");
+            break;
+        case PULL_DOWN:
+            printf("down");
+            break;
+        default: 
+            printf("UNKNOWN");
+
+    }
+     printf("\r\n");
+
+    
+}
+
+command_status pin(int argc, char *argv[]) {
+    if (argc < 3) return USAGE;
+    bool portOnly = 1;
+    char portTemp = argv[1][0];
+    GPIO_TypeDef * port = getGpioPort(portTemp);
+    int pin;
+    char * func = argv[2];
+    
+    if (strlen(argv[1])>1){
+        pin = atoi((const char *) &argv[1][1]);
+        portOnly = 0;
+
+        if (pin > 15) return USAGE;
+    }
+
+    if (!IS_GPIO_ALL_INSTANCE(port) !=0 ) return USAGE;
+
+    if (strcmp(func, "info") == 0){
+
+        if (!portOnly){
+            gpio_printPinInfo(port, pin);
+        }else {
+            int i;
             for (i=0; i<16; i++)
-            gpio_printPinInfo(getGpioPort(port), i);
-      
-        }else return USAGE;
+            gpio_printPinInfo(port, i);
+        }
 
 
-    }else if (strcmp(func,"set") == 0){
-    if (argc < 4) return USAGE;
-    char port = argv[2][0];
-    pin = atoi((const char *)&argv[2][1]);
-    char * onOrOff = argv[3];
-    GPIO_MODE mode = gpio_getMode(getGpioPort(port), pin);
-        if (strcmp(onOrOff, "on")==0){
-                   if (mode == ALT || mode == ANALOG){
+    }else if (strcmp(func,"on") == 0){
+    GPIO_MODE mode = gpio_getMode(port, pin);
+    if (mode == ALT || mode == ANALOG){
                 printf("Pin is either alternate function or analog \r\n");
                 return FAIL;
             }
-            gpio_setMode(getGpioPort(port), pin, OUTPUT);
-            gpio_writePin(getGpioPort(port), pin, 1);
-        }else if (strcmp(onOrOff, "off")==0){
+            gpio_setMode(port, pin, OUTPUT);
+            gpio_writePin(port, pin, 1);
+
+ 
+    }else if (strcmp(func,"off") == 0){
+    GPIO_MODE mode = gpio_getMode(port, pin);
             if (mode == ALT || mode == ANALOG){
                 printf("Pin is either alternate function or analog \r\n");
                 return FAIL;
             }
 
-            gpio_setMode(getGpioPort(port), pin, OUTPUT);
-            gpio_writePin(getGpioPort(port), pin, 0);
-        }else return USAGE;
-
- 
+            gpio_setMode(port, pin, OUTPUT);
+            gpio_writePin(port, pin, 0);
     }else return USAGE;
 
        
     return SUCCESS;
 }
-COMMAND_ENTRY("gpio", "printPinInfo <port>[num] [info | on | off | read]", "GPIO configuration", gpio)
+COMMAND_ENTRY("pin", "pin <port>[num] [info | on | off ]", "GPIO configuration", pin)
 
 
