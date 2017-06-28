@@ -86,4 +86,3 @@ command_status do_pin(int argc, char *argv[]) {
 }
 COMMAND_ENTRY("pin", "pin <port>[num] [info | on | off]", "Perform live manipulation of GPIO pins.", do_pin)
 
-
