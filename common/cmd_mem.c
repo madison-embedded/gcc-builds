@@ -6,7 +6,7 @@
 command_status do_md(int argc, char *argv[]) {
 	//printf("md not implemented\r\n");
 
-	//Todo: input checking
+	//Todo: input handling
 
 	int i;
 	char* address = (char*) malloc( 9 * sizeof(char)); 
