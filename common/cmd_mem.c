@@ -4,8 +4,6 @@
 #include <stdlib.h>
 
 command_status do_md(int argc, char *argv[]) {
-	//printf("md not implemented\r\n");
-
 	//Todo: input handling
 
 	int i;
