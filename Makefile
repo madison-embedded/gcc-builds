@@ -38,6 +38,7 @@ OBJECTS += common/cmd_mem.o
 OBJECTS += common/cmd_boot.o
 OBJECTS += common/cmd_gpio.o
 OBJECTS += common/cmd_analog.o
+OBJECTS += common/cmd_reset.o
 
 OBJECTS += drivers/timer.o
 
