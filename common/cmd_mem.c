@@ -29,6 +29,8 @@ command_status do_md(int argc, char *argv[]) {
 		}
 		printf("%x", content);
 		ascii_content[i % 16] = (content >= 0x20 && content <= 0x7e) ? content : '.' ;
+	}
+	
 	return USAGE;
 }
 COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
