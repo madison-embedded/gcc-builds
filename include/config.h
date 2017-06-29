@@ -1,16 +1,16 @@
 #ifndef _CONFIG__H
 #define _CONFIG__H
 
+#include <stdio.h>
 #include <stdint.h>
 #include "nuc144.h" /* TODO: make this conditional */
-#include "proc/defs.h" /* TODO: should this main processor header file have this generic name or should it be generated ?*/
-
+#include "proc/defs.h" /* TODO: should this main processor header file have this generic name or should it be generated? */
 
 /******************************************************************************/
 /*                           Utility Definitions                              */
 /******************************************************************************/
-#define APB1_F	SystemCoreClock >> APBPrescTable[(RCC->CFGR >> RCC_CFGR_PPRE1_Pos)]
-#define APB2_F	SystemCoreClock >> APBPrescTable[(RCC->CFGR >> RCC_CFGR_PPRE2_Pos)]
+#define APB1_F	SystemCoreClock >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE1) >> RCC_CFGR_PPRE1_Pos]
+#define APB2_F	SystemCoreClock >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2) >> RCC_CFGR_PPRE2_Pos]
 #define HCLK	SystemCoreClock
 #define NEWLINE_GUARD   (curr == '\n' && prev != '\r') || (curr == '\r' && prev != '\n')
 
@@ -20,6 +20,7 @@ typedef struct {
 	char *array;
 } PC_Buffer;
 extern PC_Buffer usart3_tx, usart3_rx;
+extern int _write(int fd, const void *buf, size_t count);
 /******************************************************************************/
 /******************************************************************************/
 
@@ -31,12 +32,15 @@ extern PC_Buffer usart3_tx, usart3_rx;
 #define DEBUG_BAUD	115200
 #define USB_UART	USART3
 #define USB_RX		usart3_rx
+#define USB_TX		usart3_tx
 extern PC_Buffer	USB_RX;
 extern uint32_t SystemCoreClock;
 extern volatile unsigned int ticks;
 extern void SystemCoreClockUpdate(void);
 extern const uint8_t AHBPrescTable[16];
 extern const uint8_t APBPrescTable[8];
+#define BOARD "STM32 Nucleo144 F767ZI"
+#define PROCESSOR "STM32F767ZI"
 /******************************************************************************/
 /******************************************************************************/
 

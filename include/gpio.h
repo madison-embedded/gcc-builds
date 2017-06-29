@@ -66,21 +66,15 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val);
 /*                                  Getters                                  */
 /*****************************************************************************/
 
+GPIO_TypeDef * getGpioPort(char portChar);
+char getGpioPortChar(GPIO_TypeDef * port);
+
 GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin);
 GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin);
 GPIO_PULLUP_STATE gpio_getPullupState(GPIO_TypeDef* port, uint8_t pin);
 bool gpio_getPinState(GPIO_TypeDef* port, uint8_t pin);
 int gpio_getAlternateFunc(GPIO_TypeDef* port, uint8_t pin);
 void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio);
-
-
-/*****************************************************************************/
-/*                        Display Pin Information                            */
-/*****************************************************************************/
-
-void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin);
-void gpio_printPortInfo(GPIO_TypeDef* port, uint8_t pin);
-void gpio_printAllPinInfo(GPIO_TypeDef* port, uint8_t pin);
 
 
 /*****************************************************************************/

@@ -47,7 +47,6 @@ int gpio_setClock(GPIO_TypeDef* port, bool state) {
 }
 
 int gpio_setMode(GPIO_TypeDef* port, uint8_t pin, GPIO_MODE mode) {
-	
 	if (verify_gpio_port(port) || verify_gpio_mode(mode)
 		|| pin > 15) return -1;
 	
@@ -88,7 +87,7 @@ int gpio_setPullupState(GPIO_TypeDef* port, uint8_t pin, GPIO_PULLUP_STATE state
 int gpio_readPin(GPIO_TypeDef* port, uint8_t pin) {
 	
 	if (verify_gpio_port(port) || pin > 15) return -1;
-	return port->IDR & 0x1 << pin;
+	return port->IDR >> pin & 0x1 ;
 }
 
 inline void gpio_setPin(GPIO_TypeDef* port, uint8_t pin) {
@@ -124,63 +123,45 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val) {
 /* needs to be tested */
 
 GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin){
-    return port->MODER & 0x3 << (pin*2);
+    return port->MODER >> (pin * 2) & 0x3;
 }
 
 GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin){
-    return port->OSPEEDR & 0x3 << (pin*2);
+    return port->OSPEEDR >> (pin * 2) & 0x3;
 }
 
 GPIO_PULLUP_STATE gpio_getPullupState(GPIO_TypeDef* port, uint8_t pin){
-    return port->PUPDR & 0x3 << (pin*2);
-}
-
-bool gpio_getPinState(GPIO_TypeDef* port, uint8_t pin){ 
-    return port->BSRR &  0x1 << pin;
+    return port->PUPDR >> (pin * 2)& 0x3;
 }
 
 int gpio_getAlternateFunc(GPIO_TypeDef* port, uint8_t pin){
-    return 	port->AFR[pin / 8] & 0xF << ((pin % 8) * 4);
+    return 	port->AFR[pin / 8] >> ((pin % 8) * 4) & 0xF;
 }
 
 void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio){
 gpio -> pin = pin;
-gpio -> state = gpio_getPinState( port, pin);
+gpio -> state = gpio_readPin( port, pin);
 gpio -> mode = gpio_getMode(port, pin);
 gpio -> speed = gpio_getSpeed(port, pin);
 gpio -> pullup = gpio_getPullupState(port, pin);
 }
 
 
-void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
-    printf("Pin %d \t", pin);
-    printf("Port %c \n", port);
-    if (gpio_getMode(port, pin)==OUTPUT)
-        printf("OUTPUTTING %d \t", gpio_getPinState(port, pin));
-    else if(gpio_getMode(port, pin)==INPUT)
-        printf("INPUTTING %d \t", gpio_readPin(port, pin));
-    else if(gpio_getMode(port, pin)==ALT)
-        printf("ALTERNATE TODO \t");
 
-    else if(gpio_getMode(port, pin)==ANALOG)
-        printf("ANALOG TODO \t");
-
-    printf("SPEED %d \t" ,gpio_getSpeed);
-    printf("PULLUP %d\r\n", gpio_getPullupState);
+GPIO_TypeDef * getGpioPort(char portChar){
+    uint32_t port = (uint32_t) GPIOA;
+    portChar -= 'A';
+    port += 0x400 * portChar;
+    return (GPIO_TypeDef *) port;
 
 }
-void gpio_printPortInfo(GPIO_TypeDef* port, uint8_t pin){
-    int i;
-    for (i=0; i<16; i++)
-        gpio_printPinInfo(port, i);
+char getGpioPortChar(GPIO_TypeDef * port){
+
+    char portChar = 'A';
+    portChar = ((uint32_t)port - (uint32_t)GPIOA) / 0x400 + 'A'; 
+        
+    return portChar;
 
 }
-void gpio_printAllPinInfo(GPIO_TypeDef* port, uint8_t pin){
-/* TODO not sure best way to iterate through ports*/ 
-
-}
-
-
-
 
 
