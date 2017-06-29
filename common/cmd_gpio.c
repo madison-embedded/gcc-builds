@@ -3,6 +3,21 @@
 #include <string.h>
 #include "cli.h"
 #include "gpio.h"
+#include "gpio_alias.h"
+
+int hasGpioAlias(char * name, int *pin, GPIO_TypeDef ** port){
+	int i;
+	for (i = 0; i<NUM_GPIO_ALIAS;i++){
+		if (strcmp(GPIO_TABLE[i].name, name)==0) {
+			*pin = GPIO_TABLE[i].pin;
+			*port = GPIO_TABLE[i].port;
+			return 1;
+		}
+
+	}
+
+	return 0;
+}
 
 void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 
@@ -37,17 +52,28 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 
 command_status do_pin(int argc, char *argv[]) {
 	if (argc < 2) return USAGE;
-	bool pinOnly = false;
+	bool pinOnly = false, useAlias = false;
 	char portTemp = argv[1][0];
 	int pin = 0, i;
-	GPIO_TypeDef * port = getGpioPort(portTemp);
+	GPIO_TypeDef * port; 
 	GPIO_MODE mode;
 	
+	if (hasGpioAlias(argv[1], &pin, &port)) useAlias = true;
+	else port = getGpioPort(portTemp);
+
+	if (strcmp(argv[1], "alias") == 0){
+		for (i=0; i<NUM_GPIO_ALIAS; i++){ 
+			printf("%10s \t", GPIO_TABLE[i].name);
+			gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
+		}
+		return SUCCESS;
+	}
+
 	/* check valid GPIO address */
 	if (!IS_GPIO_ALL_INSTANCE(port) !=0 ) return USAGE;
 
 	/* check valid pin number */
-	if (strlen(argv[1]) > 1) {
+	if (strlen(argv[1]) > 1 && !useAlias) {
 		pin = atoi((const char *) &argv[1][1]);
 		pinOnly = true;
 		if (pin > 15) return USAGE;
@@ -55,7 +81,7 @@ command_status do_pin(int argc, char *argv[]) {
 
 	/* print pin information */
 	if (argc == 2 || strcmp(argv[2], "info") == 0) {
-		if (pinOnly) gpio_printPinInfo(port, pin);
+		if (pinOnly || useAlias) gpio_printPinInfo(port, pin);
 		else for (i=0; i<16; i++) gpio_printPinInfo(port, i);
 	}
 
