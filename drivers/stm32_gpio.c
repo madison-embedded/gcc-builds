@@ -122,30 +122,29 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val) {
 /*****************************************************************************/
 /* needs to be tested */
 
-GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin){
+GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin) {
     return port->MODER >> (pin * 2) & 0x3;
 }
 
-GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin){
+GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin) {
     return port->OSPEEDR >> (pin * 2) & 0x3;
 }
 
-GPIO_PULLUP_STATE gpio_getPullupState(GPIO_TypeDef* port, uint8_t pin){
+GPIO_PULLUP_STATE gpio_getPullupState(GPIO_TypeDef* port, uint8_t pin) {
     return port->PUPDR >> (pin * 2)& 0x3;
 }
 
-int gpio_getAlternateFunc(GPIO_TypeDef* port, uint8_t pin){
+int gpio_getAlternateFunc(GPIO_TypeDef* port, uint8_t pin) {
     return 	port->AFR[pin / 8] >> ((pin % 8) * 4) & 0xF;
 }
 
-void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio){
-gpio -> pin = pin;
-gpio -> state = gpio_readPin( port, pin);
-gpio -> mode = gpio_getMode(port, pin);
-gpio -> speed = gpio_getSpeed(port, pin);
-gpio -> pullup = gpio_getPullupState(port, pin);
+void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio) {
+	gpio->pin = pin;
+	gpio->state = gpio_readPin( port, pin);
+	gpio->mode = gpio_getMode(port, pin);
+	gpio->speed = gpio_getSpeed(port, pin);
+	gpio->pullup = gpio_getPullupState(port, pin);
 }
-
 
 
 GPIO_TypeDef * getGpioPort(char portChar){
@@ -153,15 +152,11 @@ GPIO_TypeDef * getGpioPort(char portChar){
     portChar -= 'A';
     port += 0x400 * portChar;
     return (GPIO_TypeDef *) port;
-
 }
-char getGpioPortChar(GPIO_TypeDef * port){
 
+char getGpioPortChar(GPIO_TypeDef *port) {
     char portChar = 'A';
     portChar = ((uint32_t)port - (uint32_t)GPIOA) / 0x400 + 'A'; 
-        
     return portChar;
-
 }
-
 

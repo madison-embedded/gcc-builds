@@ -1,13 +1,8 @@
+#include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "proc/defs.h" 
 #include "cli.h"
-#include <string.h>
-#include <stdlib.h>
-
-
-
-
-
 
 command_status do_md(int argc, char *argv[]) {
 	//Todo: input handling
@@ -70,12 +65,12 @@ command_status do_md(int argc, char *argv[]) {
 
 COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
 
+
 command_status do_mw(int argc, char *argv[])
 {
 	printf("mw not implemented\r\n");
 	return USAGE;
 }
-
 COMMAND_ENTRY("mw", "mw <addr> <value> <count>", "Write data memory contents.", do_mw)
 
 
@@ -84,7 +79,7 @@ command_status do_memmap(int argc, char*argv[]) {
  
 	/* AHB1 Start */
 
-	printf("USB OTG HS   		 \t %x \t %d bytes \r\n",USB_OTG_HS,  0x4007ffff - (int)USB_OTG_HS);
+	printf("USB OTG HS   		 \t %x \t %d bytes \r\n",USB_OTG_HS_PERIPH_BASE,  0x4007ffff - USB_OTG_HS_PERIPH_BASE);
 	printf("DMA2D        		 \t %x \t %d bytes \r\n",DMA2D_BASE,       0x4002BBFF - DMA2D_BASE);
 	//printf("Ethernet MAC \t %x \t %d bytes \n", 
 	printf("DMA2	     		 \t %x \t %d bytes \r\n",DMA2_BASE,   0x400293FF - DMA2_BASE);
@@ -107,7 +102,6 @@ command_status do_memmap(int argc, char*argv[]) {
 	
 	/* END */
 	
-	
 	printf("MDIOS                    \t %x \t %d bytes \r\n",MDIOS_BASE      ,0x40017BFF  - MDIOS_BASE); 
 	printf("DFSDM1                   \t %x \t %d bytes \r\n",DFSDM1_BASE     ,0x400177FF  - DFSDM1_BASE); 
  //	printf("DSI Host                 \t %x \t %d bytes \n",DFSDM1_BASE,     ,0x400203FF  - DFSDM1_BASE); 
@@ -120,24 +114,8 @@ command_status do_memmap(int argc, char*argv[]) {
 	printf("TIM10                 	 \t %x \t %d bytes \r\n",TIM10_BASE      ,0x400147FF  - TIM10_BASE);
 	printf("TIM9                 	 \t %x \t %d bytes \r\n",TIM9_BASE       ,0x400143FF  - TIM9_BASE);
 	printf("EXTI                 	 \t %x \t %d bytes \r\n",EXTI_BASE      ,0x40013FFF   - EXTI_BASE);
-	
+
+	return SUCCESS;
 }
- 
 COMMAND_ENTRY("memmap", "memmap", "Display memory map of physical hardware peripherals", do_memmap) 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

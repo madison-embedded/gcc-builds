@@ -49,6 +49,7 @@ OBJECTS += $(PROC_DIR)/system_init.o
 OBJECTS += drivers/$(PROC_PREFIX)gpio.o
 OBJECTS += drivers/$(PROC_PREFIX)rcc.o
 OBJECTS += drivers/$(PROC_PREFIX)usart.o
+OBJECTS += drivers/$(PROC_PREFIX)adc.o
 
 CPUDIR := include/proc
 ###############################################################################
