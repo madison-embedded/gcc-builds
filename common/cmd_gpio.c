@@ -5,7 +5,7 @@
 #include "gpio.h"
 #include "gpio_alias.h"
 
-int hasGpioAlias(char * name, int *pin, GPIO_TypeDef ** port){
+int hasGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, char * name) {
 	int i;
 	for (i = 0; i<NUM_GPIO_ALIAS;i++){
 		if (strcmp(GPIO_TABLE[i].name, name)==0) {
@@ -13,15 +13,34 @@ int hasGpioAlias(char * name, int *pin, GPIO_TypeDef ** port){
 			*port = GPIO_TABLE[i].port;
 			return 1;
 		}
-
 	}
-
 	return 0;
+}
+
+int getAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
+	int i; 
+	for (i = 0; i<NUM_GPIO_ALIAS; i++){
+		if (GPIO_TABLE[i].pin == *pin && GPIO_TABLE[i].port == *port) {
+			*alias=	GPIO_TABLE[i];
+			return 1;
+		}	
+	}
+	return 0;
+
 }
 
 void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 
-	printf("%c%2d\t", getGpioPortChar(port), pin);
+	
+	GPIO alias;
+	if (getAlias(&port, &pin, &alias)) {
+		if (alias.usable) printf("Yes");
+		else printf("NO");
+		printf("\t%-10s", alias.name);
+	}
+	else printf("Probs\t-\t");
+
+	printf("\t%c%2d\t", getGpioPortChar(port), pin);
 	
 	switch (gpio_getMode(port, pin)) {
 		case OUTPUT:	printf("out %x", gpio_readPin(port, pin)); break;
@@ -31,7 +50,7 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 		default:		printf("UNKNOWN");
 	}
 
-	printf("\tSpeed: ");
+	printf("\t");
 	switch (gpio_getSpeed(port, pin)) {
 		case LOW_SPEED:			printf("low"); break;
 		case MEDIUM_SPEED:		printf("medium"); break;
@@ -40,7 +59,7 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 		default:				printf("UNKNOWN");
 	}
 
-	printf("\tPull: ");
+	printf("\t");
 	switch (gpio_getPullupState(port, pin)){
 		case NONE:		printf("none"); break;
 		case PULL_UP:	printf("up"); break;
@@ -54,18 +73,16 @@ command_status do_pin(int argc, char *argv[]) {
 	if (argc < 2) return USAGE;
 	bool pinOnly = false, useAlias = false;
 	char portTemp = argv[1][0];
-	int pin = 0, i;
+	uint8_t pin = 0, i;
 	GPIO_TypeDef * port; 
 	GPIO_MODE mode;
 	
-	if (hasGpioAlias(argv[1], &pin, &port)) useAlias = true;
+	if (hasGpioAlias(&port, &pin, argv[1])) useAlias = true;
 	else port = getGpioPort(portTemp);
 
 	if (strcmp(argv[1], "alias") == 0){
-		for (i=0; i<NUM_GPIO_ALIAS; i++){ 
-			printf("%10s \t", GPIO_TABLE[i].name);
-			gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
-		}
+		printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
+		for (i=0; i<NUM_GPIO_ALIAS; i++) gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
 		return SUCCESS;
 	}
 
@@ -81,8 +98,14 @@ command_status do_pin(int argc, char *argv[]) {
 
 	/* print pin information */
 	if (argc == 2 || strcmp(argv[2], "info") == 0) {
-		if (pinOnly || useAlias) gpio_printPinInfo(port, pin);
-		else for (i=0; i<16; i++) gpio_printPinInfo(port, i);
+		if (pinOnly || useAlias) {
+			printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
+			gpio_printPinInfo(port, pin);
+		}
+		else {
+			printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
+			for (i=0; i<16; i++) gpio_printPinInfo(port, i);
+		}
 	}
 
 	/* attempt to set pin */

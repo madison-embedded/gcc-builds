@@ -37,6 +37,7 @@ typedef struct _GPIO{
     GPIO_SPEED speed;
     GPIO_PULLUP_STATE pullup;
 	const char *name;
+	bool usable;
 } GPIO;
 
 

@@ -84,12 +84,6 @@ int gpio_setPullupState(GPIO_TypeDef* port, uint8_t pin, GPIO_PULLUP_STATE state
 	return 0;
 }
 
-int gpio_readPin(GPIO_TypeDef* port, uint8_t pin) {
-	
-	if (verify_gpio_port(port) || pin > 15) return -1;
-	return port->IDR >> pin & 0x1 ;
-}
-
 inline void gpio_setPin(GPIO_TypeDef* port, uint8_t pin) {
 	port->BSRR |= 0x1 << pin;
 }
@@ -116,11 +110,13 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val) {
 	return 0;
 }
 
+/* Getters */
 
-/*****************************************************************************/
-/*                        Welcome to Cooper's Code                           */
-/*****************************************************************************/
-/* needs to be tested */
+int gpio_readPin(GPIO_TypeDef* port, uint8_t pin) {
+	
+	if (verify_gpio_port(port) || pin > 15) return -1;
+	return port->IDR >> pin & 0x1 ;
+}
 
 GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin) {
     return port->MODER >> (pin * 2) & 0x3;
