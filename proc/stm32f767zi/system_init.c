@@ -23,6 +23,9 @@ void SystemInit(void) {
 #else
 	SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
 #endif
+
+	SCB_EnableICache();
+	SCB_DisableDCache();
 }
 
 void SystemCoreClockUpdate(void) {
