@@ -30,12 +30,12 @@ typedef enum {
 
 
 typedef struct _GPIO{
-    uint8_t pin;
-    bool state;
+	uint8_t pin;
+	bool state;
 	GPIO_TypeDef* port;
-    GPIO_MODE mode;
-    GPIO_SPEED speed;
-    GPIO_PULLUP_STATE pullup;
+	GPIO_MODE mode;
+	GPIO_SPEED speed;
+	GPIO_PULLUP_STATE pullup;
 	const char *name;
 	bool usable;
 } GPIO;
