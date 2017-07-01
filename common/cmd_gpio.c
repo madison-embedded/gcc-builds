@@ -40,7 +40,7 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 	}
 	else printf("Probs\t-\t");
 
-	printf("\t%c%2d\t", getGpioPortChar(port), pin);
+	printf("\t%c%2d\t", gpio_getGpioPortChar(port), pin);
 	
 	switch (gpio_getMode(port, pin)) {
 		case OUTPUT:	printf("out %x", gpio_readPin(port, pin)); break;
@@ -78,7 +78,7 @@ command_status do_pin(int argc, char *argv[]) {
 	GPIO_MODE mode;
 	
 	if (hasGpioAlias(&port, &pin, argv[1])) useAlias = true;
-	else port = getGpioPort(portTemp);
+	else port = gpio_getGpioPort(portTemp);
 
 	if (strcmp(argv[1], "alias") == 0){
 		printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	

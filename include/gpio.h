@@ -68,8 +68,8 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val);
 /*                                  Getters                                  */
 /*****************************************************************************/
 
-GPIO_TypeDef * getGpioPort(char portChar);
-char getGpioPortChar(GPIO_TypeDef * port);
+GPIO_TypeDef * gpio_getGpioPort(char portChar);
+char gpio_getGpioPortChar(GPIO_TypeDef * port);
 
 GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin);
 GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin);

@@ -143,14 +143,14 @@ void gpio_getPinInfo(GPIO_TypeDef* port, uint8_t pin, GPIO * gpio) {
 }
 
 
-GPIO_TypeDef * getGpioPort(char portChar){
+GPIO_TypeDef * gpio_getGpioPort(char portChar){
     uint32_t port = (uint32_t) GPIOA;
     portChar -= 'A';
     port += 0x400 * portChar;
     return (GPIO_TypeDef *) port;
 }
 
-char getGpioPortChar(GPIO_TypeDef *port) {
+char gpio_getGpioPortChar(GPIO_TypeDef *port) {
     char portChar = 'A';
     portChar = ((uint32_t)port - (uint32_t)GPIOA) / 0x400 + 'A'; 
     return portChar;

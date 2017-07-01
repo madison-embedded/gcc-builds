@@ -50,6 +50,7 @@ OBJECTS += drivers/$(PROC_PREFIX)gpio.o
 OBJECTS += drivers/$(PROC_PREFIX)rcc.o
 OBJECTS += drivers/$(PROC_PREFIX)usart.o
 OBJECTS += drivers/$(PROC_PREFIX)adc.o
+OBJECTS += drivers/$(PROC_PREFIX)exti.o
 
 CPUDIR := include/proc
 ###############################################################################
