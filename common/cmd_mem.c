@@ -4,29 +4,71 @@
 #include "proc/defs.h" 
 #include "cli.h"
 
+
+
+bool md_input_handler(unsigned char* mem_ptr, int length)
+{
+	unsigned char* mem = (unsigned char*) mem_ptr;
+	int i;
+
+	for(i = 0; i < length; i++)
+	{	
+		mem = mem + i;
+		
+		if((int) mem >= 0x00004000 && (int) mem <= 0x000FFFFF) return false; 
+		
+		if((int) mem >= 0x00110000 && (int) mem <= 0x001FFFFF) return false; 
+
+		if((int) mem >= 0x00300000 && (int) mem <= 0x07FFFFFF) return false; 
+
+		if((int) mem >= 0x08200000 && (int) mem <= 0x1FFEFFFF) return false; 
+
+		if((int) mem >= 0x1FFF0020 && (int) mem <= 0x1FFFFFFF) return false; 
+
+		if((int) mem >= 0x20080000 && (int) mem <= 0x3FFFFFFF) return false; 
+
+		if((int) mem >= 0x40008000 && (int) mem <= 0x4000FFFF) return false; 
+
+		if((int) mem >= 0x40016C00 && (int) mem <= 0x4001FFFF) return false; 
+
+		if((int) mem >= 0x40080000 && (int) mem <= 0x4FFFFFFF) return false; 
+
+		if((int) mem >= 0x50060C00 && (int) mem <= 0x5FFFFFFF) return false; 
+
+		if((int) mem >= 0xE0100000 && (int) mem <= 0xFFFFFFFF) return false; 
+	}
+
+	return true; 
+}
+
+
 command_status do_md(int argc, char *argv[]) {
-	//Todo: input handling
 
 	int i;
+	char content;
+	int temp;
+
 	char* address = (char*) malloc( 9 * sizeof(char)); 
    
 	for(i = 0; i < 8; i++)
-		address[i] = argv[1][i+2];
-	
+		address[i] = argv[1][i+2];	
     address[8] = '\0';
 
 	unsigned char* mem_ptr = (unsigned char *) strtol(address, NULL, 16);
     
 	int length = atoi(argv[2]);
+
+	//input handling 
+	if(!md_input_handler(mem_ptr, length)) return FAIL;
+
+
 	char* ascii_content = (char*) malloc(17*sizeof(char));
 	ascii_content[16] = '\0';
-	char content;
-	int temp;
       
 	for(i=0; i<length; i++)
 	{
 		content = (char) mem_ptr[i];
- 
+	
 		if(i % 16 == 0) //new line
 		{
  		
@@ -60,7 +102,7 @@ command_status do_md(int argc, char *argv[]) {
 		printf(" %s\r\n", ascii_content);
 	}
 
-	return USAGE;
+	return SUCCESS;
 }
 
 COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
