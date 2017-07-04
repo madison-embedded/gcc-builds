@@ -17,8 +17,8 @@ CORE=CM$(CORTEX_M)
 ###############################################################################
 # Cross Compiler Settings
 TOOLCHAIN=arm-none-eabi-
-CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin
-# -Os -flto -nostdlib -lnosys
+CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os
+# -Os -nostdlib -lnosys
 
 # Linker Settings
 LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
@@ -28,6 +28,7 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 ###############################################################################
 # Global Objects
 OBJECTS += common/main.o 
+OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
 OBJECTS += common/handlers.o
@@ -35,6 +36,9 @@ OBJECTS += common/handlers.o
 OBJECTS += common/cli.o
 OBJECTS += common/cmd_mem.o
 OBJECTS += common/cmd_boot.o
+OBJECTS += common/cmd_gpio.o
+OBJECTS += common/cmd_analog.o
+OBJECTS += common/cmd_reset.o
 
 OBJECTS += drivers/timer.o
 

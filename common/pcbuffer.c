@@ -30,6 +30,10 @@ bool pc_buffer_full(PC_Buffer *buffer) {
 	return buffer->produce_count - buffer->consume_count == buffer->buffer_SIZE;
 }
 
+bool pc_buffer_messageAvailable(PC_Buffer *buffer) {
+	return buffer->message_available > 0;
+}
+
 bool pc_buffer_getMessage(PC_Buffer *buffer, char *message, int maxLength) {
 	char curr = '\0', prev = '\0';
 	int index = 0;
