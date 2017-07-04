@@ -1,0 +1,49 @@
+#include "gpio.h"
+
+#define FILL_GPIO(_name, _port, _pin, _mode, _speed, _pullup, _usable) \
+	 {\
+		.name = _name,\
+		.port = _port,\
+		.pin = _pin,\
+		.mode = _mode,\
+		.speed = _speed,\
+		.pullup = _pullup,\
+		.usable = _usable,\
+	},
+#define NUM_GPIO_ALIAS sizeof(GPIO_TABLE)/sizeof(GPIO)
+
+const GPIO GPIO_TABLE[]={
+
+	/* Sensors */
+	
+	/* STM32F767ZI */
+	FILL_GPIO("JTDI",		GPIOA, 15, OUTPUT, MEDIUM_SPEED, PULL_UP, false)
+
+	/* Nucleo 144 LEDs */
+	FILL_GPIO("REDLED",		GPIOB, 14, OUTPUT, MEDIUM_SPEED, NONE, true)
+	FILL_GPIO("BLUELED",	GPIOB, 7, OUTPUT, MEDIUM_SPEED, NONE, true)
+	FILL_GPIO("GREENLED",	GPIOB, 0, OUTPUT, MEDIUM_SPEED, NONE, true)
+
+	/* Nucleo 144 USB USART */
+
+	/*	Nucleo 144 USB */
+	FILL_GPIO("USB SOF",		GPIOA, 8, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB VBUS",		GPIOA, 9, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB ID",			GPIOA, 10, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB DM",			GPIOA, 11, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB DP",			GPIOA, 12, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB GPIO OUT",	GPIOG, 6, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("USB GPIO IN",	GPIOG, 7, OUTPUT, MEDIUM_SPEED, NONE, false)
+
+	/* Nucleo 144 Ethernet */
+	FILL_GPIO("RMII Ref Clk",	GPIOA, 1, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII MDIO",		GPIOA, 2, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII MDC",		GPIOC, 1, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII RX DV",		GPIOA, 7, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII RXD0",		GPIOC, 4, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII RXD1",		GPIOC, 5, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII TX EN",		GPIOG, 11, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII TXD0",		GPIOG, 13, OUTPUT, MEDIUM_SPEED, NONE, false)
+	FILL_GPIO("RMII TXD1",		GPIOB, 13, OUTPUT, MEDIUM_SPEED, NONE, false)
+};
+

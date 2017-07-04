@@ -18,13 +18,13 @@ int main(void) {
 	while(1) {
 
 		/* Handle Button */
-		if (readButton()) {
-			setLED(1, true);
-			setLED(2, true);
+		if (readButton()){
+/*			setLED(1, true);*/
+/*			setLED(2, true);*/
 		}
 		else {
-			setLED(1, false);
-			setLED(2, false);
+/*			setLED(1, false);*/
+/*			setLED(2, false);*/
 		}
 
 		check_input();

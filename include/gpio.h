@@ -29,13 +29,15 @@ typedef enum {
 } GPIO_PULLUP_STATE;
 
 
-typedef struct{
-    uint8_t pin;
-    bool state;
-    GPIO_MODE mode;
-    GPIO_SPEED speed;
-    GPIO_PULLUP_STATE pullup;
-
+typedef struct _GPIO{
+	uint8_t pin;
+	bool state;
+	GPIO_TypeDef* port;
+	GPIO_MODE mode;
+	GPIO_SPEED speed;
+	GPIO_PULLUP_STATE pullup;
+	const char *name;
+	bool usable;
 } GPIO;
 
 
@@ -66,8 +68,8 @@ int gpio_setAlternateFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t val);
 /*                                  Getters                                  */
 /*****************************************************************************/
 
-GPIO_TypeDef * getGpioPort(char portChar);
-char getGpioPortChar(GPIO_TypeDef * port);
+GPIO_TypeDef * gpio_getGpioPort(char portChar);
+char gpio_getGpioPortChar(GPIO_TypeDef * port);
 
 GPIO_MODE gpio_getMode(GPIO_TypeDef* port, uint8_t pin);
 GPIO_SPEED gpio_getSpeed(GPIO_TypeDef* port, uint8_t pin);
