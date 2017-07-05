@@ -97,7 +97,7 @@ command_status do_md(int argc, char *argv[]) {
 		}
 		
 		
-		if(i%16 == 15) 
+		if((i+3)%16 == 15) 
 			printf(" %s\r\n", ascii_content);
 	}
 
