@@ -15,27 +15,27 @@ bool md_input_handler(unsigned char* mem_ptr, int length)
 	{	
 		mem = mem + i;
 		
-		if((int) mem >= 0x00004000 && (int) mem <= 0x000FFFFF) return false; 
+		if((unsigned int) mem >= 0x00004000 && (unsigned int) mem <= 0x000FFFFF) return false; 
 		
-		if((int) mem >= 0x00110000 && (int) mem <= 0x001FFFFF) return false; 
+		if((unsigned int) mem >= 0x00110000 && (unsigned int) mem <= 0x001FFFFF) return false; 
 
-		if((int) mem >= 0x00300000 && (int) mem <= 0x07FFFFFF) return false; 
+		if((unsigned int) mem >= 0x00300000 && (unsigned int) mem <= 0x07FFFFFF) return false; 
 
-		if((int) mem >= 0x08200000 && (int) mem <= 0x1FFEFFFF) return false; 
+		if((unsigned int) mem >= 0x08200000 && (unsigned int) mem <= 0x1FFEFFFF) return false; 
 
-		if((int) mem >= 0x1FFF0020 && (int) mem <= 0x1FFFFFFF) return false; 
+		if((unsigned int) mem >= 0x1FFF0020 && (unsigned int) mem <= 0x1FFFFFFF) return false; 
 
-		if((int) mem >= 0x20080000 && (int) mem <= 0x3FFFFFFF) return false; 
+		if((unsigned int) mem >= 0x20080000 && (unsigned int) mem <= 0x3FFFFFFF) return false; 
 
-		if((int) mem >= 0x40008000 && (int) mem <= 0x4000FFFF) return false; 
+		if((unsigned int) mem >= 0x40008000 && (unsigned int) mem <= 0x4000FFFF) return false; 
 
-		if((int) mem >= 0x40016C00 && (int) mem <= 0x4001FFFF) return false; 
+		if((unsigned int) mem >= 0x40016C00 && (unsigned int) mem <= 0x4001FFFF) return false; 
 
-		if((int) mem >= 0x40080000 && (int) mem <= 0x4FFFFFFF) return false; 
+		if((unsigned int) mem >= 0x40080000 && (unsigned int) mem <= 0x4FFFFFFF) return false; 
 
-		if((int) mem >= 0x50060C00 && (int) mem <= 0x5FFFFFFF) return false; 
+		if((unsigned int) mem >= 0x50060C00 && (unsigned int) mem <= 0x5FFFFFFF) return false; 
 
-		if((int) mem >= 0xE0100000 && (int) mem <= 0xFFFFFFFF) return false; 
+		if((unsigned int) mem >= 0xE0100000 && (unsigned int) mem <= 0xFFFFFFFF) return false; 
 	}
 
 	return true; 
@@ -48,7 +48,7 @@ command_status do_md(int argc, char *argv[]) {
 	
 	if(argv[1][0] != '0' || argv[1][1] != 'x') return USAGE;
 
-	int i;
+	int i, j;
 	char content;
 	int temp;
 
@@ -69,34 +69,36 @@ command_status do_md(int argc, char *argv[]) {
 	//input handling 
 	if(!md_input_handler(mem_ptr, length)) 
 	{	
-		printf("Illegal memory Access\r\n");
+		printf("Illegal Memory Access\r\n");
 		return FAIL;
 	}
 
 	char* ascii_content = (char*) malloc(17*sizeof(char));
 	ascii_content[16] = '\0';
       
-	for(i=0; i<length; i++)
+	for(i=0; i<length; i += 4)
 	{
-		content = (char) mem_ptr[i];
-	
 		if(i % 16 == 0) //new line
-		{
- 		
 			printf("%8p:", &mem_ptr[i]);
-		};
-		if(i % 4 == 0) //space
+		
+		printf(" ");
+		
+		for(j=3; j>=0; j--)
 		{
-			printf(" ");
+			content = (char) mem_ptr[i+j];
+			
+			if(content >= 16)
+				printf("%x", content);
+			else 
+				printf("0%x", content);
+			
+			ascii_content[(i+3-j) % 16] = (content >= 0x20 && content <= 0x7e) ? content : '.' ;
+	
 		}
 		
-		if(content >= 16)
-			printf("%x", content);
-		else 
-			printf("0%x", content);
-		ascii_content[i % 16] = (content >= 0x20 && content <= 0x7e) ? content : '.' ;
-	
-		if(i%16 == 15) printf(" %s\r\n", ascii_content);
+		
+		if(i%16 == 15) 
+			printf(" %s\r\n", ascii_content);
 	}
 
 	if(length % 16 != 0) 
