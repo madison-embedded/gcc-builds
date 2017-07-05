@@ -56,7 +56,7 @@ command_status do_md(int argc, char *argv[]) {
    
 	for(i = 0; i < 8; i++)
 		address[i] = argv[1][i+2];	
-    address[8] = '\0';
+	address[8] = '\0';
 
 	
 	unsigned char* mem_ptr = (unsigned char *) strtol(address, NULL, 16);
