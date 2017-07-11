@@ -14,15 +14,15 @@ void setup_osc(void) {
 	RCC->PLLCFGR = 0x24003010;	/* set PLL bits to default	*/
 		
 	/* Set PLL configs */
-	RCC->PLLCFGR |= PLLN; RCC->PLLCFGR |= PLLM;
-	RCC->PLLCFGR |= PLLP; RCC->PLLCFGR |= PLLQ;
-	RCC->PLLCFGR |= PLLR;
+	RCC->PLLCFGR |= PLLN_VAL; RCC->PLLCFGR |= PLLM_VAL;
+	RCC->PLLCFGR |= PLLP_VAL; RCC->PLLCFGR |= PLLQ_VAL;
+	RCC->PLLCFGR |= PLLR_VAL;
 		
 	/* Clear out default bits, if you clear them first the board gets messed up */
 	/* (bonus points if you can answer why that is) */
-	RCC->PLLCFGR &= ~PLLN; RCC->PLLCFGR &= ~PLLM;
-	RCC->PLLCFGR &= ~PLLP; RCC->PLLCFGR &= ~PLLQ;
-	RCC->PLLCFGR &= ~PLLR;
+	RCC->PLLCFGR &= ~PLLN_VAL; RCC->PLLCFGR &= ~PLLM_VAL;
+	RCC->PLLCFGR &= ~PLLP_VAL; RCC->PLLCFGR &= ~PLLQ_VAL;
+	RCC->PLLCFGR &= ~PLLR_VAL;
 		
 	/* set HSE as PLL clock src	*/
 	RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;			

@@ -33,6 +33,7 @@ OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
 OBJECTS += common/handlers.o
 
+# Commands
 OBJECTS += common/cli.o
 OBJECTS += common/cmd_mem.o
 OBJECTS += common/cmd_boot.o
@@ -51,6 +52,15 @@ OBJECTS += drivers/$(PROC_PREFIX)rcc.o
 OBJECTS += drivers/$(PROC_PREFIX)usart.o
 OBJECTS += drivers/$(PROC_PREFIX)adc.o
 OBJECTS += drivers/$(PROC_PREFIX)exti.o
+
+# HAL Drivers
+#OBJECTS += drivers/hal/$(PROC_PREFIX)eth.o
+OBJECTS += drivers/hal/stm32f7xx_hal.o
+OBJECTS += drivers/hal/stm32f7xx_hal_eth.o
+OBJECTS += drivers/hal/stm32f7xx_hal_cortex.o
+OBJECTS += drivers/hal/stm32f7xx_hal_flash.o
+OBJECTS += drivers/hal/stm32f7xx_hal_rcc.o
+OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
 
 CPUDIR := include/proc
 ###############################################################################
