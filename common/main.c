@@ -19,22 +19,21 @@ int main(void) {
 
 		/* Handle Button */
 		if (readButton()){
-/*			setLED(1, true);*/
-/*			setLED(2, true);*/
+			setLED(1, true);
+			setLED(0, true);
 		}
 		else {
-/*			setLED(1, false);*/
-/*			setLED(2, false);*/
+			setLED(1, false);
+			setLED(0, false);
 		}
 
 		check_input();
 
 		/* Blink Red LED */
-		curr = ticks / 1000;
-		if (curr != prev) {
+		curr = ticks / 250;
+		if (curr != prev)
 			(curr % 2) ? 
-				setLED(0, true) : setLED(0, false);
-		}
+				setLED(2, true) : setLED(2, false);
 		prev = curr;
 	}
 }

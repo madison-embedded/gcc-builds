@@ -2,7 +2,7 @@
 
 # ST-Link V2
 if [ -d "/media/$USERNAME/NODE_F767ZI" ]; then
-	cp badgerloop.bin /media/$USERNAME/NODE_F767ZI
+	cp e2c.bin /media/$USERNAME/NODE_F767ZI
 	echo "Copying badgerloop.bin to /media/$USERNAME/NODE_F767ZI"
 # J-Link
 else

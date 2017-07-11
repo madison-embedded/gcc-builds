@@ -58,10 +58,6 @@ void early_init(void) {
 
 	setup_osc();
 
-	/* Disables Caches */
-	//SCB_DisableICache();
-	//SCB_DisableDCache();
-
 	/* LEDs */
 	gpio_setClock(LED_GPIO, true);
 	gpio_setMode(LED_GPIO, GREEN_PIN, OUTPUT);
@@ -88,6 +84,10 @@ void early_init(void) {
 bool board_init(void) {
 
 	early_init();
+
+	/* TODO: I2C */
+
+	/* TODO: Ethernet */
 
 	return true;
 }
