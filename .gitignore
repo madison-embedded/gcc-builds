@@ -8,4 +8,5 @@
 *.swp
 include/proc
 output.txt
+.~*
 
