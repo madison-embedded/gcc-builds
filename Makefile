@@ -16,8 +16,11 @@ CORE=CM$(CORTEX_M)
 
 ###############################################################################
 # Cross Compiler Settings
+
+FPU = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+
 TOOLCHAIN=arm-none-eabi-
-CFLAGS=$(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os
+CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os 
 # -Os -nostdlib -lnosys
 
 # Linker Settings
@@ -40,7 +43,7 @@ OBJECTS += common/cmd_boot.o
 OBJECTS += common/cmd_gpio.o
 OBJECTS += common/cmd_analog.o
 OBJECTS += common/cmd_reset.o
-
+OBJECTS += common/cmd_float.o
 OBJECTS += drivers/timer.o
 
 # Conditional Objects
