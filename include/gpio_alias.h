@@ -62,7 +62,15 @@ const GPIO GPIO_TABLE[] = {
 	FILL_GPIO("RMII TXD1",		GPIOB, 13, OUTPUT, LOW_SPEED, NONE, false)
 
 	/* Application I/O */
-
+	FILL_GPIO("Solenoid1",		GPIOD,  0, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid2",		GPIOD,  1, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid3",		GPIOD,  3, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid4",		GPIOD,  4, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid5",		GPIOD,  5, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid6",		GPIOD,  6, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid7",		GPIOD,  7, OUTPUT, LOW_SPEED, NONE, false)
+	FILL_GPIO("Solenoid8",		GPIOE,  14, OUTPUT, LOW_SPEED, NONE, true)
+	
 	/* Application Analog */
 
 	/* Application PWM */

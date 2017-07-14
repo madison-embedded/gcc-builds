@@ -16,7 +16,6 @@ int main(void) {
 	printPrompt();
 
 	while(1) {
-
 		/* Handle Button */
 		if (readButton()){
 			setLED(1, true);

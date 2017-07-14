@@ -115,6 +115,7 @@ command_status do_pin(int argc, char *argv[]) {
 			printf("Pin is either alternate function or analog \r\n");
 			return FAIL;
 		}
+		gpio_setClock(port, true);
 		gpio_setMode(port, pin, OUTPUT);
 		gpio_writePin(port, pin, 1);
 	}
