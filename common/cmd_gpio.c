@@ -30,8 +30,6 @@ int getAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
 }
 
 void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
-
-	
 	GPIO alias;
 	if (getAlias(&port, &pin, &alias)) {
 		if (alias.usable) printf("Yes");

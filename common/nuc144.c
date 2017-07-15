@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "gpio.h"
+#include "gpio_alias.h"
 #include "usart.h"
 #include "config.h"
 #include "rcc.h"
@@ -58,24 +59,8 @@ void early_init(void) {
 
 	setup_osc();
 
-	/* LEDs */
-	gpio_setClock(LED_GPIO, true);
-	gpio_setMode(LED_GPIO, GREEN_PIN, OUTPUT);
-	gpio_setMode(LED_GPIO, BLUE_PIN, OUTPUT);
-	gpio_setMode(LED_GPIO, RED_PIN, OUTPUT);
+	gpioAliasInit();
 	
-	/* button (no need for pull-up or pull-down) */
-	gpio_setClock(BUTTON_GPIO, true);
-	gpio_setMode(BUTTON_GPIO, BUTTON_PIN, INPUT);	
-	
-	/* USART3 -> ST-LINKv2 -> USB virtual COM */
-	gpio_setClock(USB_UART_GPIO, true);
-	gpio_setSpeed(USB_UART_GPIO, USB_UART_TX, HIGH_SPEED);
-	gpio_setSpeed(USB_UART_GPIO, USB_UART_RX, HIGH_SPEED);
-	gpio_setMode(USB_UART_GPIO, USB_UART_TX, ALT);
-	gpio_setMode(USB_UART_GPIO, USB_UART_RX, ALT);
-	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_TX, 7); /* TODO: define this somewhere? */
-	gpio_setAlternateFunc(USB_UART_GPIO, USB_UART_RX, 7); /* TODO: define this somewhere? */
 	init_regs[0] = USART_CR1_RXNEIE;
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
 }
