@@ -28,6 +28,14 @@ typedef enum {
 	PULL_DOWN =	2
 } GPIO_PULLUP_STATE;
 
+typedef enum {
+	OTHER = 0x0,
+	SENSOR = 0x1,
+	SOLENOID = 0x2,
+	RETRO = 0x3,
+	LED = 0x4,
+	I2C = 0x6
+} GPIO_GROUP;
 
 typedef struct _GPIO{
 	GPIO_TypeDef* port;
@@ -39,6 +47,7 @@ typedef struct _GPIO{
 	GPIO_PULLUP_STATE pullup;
 	const char *name;
 	bool usable;
+	GPIO_GROUP group;
 } GPIO;
 
 
