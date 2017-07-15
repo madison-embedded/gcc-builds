@@ -77,7 +77,7 @@ const GPIO GPIO_TABLE[] = {
 };
 
 const uint8_t NUM_GPIO_ALIAS = sizeof(GPIO_TABLE)/sizeof(GPIO);
-const char * GROUP_NAMES[] = {"other", "sensors", "solenoid", "retro", "led"};
+const char * GROUP_NAMES[] = {"other", "sensors", "solenoid", "retro", "led", "i2c"};
 const uint8_t NUM_GROUPS = sizeof(GROUP_NAMES)/sizeof(char *);
 
 int gpioAliasInit(){

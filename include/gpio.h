@@ -32,9 +32,9 @@ typedef enum {
 	OTHER = 0x0,
 	SENSOR = 0x1,
 	SOLENOID = 0x2,
-	RETRO = 0x3,
-	LED = 0x4,
-	I2C = 0x6
+	RETRO = 0x5,
+	LED = 0x8,
+	I2C = 0x11
 } GPIO_GROUP;
 
 typedef struct _GPIO{
