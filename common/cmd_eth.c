@@ -17,6 +17,10 @@ command_status do_eth(int argc, char *argv[]) {
 
 	if (!strcmp(argv[1], "phy") && argc == 3) {
 		phy_reg = atoi(argv[2]);
+		if (EthHandle.Instance != ETH) {
+			printf("Ethernet not initialized!\r\n");
+			return FAIL;
+		}
 		if (phy_reg > 31 || phy_reg < 0) {
 			printf("invalid phy register %d\r\n", phy_reg);
 			return USAGE;

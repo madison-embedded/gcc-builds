@@ -80,9 +80,6 @@ bool board_init(void) {
 
 	/* TODO: I2C */
 
-	/* TODO: Ethernet */
-	eth_init();
-
 	printPrompt();
 	return true;
 }
