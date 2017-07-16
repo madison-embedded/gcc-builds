@@ -9,7 +9,7 @@ PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
 TERMINAL=gnome-terminal
 OBJDUMP_FILE=output.txt
-DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main
+DEFINES := -D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
 ###############################################################################
 
@@ -45,6 +45,7 @@ OBJECTS += common/cmd_gpio.o
 OBJECTS += common/cmd_analog.o
 OBJECTS += common/cmd_reset.o
 OBJECTS += common/cmd_float.o
+OBJECTS += common/cmd_eth.o
 OBJECTS += drivers/timer.o
 
 # Conditional Objects
