@@ -251,15 +251,16 @@ static void eth_init(void) {
 
 	if (hal_eth_init_status != HAL_OK) {
 		printf("Ethernet init failed!\r\n");
+		return;
 	}
 
     /* Initialize Tx Descriptors list: Chain Mode */
-    //HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
+    HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
 
     /* Initialize Rx Descriptors list: Chain Mode  */
-    //HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
+    HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
 
     /* Enable MAC and DMA transmission and reception */
-    //HAL_ETH_Start(&EthHandle);
+    HAL_ETH_Start(&EthHandle);
 }
 

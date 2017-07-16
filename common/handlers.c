@@ -6,6 +6,7 @@
 /* this 32-bit count overflows after 49.7 days */
 volatile unsigned int ticks = 0;
 void SysTick_Handler(void) { ticks++; }
+uint32_t HAL_GetTick(void) { return ticks; }
 
 void fault(void) {
 	
@@ -62,5 +63,18 @@ void UsageFault_Handler(void) {
 	//SCB->USFR;
 	//SCB->CFSR;
 	fault();
+}
+
+#include "hal/stm32f7xx_hal.h"
+extern ETH_HandleTypeDef EthHandle;
+
+/**
+ * Ethernet IRQ Handler
+ *
+ * @param  None
+ * @retval None
+ */
+void ETH_IRQHandler(void) {
+    HAL_ETH_IRQHandler(&EthHandle);
 }
 
