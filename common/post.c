@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "config.h"
 #include "rcc.h"
+#include "hal/stm32f7xx_hal.h"
 
 void print_post_info(void) {
 	int i;
@@ -13,17 +14,18 @@ void print_post_info(void) {
 	printf("Oscillator Settings:\r\n");
 	for (i = 0; i < NUM_CLK_SRCS; i++) {
 		printf("%s:\t%s", clk_src_strings[i], rcc_getClockState((clk_src_t) i) ? "ON" : "OFF");
-		if (i == HSE) printf("\t(%lu Hz), bypass %s", HSE_VALUE, rcc_getHSEBYP() ? "on" : "off");
-		if (i == HSI) printf("\t(%lu Hz)", HSI_VALUE);
+		if (i == HSE) printf("\t(%lu kHz), bypass %s", HSE_VALUE / 1000, rcc_getHSEBYP() ? "on" : "off");
+		if (i == HSI) printf("\t(%lu kHz)", HSI_VALUE / 1000);
 		if (i == LSE) printf("\t(%lu Hz), bypass %s", LSE_VALUE, rcc_getLSEBYP() ? "on" : "off");
 		if (i == PLL) printf("\t(source: %s)", clk_src_strings[rcc_get_PLLClockSrc()]);
 		printf("\r\n");
 	}
 
 	printf("\nFrequencies:\r\n");
-	printf("SYSCLK:\t%lu Hz (source: %s)\r\n", SystemCoreClock, clk_src_strings[rcc_get_SysClockSrc()]);
-	printf("APB1:\t%lu Hz\r\n", APB1_F);
-	printf("APB2:\t%lu Hz\r\n", APB2_F);
+	printf("SYSCLK:\t%lu kHz (source: %s)\r\n", SystemCoreClock / 1000, clk_src_strings[rcc_get_SysClockSrc()]);
+	printf("HCLK:\t%lu kHz\r\n", HAL_RCC_GetHCLKFreq() / 1000);
+	printf("APB1:\t%lu kHz\r\n", (APB1_F) / 1000);
+	printf("APB2:\t%lu kHz\r\n", (APB2_F) / 1000);
 
 	printf("\nUse 'help' for a list of commands.\r\n");
 	printf("----------------------------------------------------------------------\r\n\r\n");
