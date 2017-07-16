@@ -9,7 +9,7 @@ PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
 TERMINAL=gnome-terminal
 OBJDUMP_FILE=output.txt
-DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main
+DEFINES := -D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
 ###############################################################################
 

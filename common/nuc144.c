@@ -54,6 +54,7 @@ void setup_osc(void) {
 }
 
 /* static initializations that don't fail */
+extern void print_post_info(void);
 void early_init(void) {
 
 	uint32_t init_regs[3] = {0, 0, 0};
@@ -66,9 +67,13 @@ void early_init(void) {
 	
 	init_regs[0] = USART_CR1_RXNEIE;
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
+
+	print_post_info();
 }
 
 /* instantiate UART & button + LEDs no matter what */
+static void eth_init(void);
+extern void printPrompt(void);
 bool board_init(void) {
 
 	early_init();
@@ -76,7 +81,9 @@ bool board_init(void) {
 	/* TODO: I2C */
 
 	/* TODO: Ethernet */
+	eth_init();
 
+	printPrompt();
 	return true;
 }
 
@@ -202,5 +209,57 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
         /* Disable the Ethernet global Interrupt */
         NVIC_DisableIRQ(ETH_IRQn);
     }
+}
+
+#define PHY_TASK_WAIT           (200)
+#define ETH_ARCH_PHY_ADDRESS    (0x00)
+
+ETH_HandleTypeDef EthHandle;
+
+__ALIGN_BEGIN ETH_DMADescTypeDef DMARxDscrTab[ETH_RXBUFNB] __ALIGN_END; /* Ethernet Rx DMA Descriptor */
+
+__ALIGN_BEGIN ETH_DMADescTypeDef DMATxDscrTab[ETH_TXBUFNB] __ALIGN_END; /* Ethernet Tx DMA Descriptor */
+
+__ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethernet Receive Buffer */
+
+__ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
+
+static void eth_init(void) {
+    unsigned char ST_mac_addr[3] = {0x00, 0x80, 0xe1}; // default STMicro mac address
+	uint32_t word0 = *(uint32_t *) UID_BASE;
+    uint8_t MACAddr[6];
+    HAL_StatusTypeDef hal_eth_init_status;
+
+    MACAddr[0] = ST_mac_addr[0];
+    MACAddr[1] = ST_mac_addr[1];
+    MACAddr[2] = ST_mac_addr[2];
+    MACAddr[3] = (word0 & 0x00ff0000) >> 16;
+    MACAddr[4] = (word0 & 0x0000ff00) >> 8;
+    MACAddr[5] = (word0 & 0x000000ff);
+
+    /* Init ETH */
+    EthHandle.Instance = ETH;
+    EthHandle.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
+    EthHandle.Init.Speed = ETH_SPEED_100M;
+    EthHandle.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
+    EthHandle.Init.PhyAddress = ETH_ARCH_PHY_ADDRESS;
+    EthHandle.Init.MACAddr = MACAddr;
+    EthHandle.Init.RxMode = ETH_RXPOLLING_MODE;
+    EthHandle.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
+    EthHandle.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
+    hal_eth_init_status = HAL_ETH_Init(&EthHandle);
+
+	if (hal_eth_init_status != HAL_OK) {
+		printf("Ethernet init failed!\r\n");
+	}
+
+    /* Initialize Tx Descriptors list: Chain Mode */
+    //HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
+
+    /* Initialize Rx Descriptors list: Chain Mode  */
+    //HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
+
+    /* Enable MAC and DMA transmission and reception */
+    //HAL_ETH_Start(&EthHandle);
 }
 

@@ -1,9 +1,6 @@
 #include <stdio.h>
-//#include "config.h"
 #include "cli.h"
 #include "timer.h"
-
-extern void print_post_info(void);
 
 int main(void) {
 
@@ -11,9 +8,6 @@ int main(void) {
 
 	if (!board_init())
 		fault();
-
-	print_post_info();
-	printPrompt();
 
 	while(1) {
 		/* Handle Button */
