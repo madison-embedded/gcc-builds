@@ -56,6 +56,7 @@ OBJECTS += drivers/$(PROC_PREFIX)rcc.o
 OBJECTS += drivers/$(PROC_PREFIX)usart.o
 OBJECTS += drivers/$(PROC_PREFIX)adc.o
 OBJECTS += drivers/$(PROC_PREFIX)exti.o
+OBJECTS += drivers/$(PROC_PREFIX)tim.o
 
 # HAL Drivers
 #OBJECTS += drivers/hal/$(PROC_PREFIX)eth.o
