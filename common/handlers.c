@@ -22,6 +22,10 @@ void fault(void) {
 	}
 }
 
+void assert_failed(uint8_t* file, uint32_t line) {
+	fault();
+}
+
 /* helpful: http://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html */
 
 /* I don't think any of these will actually work because
