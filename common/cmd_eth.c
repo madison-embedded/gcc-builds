@@ -5,6 +5,7 @@
 #include "hal/stm32f7xx_hal.h"
 
 extern ETH_HandleTypeDef EthHandle;
+extern void eth_init(void);
 
 command_status do_eth(int argc, char *argv[]) {
 
@@ -12,9 +13,9 @@ command_status do_eth(int argc, char *argv[]) {
 	uint32_t regVal;
 	HAL_StatusTypeDef ret;
 
-	if (argc < 3) return USAGE;
+	if (argc < 2) return USAGE;
 
-	if (!strcmp(argv[1], "phy")) {
+	if (!strcmp(argv[1], "phy") && argc == 3) {
 		phy_reg = atoi(argv[2]);
 		if (phy_reg > 31 || phy_reg < 0) {
 			printf("invalid phy register %d\r\n", phy_reg);
@@ -27,6 +28,7 @@ command_status do_eth(int argc, char *argv[]) {
 		}
 		printf("register %d value: 0x%lx\r\n", phy_reg, regVal & 0xffff);
 	}
+	else if (!strcmp(argv[1], "init")) eth_init();
 	else return USAGE;
 
 	return SUCCESS;

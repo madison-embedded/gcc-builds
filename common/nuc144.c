@@ -72,7 +72,7 @@ void early_init(void) {
 }
 
 /* instantiate UART & button + LEDs no matter what */
-static void eth_init(void);
+void eth_init(void);
 extern void printPrompt(void);
 bool board_init(void) {
 
@@ -224,7 +224,7 @@ __ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethe
 
 __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
 
-static void eth_init(void) {
+inline void eth_init(void) {
     unsigned char ST_mac_addr[3] = {0x00, 0x80, 0xe1}; // default STMicro mac address
 	uint32_t word0 = *(uint32_t *) UID_BASE;
     uint8_t MACAddr[6];
@@ -247,12 +247,17 @@ static void eth_init(void) {
     EthHandle.Init.RxMode = ETH_RXPOLLING_MODE;
     EthHandle.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
     EthHandle.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
+
+	printf("Initializing ethernet . . . ");
+	fflush(stdout);
+
     hal_eth_init_status = HAL_ETH_Init(&EthHandle);
 
 	if (hal_eth_init_status != HAL_OK) {
-		printf("Ethernet init failed!\r\n");
+		printf("failed: %d\r\n\n", hal_eth_init_status);
 		return;
 	}
+	printf("success!\r\n\n");
 
     /* Initialize Tx Descriptors list: Chain Mode */
     HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
