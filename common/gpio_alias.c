@@ -1,0 +1,109 @@
+#include "gpio_alias.h"
+#include "gpio.h"
+
+const GPIO GPIO_TABLE[] = {
+	
+	/* STM32F767ZI */
+	FILL_GPIO("JTDI",			GPIOA, 15, ALT, LOW_SPEED, PULL_UP, false, OTHER)
+	FILL_GPIO("SWCLK",			GPIOA, 14, ALT, VERY_HIGH_SPEED, PULL_DOWN, false, OTHER)
+	FILL_GPIO("SWDAT",			GPIOA, 13, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("NJTRST",			GPIOB,  4, ALT, LOW_SPEED, PULL_UP, false, OTHER)
+	FILL_GPIO("JTDO",			GPIOB,  3, ALT, VERY_HIGH_SPEED, NONE, false, OTHER)
+	FILL_GPIO("OSC_IN",			GPIOH,  0, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("OSC_OUT",		GPIOH,  1, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("LSE_IN",			GPIOC, 14, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("LSE_OUT",		GPIOC, 15, INPUT, LOW_SPEED, NONE, false, OTHER)
+
+	/* Nucleo 144 I/O */
+	FILL_GPIO("REDLED",			GPIOB, 14, OUTPUT, LOW_SPEED, NONE, true, LED)
+	FILL_GPIO("BLUELED",		GPIOB,  7, OUTPUT, LOW_SPEED, NONE, true, LED)
+	FILL_GPIO("GREENLED",		GPIOB,  0, OUTPUT, LOW_SPEED, NONE, true, LED)
+	FILL_GPIO("BUTTON",			GPIOC, 13,  INPUT, LOW_SPEED, NONE, true, LED)
+
+	/* Nucleo 144 USB USART */
+	FILL_AFIO("UART TX",		GPIOD, 8, ALT, 7, HIGH_SPEED, NONE, true, OTHER)
+	FILL_AFIO("UART RX",		GPIOD, 9, ALT, 7, HIGH_SPEED, NONE, true, OTHER)
+
+	/*	Nucleo 144 USB */
+	FILL_GPIO("USB SOF",		GPIOA,  8, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB VBUS",		GPIOA,  9, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB ID",			GPIOA, 10, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB DM",			GPIOA, 11, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB DP",			GPIOA, 12, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB GPIO OUT",	GPIOG,  6, INPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("USB GPIO IN",	GPIOG,  7, INPUT, LOW_SPEED, NONE, false, OTHER)
+
+	/* Nucleo 144 Ethernet */
+	FILL_GPIO("RMII REFCLK",	GPIOA, 1, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII MDIO",		GPIOA, 2, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII MDC",		GPIOC, 1, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII RX DV",		GPIOA, 7, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII RXD0",		GPIOC, 4, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII RXD1",		GPIOC, 5, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII TX EN",		GPIOG, 11, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII TXD0",		GPIOG, 13, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("RMII TXD1",		GPIOB, 13, OUTPUT, LOW_SPEED, NONE, false, OTHER)
+
+	/* Application I/O */
+	FILL_GPIO("Sol1",		GPIOD,  0, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol2",		GPIOD,  1, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol3",		GPIOD,  3, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol4",		GPIOD,  4, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol5",		GPIOD,  5, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol6",		GPIOD,  6, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol7",		GPIOD,  7, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("Sol8",		GPIOE,  14, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	
+	/* Application Analog */
+
+	/* Application PWM */
+
+	/* Application Input Capture */
+	FILL_AFIO("Retro1",		GPIOE,  9, ALT, 1, LOW_SPEED, NONE, true, RETRO)
+	FILL_AFIO("Retro2",		GPIOE, 11, ALT, 1, LOW_SPEED, NONE, true, RETRO)
+	FILL_AFIO("Retro3",		GPIOE, 13, ALT, 1, LOW_SPEED, NONE, true, RETRO)
+
+	/* Application I2C */
+	FILL_AFIO("I2C2 SDA",		GPIOF, 0, ALT, 4, LOW_SPEED, NONE, true, I2C)
+	FILL_AFIO("I2C2 SCL",		GPIOF, 1, ALT, 4, LOW_SPEED, NONE, true, I2C)
+
+	/* Application SDMMC */
+	FILL_GPIO("SDMMC1 D0",		GPIOC,  8, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("SDMMC1 D1",		GPIOC,  9, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("SDMMC1 D2",		GPIOC, 10, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("SDMMC1 D3",		GPIOC, 11, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("SDMMC1 CK",		GPIOC, 12, ALT, LOW_SPEED, NONE, false, OTHER)
+	FILL_GPIO("SDMMC1 CMD",		GPIOD,  2, ALT, LOW_SPEED, NONE, false, OTHER)
+};
+
+const uint8_t NUM_GPIO_ALIAS = sizeof(GPIO_TABLE)/sizeof(GPIO);
+const char * GROUP_NAMES[] = {"other", "sensors", "solenoid", "retro", "led", "i2c"};
+const uint8_t NUM_GROUPS = sizeof(GROUP_NAMES)/sizeof(char *);
+
+int gpioAliasInit(){
+	int i;
+	GPIO_TypeDef * port;
+	uint8_t pin;
+
+	for(i =0; i < NUM_GPIO_ALIAS; i++){
+		if (GPIO_TABLE[i].usable){
+			port = GPIO_TABLE[i].port;
+			pin = GPIO_TABLE[i].pin;
+
+			gpio_setClock(port, true);
+			gpio_setMode(port, pin, GPIO_TABLE[i].mode);
+			gpio_setSpeed(port, pin, GPIO_TABLE[i].speed);
+			
+			if (GPIO_TABLE[i].mode == ALT)
+				gpio_setAlternateFunc(port, pin, GPIO_TABLE[i].af_val);
+			
+			if (GPIO_TABLE[i].mode == OUTPUT)
+				gpio_writePin(port, pin, 0);
+		}
+	}
+
+	return 0;
+}
+
+
+

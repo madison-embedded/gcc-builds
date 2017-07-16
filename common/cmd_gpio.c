@@ -5,6 +5,17 @@
 #include "gpio.h"
 #include "gpio_alias.h"
 
+int isGroup(char * group){
+	int i;
+	for (i = 0; i < NUM_GROUPS; i ++) {
+		if (strcmp(GROUP_NAMES[i], group) == 0) {
+			if (!i) return 0;
+			return 0x1 << (i-1);
+		}
+	}
+	return -1;
+}
+
 int hasGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, char * name) {
 	int i;
 	for (i = 0; i<NUM_GPIO_ALIAS;i++){
@@ -30,8 +41,6 @@ int getAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
 }
 
 void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
-
-	
 	GPIO alias;
 	if (getAlias(&port, &pin, &alias)) {
 		if (alias.usable) printf("Yes");
@@ -73,14 +82,25 @@ command_status do_pin(int argc, char *argv[]) {
 	if (argc < 2) return USAGE;
 	bool pinOnly = false, useAlias = false;
 	char portTemp = argv[1][0];
+	int group;
 	uint8_t pin = 0, i;
 	GPIO_TypeDef * port; 
 	GPIO_MODE mode;
-	
+
 	if (hasGpioAlias(&port, &pin, argv[1])) useAlias = true;
 	else port = gpio_getGpioPort(portTemp);
 
-	if (strcmp(argv[1], "alias") == 0){
+	group = isGroup(argv[1]);
+	if (group != -1) {
+		printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
+		for (i=0; i<NUM_GPIO_ALIAS; i++) {
+			if (group & GPIO_TABLE[i].group)
+			gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
+		}
+		return SUCCESS;
+	}
+
+	if (strcmp(argv[1], "alias") == 0) {
 		printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
 		for (i=0; i<NUM_GPIO_ALIAS; i++) gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
 		return SUCCESS;

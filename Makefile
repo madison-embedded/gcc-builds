@@ -35,6 +35,7 @@ OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
 OBJECTS += common/handlers.o
+OBJECTS += common/gpio_alias.o
 
 # Commands
 OBJECTS += common/cli.o
