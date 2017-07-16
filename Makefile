@@ -73,16 +73,20 @@ CPUDIR := include/proc
 ###############################################################################
 # Source Rules
 %.o: %.S
-	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	+@echo "building $(notdir $<)"
+	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
 %.o: %.c
-	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	+@echo "building $(notdir $<)"
+	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
 $(PROJECT).elf: $(OBJECTS)
-	$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
+	+@echo "linking $(notdir $@)"
+	@$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
 
 $(PROJECT).bin: $(PROJECT).elf
-	$(TOOLCHAIN)objcopy -O binary $< $@
+	@$(TOOLCHAIN)objcopy -O binary $< $@
+	+@echo "Ready to flash $@."
 
 # Project Rules
 $(OBJECTS): | $(CPUDIR)
@@ -91,11 +95,12 @@ $(OBJDUMP_FILE): $(PROJECT).bin
 	$(TOOLCHAIN)objdump -D $(PROJECT).elf > $(OBJDUMP_FILE)
 
 $(CPUDIR):
-	ln -s ../$(PROC_DIR) $@
+	+@echo "Creating $@"
+	@ln -s ../$(PROC_DIR) $@
 
 clean: 
-	rm -f *.bin *.map *.elf $(CPUDIR) output.txt
-	find . -name '*.o' -delete
+	@rm -f *.bin *.map *.elf $(CPUDIR) output.txt
+	@find . -name '*.o' -delete
 
 install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh

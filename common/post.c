@@ -3,13 +3,16 @@
 #include "rcc.h"
 #include "hal/stm32f7xx_hal.h"
 
+const unsigned int *UID = (const unsigned int *) UID_BASE;
+
 void print_post_info(void) {
 	int i;
 	printf("\r\n----------------------------------------------------------------------\r\n");
 	printf("-        University of Wisconsin-Madison Embedded Engineering        -\r\n");
 	printf("----------------------------------------------------------------------\r\n");
 	printf("Board:\t\t%s\r\n", BOARD);
-	printf("Processor:\t%s\r\n\n", PROCESSOR);
+	printf("Processor:\t%s (%08x-%08x-%08x)\r\n", PROCESSOR, UID[0], UID[1], UID[2]);
+	printf("Flash Size:\t%uK\r\n\n", *((const unsigned int*) FLASHSIZE_BASE) & 0xffff);
 
 	printf("Oscillator Settings:\r\n");
 	for (i = 0; i < NUM_CLK_SRCS; i++) {
