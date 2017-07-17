@@ -69,6 +69,9 @@ OBJECTS += drivers/hal/stm32f7xx_hal_rcc.o
 OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
 
 CPUDIR := include/proc
+
+#Middleware
+include middleware/LwIP/makefile.conf
 ###############################################################################
 
 

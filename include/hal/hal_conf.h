@@ -83,14 +83,6 @@
 
 /* Section 1 : Ethernet peripheral configuration */
 
-/* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
-#define MAC_ADDR0   2U
-#define MAC_ADDR1   0U
-#define MAC_ADDR2   0U
-#define MAC_ADDR3   0U
-#define MAC_ADDR4   0U
-#define MAC_ADDR5   0U
-
 /* Definition of the Ethernet driver buffers size and count */   
 #define ETH_RX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for receive               */
 #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
@@ -149,7 +141,7 @@
 /* CRC FEATURE: Use to activate CRC feature inside HAL SPI Driver
  * Activated: CRC code is present inside driver
  * Deactivated: CRC code cleaned from driver */
-#define USE_SPI_CRC                     1U
+#define USE_SPI_CRC                     0U
 
 #ifdef HAL_RCC_MODULE_ENABLED
 #include "stm32f7xx_hal_rcc.h"
