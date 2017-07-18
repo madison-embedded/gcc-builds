@@ -1229,6 +1229,7 @@ pbuf_coalesce(struct pbuf *p, pbuf_layer layer)
   err = pbuf_copy(q, p);
   LWIP_ASSERT("pbuf_copy failed", err == ERR_OK);
   pbuf_free(p);
+  err = err;
   return q;
 }
 
