@@ -478,3 +478,12 @@ void HAL_DisableMemorySwappingBank(void)
 }
 #endif /* STM32F767xx || STM32F769xx || STM32F777xx || STM32F779xx */
 
+void hal_print_status(HAL_StatusTypeDef stat) {
+	switch (stat) {
+		case HAL_OK: printf("OK"); break;
+		case HAL_ERROR: printf("ERROR"); break;
+		case HAL_BUSY: printf("BUSY"); break;
+		case HAL_TIMEOUT: printf("TIMEOUT"); break;
+	}
+}
+

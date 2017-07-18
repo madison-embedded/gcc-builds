@@ -55,7 +55,9 @@ static void low_level_init(struct netif *netif) {
     hal_eth_init_status = HAL_ETH_Init(&EthHandle);
 
 	if (hal_eth_init_status != HAL_OK) {
-		printf("failed: %d\r\n\n", hal_eth_init_status);
+		printf("failed: ");
+		eth_print_status(hal_eth_init_status);
+		printf("\r\n\n");
 		return;
 	}
 	printf("success!\r\n\n");
@@ -425,10 +427,20 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth) {
     }
 }
 
-sys_prot_t sys_arch_protect(void) {
-	return 0;
+void eth_print_status(HAL_ETH_StateTypeDef stat) {
+	switch (stat) {
+		case HAL_ETH_STATE_RESET: printf("RESET"); break;
+		case HAL_ETH_STATE_READY: printf("READY"); break;
+		case HAL_ETH_STATE_BUSY: printf("BUSY"); break;
+		case HAL_ETH_STATE_BUSY_RX: printf("BUSY_RX"); break;
+		case HAL_ETH_STATE_BUSY_TX: printf("BUSY_TX"); break;
+		case HAL_ETH_STATE_BUSY_TX_RX: printf("BUSY_TX_RX"); break;
+		case HAL_ETH_STATE_BUSY_WR: printf("BUSY_WR"); break;
+		case HAL_ETH_STATE_BUSY_RD: printf("BUSY_RD"); break;
+		case HAL_ETH_STATE_TIMEOUT: printf("TIMEOUT"); break;
+		case HAL_ETH_STATE_ERROR: printf("ERROR"); break;
+	}
 }
 
-void sys_arch_unprotect(sys_prot_t pval) {
-	UNUSED(pval);
-}
+sys_prot_t sys_arch_protect(void) { return 0; }
+void sys_arch_unprotect(sys_prot_t pval) { UNUSED(pval); }

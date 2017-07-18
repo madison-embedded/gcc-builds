@@ -5,30 +5,6 @@
 #include "ethernetif.h"
 #include "hal/stm32f7xx_hal.h"
 
-void eth_print_status(HAL_ETH_StateTypeDef stat) {
-	switch (stat) {
-		case HAL_ETH_STATE_RESET: printf("RESET"); break;
-		case HAL_ETH_STATE_READY: printf("READY"); break;
-		case HAL_ETH_STATE_BUSY: printf("BUSY"); break;
-		case HAL_ETH_STATE_BUSY_RX: printf("BUSY_RX"); break;
-		case HAL_ETH_STATE_BUSY_TX: printf("BUSY_TX"); break;
-		case HAL_ETH_STATE_BUSY_TX_RX: printf("BUSY_TX_RX"); break;
-		case HAL_ETH_STATE_BUSY_WR: printf("BUSY_WR"); break;
-		case HAL_ETH_STATE_BUSY_RD: printf("BUSY_RD"); break;
-		case HAL_ETH_STATE_TIMEOUT: printf("TIMEOUT"); break;
-		case HAL_ETH_STATE_ERROR: printf("ERROR"); break;
-	}
-}
-
-void hal_print_status(HAL_StatusTypeDef stat) {
-	switch (stat) {
-		case HAL_OK: printf("OK"); break;
-		case HAL_ERROR: printf("ERROR"); break;
-		case HAL_BUSY: printf("BUSY"); break;
-		case HAL_TIMEOUT: printf("TIMEOUT"); break;
-	}
-}
-
 command_status do_eth(int argc, char *argv[]) {
 
 	uint16_t phy_reg;

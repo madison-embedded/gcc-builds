@@ -11,5 +11,7 @@ extern ETH_HandleTypeDef EthHandle;
 void ethernetif_input(struct netif *netif);
 void Netif_Config(void);
 
+void eth_print_status(HAL_ETH_StateTypeDef stat);
+
 #endif
 
