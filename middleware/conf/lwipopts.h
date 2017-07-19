@@ -16,6 +16,8 @@
 #define LWIP_IPV6                   0
 #define MEM_LIBC_MALLOC				1
 
+#define LWIP_DEBUG					1
+
 #define ADDR_TIMEOUT                0
 #define PREF_IPV4                   1
 #define PREF_IPV6                   2
