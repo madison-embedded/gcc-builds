@@ -6,7 +6,13 @@
 typedef struct req_telem {
 	uint8_t team_id;
 #define TEAM_ID	0xab
-	uint8_t status;
+	uint8_t status,
+#define FAULT	0x0
+#define IDLE	0x1
+#define READY	0x2
+#define PUSHING	0x3
+#define COAST	0x4
+#define BRAKING	0x5
 	int acceleration,
 		position,
 		velocity;

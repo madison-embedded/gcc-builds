@@ -13,6 +13,7 @@ int send_telemetry_to_SpaceX(badgerloop_telemetry_t *data) {
 }
 
 int send_telemetry_to_Dashboard(badgerloop_telemetry_t *data) {
+
 	return 0;
 }
 
