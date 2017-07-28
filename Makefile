@@ -11,6 +11,9 @@ TERMINAL=gnome-terminal
 OBJDUMP_FILE=output.txt
 DEFINES := -D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
+GIT_TIME= $(shell git log -n 1 --date=iso --format="%at")
+DEFINES+=-D_GIT_TIME='$(GIT_TIME)'
+DEFINES+=-D_VERSION_MAJOR='$(VERSION_MAJOR)' -D_VERSION_MINOR='$(VERSION_MINOR)'
 ###############################################################################
 
 
@@ -20,7 +23,7 @@ CORE=CM$(CORTEX_M)
 FPU = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 
 TOOLCHAIN=arm-none-eabi-
-CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os 
+CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os
 # -Os -nostdlib -lnosys
 
 # Linker Settings
@@ -30,8 +33,8 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 
 ###############################################################################
 # Global Objects
-OBJECTS += common/main.o 
-OBJECTS += common/badgerloop.o 
+OBJECTS += common/main.o
+OBJECTS += common/badgerloop.o
 OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
@@ -105,11 +108,13 @@ $(CPUDIR):
 	+@echo "Creating $@"
 	@ln -s ../$(PROC_DIR) $@
 
-clean: 
+clean:
 	@rm -f *.bin *.map *.elf $(CPUDIR) output.txt
 	@find . -name '*.o' -delete
 
-install: $(PROJECT).bin
+install:
+	printf $(GIT_TIME)
+	 $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
 
 debug: $(PROJECT).bin
@@ -121,4 +126,3 @@ dump: $(OBJDUMP_FILE)
 %_config:
 	@echo $@
 ###############################################################################
-

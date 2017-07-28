@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include "config.h"
 #include "rcc.h"
 #include "hal/stm32f7xx_hal.h"
@@ -30,7 +31,11 @@ void print_post_info(void) {
 	printf("APB1:\t%lu kHz\r\n", (APB1_F) / 1000);
 	printf("APB2:\t%lu kHz\r\n", (APB2_F) / 1000);
 
+	char buff[40];
+	strftime(buff, sizeof(_GIT_TIME), "%c", _GIT_TIME);
+	printf("GitHub date: %s\n", buff);
+	printf("Verson %d.%d compiled on: %s %s\n", _VERSION_MAJOR, _VERSION_MINOR, __DATE__, __TIME__);
+
 	printf("\nUse 'help' for a list of commands.\r\n");
 	printf("----------------------------------------------------------------------\r\n\r\n");
 }
-
