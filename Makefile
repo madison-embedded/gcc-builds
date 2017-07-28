@@ -112,9 +112,7 @@ clean:
 	@rm -f *.bin *.map *.elf $(CPUDIR) output.txt
 	@find . -name '*.o' -delete
 
-install:
-	printf $(GIT_TIME)
-	 $(PROJECT).bin
+install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
 
 debug: $(PROJECT).bin
