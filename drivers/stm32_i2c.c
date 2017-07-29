@@ -18,7 +18,7 @@ bool enable_I2C_clk(uint32_t i2c_base){
 	int shift ;
     /* 1) The following enables a clock for a specific I2C */
 	switch(i2c_base)
-    {
+    	{
     	case I2C1_BASE:                 // Enable clock
         	shift = 21;
             break;
