@@ -42,7 +42,7 @@ const GPIO GPIO_TABLE[] = {
 	FILL_GPIO("RMII RXD1",		GPIOC, 5, OUTPUT, LOW_SPEED, NONE, false, OTHER)
 	FILL_GPIO("RMII TX EN",		GPIOG, 11, OUTPUT, LOW_SPEED, NONE, false, OTHER)
 	FILL_GPIO("RMII TXD0",		GPIOG, 13, OUTPUT, LOW_SPEED, NONE, false, OTHER)
-	FILL_GPIO("RMII TXD1",		GPIOB, 13, OUTPUT, LOW_SPEED, NONE, fEXTI
+	FILL_GPIO("RMII TXD1",		GPIOB, 13, OUTPUT, LOW_SPEED, NONE, false, OTHER)
 	/* Application I/O */
 	/* INPUT */
 	FILL_GPIO("LIMITSWITCH1",		GPIOG,  2, INPUT, LOW_SPEED, NONE, true, SOLENOID)
@@ -109,7 +109,7 @@ const GPIO GPIO_TABLE[] = {
 };
 
 const uint8_t NUM_GPIO_ALIAS = sizeof(GPIO_TABLE)/sizeof(GPIO);
-const char * GROUP_NAMES[] = {"other", "sensors", "solenoid", "retro", "led", "i2c"};
+const char * GROUP_NAMES[] = {"other", "sensors", "solenoid", "retro", "led", "i2c", "PRESSURE"};
 const uint8_t NUM_GROUPS = sizeof(GROUP_NAMES)/sizeof(char *);
 
 int gpioAliasInit(){
