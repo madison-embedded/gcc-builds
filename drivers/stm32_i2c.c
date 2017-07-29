@@ -1,4 +1,4 @@
-nclude "proc/defs.h"
+#include "proc/defs.h"
 #include <stdint.h>
 #include <stdbool.h>
 
