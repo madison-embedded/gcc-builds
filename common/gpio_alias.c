@@ -96,8 +96,8 @@ const GPIO GPIO_TABLE[] = {
 	FILL_AFIO("Retro3",		GPIOE, 13, ALT, 1, LOW_SPEED, NONE, true, RETRO)
 
 	/* Application I2C */
-	FILL_AFIO("I2C2 SDA",		GPIOF, 0, ALT, 4, LOW_SPEED, NONE, true, I2C)
-	FILL_AFIO("I2C2 SCL",		GPIOF, 1, ALT, 4, LOW_SPEED, NONE, true, I2C)
+	FILL_AFIO("SDA",		GPIOF, 0, ALT, 4, LOW_SPEED, NONE, true, I2C)
+	FILL_AFIO("SCL",		GPIOF, 1, ALT, 4, LOW_SPEED, NONE, true, I2C)
 
 	/* Application SDMMC */
 	FILL_GPIO("SDMMC1 D0",		GPIOC,  8, ALT, LOW_SPEED, NONE, false, OTHER)
@@ -129,6 +129,9 @@ int gpioAliasInit(){
 			if (GPIO_TABLE[i].mode == ALT)
 				gpio_setAlternateFunc(port, pin, GPIO_TABLE[i].af_val);
 			
+			if (GPIO_TABLE[i].group == I2C)
+				gpio_openDrainState(port, pin, true);
+
 			if (GPIO_TABLE[i].mode == OUTPUT)
 				gpio_writePin(port, pin, 0);
 		}
