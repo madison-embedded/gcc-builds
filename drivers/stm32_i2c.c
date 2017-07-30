@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+#include "proc/defs.h"
+>>>>>>> b043b07ef888af35ec11ad7af755536eb0f08de8
 #include <stdint.h>
 #include <stdbool.h>
 #include "proc/defs.h"
@@ -22,6 +26,7 @@ bool I2C_setClock(uint32_t i2c_base, bool state )
     /* 1) The following enables a clock for a specific I2C */
 	switch(i2c_base)
     	{
+
     	   case I2C1_BASE:                 // Enable clock
         	i2c = RCC_APB1ENR_I2C1EN;
            	break;
@@ -39,6 +44,7 @@ bool I2C_setClock(uint32_t i2c_base, bool state )
             	break;
 	    default:
             	return false;
+
 	}
       	
 	
