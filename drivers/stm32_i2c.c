@@ -1,6 +1,8 @@
-nclude "proc/defs.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "proc/defs.h"
+#include "i2c.h"
+
 
 volatile uint8_t* BUFFER_I2C = NULL;
 
@@ -13,36 +15,43 @@ volatile bool I2C2_BUSY = false;
 volatile bool I2C3_BUSY = false;
 volatile bool I2C4_BUSY = false;
 
-bool enable_I2C_clk(uint32_t i2c_base){
+bool I2C_setClock(uint32_t i2c_base, bool state )
+{
 
-	int shift ;
+	uint32_t i2c ;
     /* 1) The following enables a clock for a specific I2C */
 	switch(i2c_base)
-    {
-    	case I2C1_BASE:                 // Enable clock
-        	shift = 21;
-            break;
-		case I2C2_BASE:                 // Enable clock
-            shift = 22;
-            break;
-		case I2C3_BASE:                 // Enable clock
-            shift = 23;
-            break;
-        case I2C4_BASE:
-            shift = 24;
-            break;
-		default:
-            return false;
+    	{
+    	   case I2C1_BASE:                 // Enable clock
+        	i2c = RCC_APB1ENR_I2C1EN;
+           	break;
+
+	    case I2C2_BASE:                 // Enable clock
+            	i2c = RCC_APB1ENR_I2C2EN;
+            	break;
+
+	    case I2C3_BASE:                 // Enable clock
+            	i2c = RCC_APB1ENR_I2C3EN;
+            	break;
+
+            case I2C4_BASE:
+            	i2c = RCC_APB1ENR_I2C4EN;
+            	break;
+	    default:
+            	return false;
 	}
-       
- 	RCC -> APB1ENR &= ~ ( 1 << shift );
-	while ( RCC -> APB1ENR & 0x1 ){}
-	RCC -> APB1ENR |= 1 << shift ; 
+      	
+	
+ 	RCC -> APB1ENR &= ~ i2c;
+	while ( RCC -> APB1ENR & i2c ){}
+
+	if( state) 
+		RCC -> APB1ENR |= i2c ; 
  
 	return true;
 }
 
-bool verify_I2C_base(uint32_t i2c_base)
+bool I2C_verifyBase(uint32_t i2c_base)
 {
 	switch(i2c_base)
     {
@@ -57,93 +66,141 @@ bool verify_I2C_base(uint32_t i2c_base)
       	default: return false;         
     }
 } 
-
-bool config_I2C_filter(bool analog_on_off, uint8_t digital_filter_config, uint32_t i2c_base)
+bool I2C_set_analog_filter( bool analog_on, uint32_t i2c_base )
 {
-	I2C_TypeDef * i2c = NULL;
 
-	if(verify_I2C_base(i2c_base))
-	       i2c = (I2C_TypeDef *) i2c_base;
-	else return false; // illegal argument
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	if(!I2C_verifyBase(i2c_base))
+		return false; 
 
-	/* Enables/Disables Analog filter: 
-	   analog_on_off == true ==> ON
-	   analog_on_off == false ==> OFF
-	*/	
-	if(analog_on_off)
-		i2c -> CR1 &= ~(1<<12); 		
+	if(analog_on)
+
+		i2c -> CR1 &= ~I2C_CR1_ANFOFF; 		
 	else 
-		i2c -> CR1 |= (1<<12);
-
-	/*
-	  Configure Digital Filter	
-	*/
-	if(digital_filter_config < 16)
-	{
-		i2c -> CR1 &= ~(0xF << 8);
-		i2c -> CR1 |= (digital_filter_config << 8); 
-	}
-	else return false; // illegal argument 
-
+		i2c -> CR1 |= I2C_CR1_ANFOFF;
 	return true;
-}
-
-bool set_I2C_timing(uint32_t i2c_base , uint8_t preScaler, uint8_t setup_time, uint8_t hold_time, uint8_t sclh, uint8_t scll)
-{	
-	I2C_TypeDef * i2c = NULL;
-
-	if(verify_I2C_base(i2c_base))
-	       i2c = (I2C_TypeDef *) i2c_base;
-	else return false; // illegal argument
-
-	//Arguments should be less than 5 bits
-    if(preScaler >= 16 || setup_time >= 16 || hold_time >= 16) 
-                return false;
-
-    i2c -> TIMINGR |= (preScaler << 28) | (setup_time << 20) | (hold_time << 16) 
-					  | (sclh <<8) | (scll);
-	return true;
-}
-
-bool on_off_I2C_clockStretch(bool on_off, uint32_t i2c_base)
-{
-	I2C_TypeDef * i2c = NULL;
-
-	if(verify_I2C_base(i2c_base))
-	       i2c = (I2C_TypeDef *) i2c_base;
-	else return false; // illegal argument
-
-	if(on_off)  i2c -> CR1 &= ~(1<<17); // must be kept cleared in master mode
-			  
-	else i2c -> CR1 |= (1<<17); 
-
-	return true;
-}
-
-bool enable_disable_I2C(uint32_t i2c_base, bool en_dis)
-{
-	I2C_TypeDef * i2c = NULL;
-
-	if(verify_I2C_base(i2c_base))
-	       i2c = (I2C_TypeDef *) i2c_base;
-	else return false; // illegal argument
-
-	if(en_dis)
-	{ 
-		i2c -> CR1 &= ~(0x1);
-
-		while( (i2c -> CR1 & 0x1) ){} 
-		i2c -> CR1 |= 0x1;
-    }
-	else i2c -> CR1 &= ~(0x1);
 	
+} 
+
+bool I2C_set_digital_filter(uint8_t digital_filter, uint32_t i2c_base)
+{
+	
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	if(!I2C_verifyBase(i2c_base) || (digital_filter > 15 ))
+		return false;
+
+	i2c -> CR1 &= ~I2C_CR1_DNF_Msk;
+	i2c -> CR1 |= (digital_filter << I2C_CR1_DNF_Pos); 
+	return true; 
+} 
+
+bool  I2C_setPreScaler(uint8_t preScaler, uint32_t i2c_base)
+{
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	
+	if(!I2C_verifyBase(i2c_base) || ( preScaler > 15 ))
+		return false;
+
+	i2c -> TIMINGR &=  ~I2C_TIMINGR_PRESC_Msk ; 
+	i2c -> TIMINGR |= preScaler << I2C_TIMINGR_PRESC_Pos; 
+	return true; 
+	
+}
+
+bool I2C_setSCLDEL(uint8_t scldel, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	
+	if(!I2C_verifyBase(i2c_base) || ( scldel > 15 ))
+		return false;
+	i2c -> TIMINGR &= ~I2C_TIMINGR_SCLDEL_Msk;
+	i2c -> TIMINGR |= scldel << I2C_TIMINGR_SCLDEL_Pos;
+	return true;
+
+}
+
+
+bool I2C_setSDADEL(uint8_t sdadel, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	
+	if(!I2C_verifyBase(i2c_base) || ( sdadel > 15 ))
+		return false;
+	
+	i2c -> TIMINGR &= ~I2C_TIMINGR_SDADEL_Msk;
+	i2c -> TIMINGR |= sdadel << I2C_TIMINGR_SDADEL_Pos;
+	return true;
+}
+
+bool I2C_setSCLH(uint8_t sclh, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	
+	if(!I2C_verifyBase(i2c_base) || ( sclh > 15 ))
+		return false;
+	
+	i2c -> TIMINGR &= ~I2C_TIMINGR_SCLH_Msk;
+	i2c -> TIMINGR |= sclh << I2C_TIMINGR_SCLH_Pos;
+	return true;
+}
+
+
+bool I2C_setSCLL(uint8_t scll, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = ( I2C_TypeDef * ) i2c_base;
+	
+	if(!I2C_verifyBase(i2c_base) || ( scll > 15 ))
+		return false;
+	
+	i2c -> TIMINGR &= ~I2C_TIMINGR_SCLL_Msk;
+	i2c -> TIMINGR |= scll << I2C_TIMINGR_SCLL_Pos;
+	return true;
+}
+
+
+
+bool I2C_clockStretch_off(bool clockStretch_off, uint32_t i2c_base)
+{
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+
+	if( !clockStretch_off )  
+		i2c -> CR1 &= ~I2C_CR1_NOSTRETCH_Msk; // must be kept cleared in master mode
+	else 
+		i2c -> CR1 |= I2C_CR1_NOSTRETCH; 
+
+	return true;
+}
+
+bool I2C_enable(bool enable, uint32_t i2c_base)
+{
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+
+	 
+	i2c -> CR1 &= ~I2C_CR1_PE_Msk;
+	while( (i2c -> CR1 & I2C_CR1_PE) ){} 
+	
+	if(enable)
+		i2c -> CR1 |= I2C_CR1_PE;
+    	
 	return true; 
 		
 }	
 
-bool disable_i2c_NVIC(uint32_t i2c_base)
+bool I2C_disable_NVIC(uint32_t i2c_base)
 {	
-	if(! verify_I2C_base(i2c_base))
+   if(! I2C_verifyBase(i2c_base))
 		return false; // illegal argument
 
     /* 1) The following enables a clock for a specific I2C */
@@ -159,7 +216,7 @@ bool disable_i2c_NVIC(uint32_t i2c_base)
 
             case I2C3_BASE:                 // Enable clock	
 					NVIC_DisableIRQ(I2C3_EV_IRQn); // Enable Interrupt Handler
-		            return true; 
+		        return true; 
 
             case I2C4_BASE:	
 					NVIC_DisableIRQ(I2C4_EV_IRQn); // Enable Interrupt Handler
@@ -171,9 +228,9 @@ bool disable_i2c_NVIC(uint32_t i2c_base)
 
 }    
 
-bool enable_i2c_NVIC(uint32_t i2c_base)
+bool I2C_enable_NVIC(uint32_t i2c_base)
 {	
-	if(! verify_I2C_base(i2c_base))
+    if(! I2C_verifyBase(i2c_base))
 		return false; // illegal argument
 
     /* 1) The following enables a clock for a specific I2C */
@@ -199,66 +256,151 @@ bool enable_i2c_NVIC(uint32_t i2c_base)
                     return false;
      }
 }    
-                                                  
-bool master_i2c_config(uint32_t i2c_base, uint8_t ten_bit_mode, uint32_t slave_addr, uint8_t head10R) 
+    
+bool I2C_set10BitMode(bool ten_bit_mode, uint32_t i2c_base)
 {
+	
 	I2C_TypeDef * i2c = NULL;
 
-	if(verify_I2C_base(i2c_base))
+	if(I2C_verifyBase(i2c_base))
 	       i2c = (I2C_TypeDef *) i2c_base;
 	else return false; // illegal argument
+	while (i2c -> CR2 & I2C_CR2_START_Msk) {}; // START bit set; illegal to change 
+	if(ten_bit_mode)
+		i2c -> CR2 |= I2C_CR2_ADD10; 
+	else	
+		i2c -> CR2 &= I2C_CR2_ADD10_Msk;
 
-	/* Sets ten bit addressing mode or 7 bit mode 
-	 and a slave address*/
-	while (i2c -> CR2 & (1<<13)) {}; // START bit set; illegal to change 
+	return true; 
+}
 
-	if(ten_bit_mode == 1)
+bool I2C_setSlaveAddr(uint32_t slave_addr, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+	while (i2c -> CR2 & I2C_CR2_START_Msk) {}; // START bit set; illegal to change 
+	
+	if( i2c -> CR2 & I2C_CR2_ADD10 )
 	{
-		i2c -> CR2 |= 1<<11;
 		if ( slave_addr >= 1024) // slave address must be 10 bits long 
 			return false; 
-		else
-		{	
-			i2c -> CR2 &= 0xFFFFFC00;
-			i2c -> CR2 |= slave_addr << 1; 
-		}	 
+		i2c -> CR2 &= ~I2C_CR2_SADD_Msk;
+		i2c -> CR2 |= slave_addr; 
 	}
 	else
 	{
-		i2c -> CR2 &= ~(1<<11);
-		if(slave_addr >= 0x8F ) // argument should be 8 bits long
-			return false;
-		else
-		{
-			i2c -> CR2 &= 0xFFFFFC00;		
-			i2c -> CR2 |= (slave_addr << 1);
-		}
-	}
-	
-	
-	/*Sets transfer direction and head10R must be configure to indicate 
-	 if the complete address sequence must be sent or only the header in 
-	case of a direction change*/ 
-	
-	i2c -> CR2 &= ~(1 << 12);
-	
-	i2c -> CR2 |= (head10R << 12); 
-  
-		
-	i2c -> CR2 |= (1<<25); // AutoEND
-	
- 	i2c -> CR1 |= 1 << 5 ; // Stop detection interrupt enable 
-	
-	i2c -> CR1 &= ~(0x6);
+		i2c -> CR2 &= ~I2C_CR2_SADD_Msk;
+		i2c -> CR2 |= slave_addr << 1; 
+	}	
+	return true;
+} 
 
-   	i2c -> CR1 |= 1 << 1; 	// Transmit interrupt enable
-	i2c -> CR1 |= 1 << 2;   // Receive interrupt enable
+bool I2C_setHead10R(bool  head10R, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+	
+	while (i2c -> CR2 & I2C_CR2_START) {}; // START bit set; illegal to change 
+	if(head10R)
+		i2c -> CR2 |= I2C_CR2_HEAD10R;
+	else
+		i2c -> CR2 &= ~I2C_CR2_HEAD10R_Msk;
+		
+	return true; 	
+}	
+
+bool I2C_setAutoend(bool enable, uint32_t i2c_base) 
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+	
+	while (i2c -> CR2 & I2C_CR2_START) {}; // START bit set; illegal to change 
+	if(enable) 
+		i2c -> CR2 |= I2C_CR2_AUTOEND; 
+	else 
+		i2c -> CR2 &= ~I2C_CR2_AUTOEND_Msk; 
 
 	return true;
 }
 
+bool I2C_StopDetect_Interrupt_Enable(bool enable, uint32_t i2c_base )
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+
+	if(enable)
+		i2c -> CR1 |= I2C_CR1_STOPIE; 
+ 	else 
+		i2c -> CR1 &= ~I2C_CR1_STOPIE_Msk; 
+	return true; 	
+}
+
+bool I2C_Transmit_Interrupt_Enable(bool enable, uint32_t i2c_base )
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+
+	if(enable)
+		i2c -> CR1 |= I2C_CR1_TXIE; 
+ 	else 
+		i2c -> CR1 &= ~I2C_CR1_TXIE_Msk; 
+	return true; 	
+}
+
+bool I2C_Receive_Interrupt_Enable(bool enable, uint32_t i2c_base )
+{
+	
+	I2C_TypeDef * i2c = NULL;
+
+	if(I2C_verifyBase(i2c_base))
+	       i2c = (I2C_TypeDef *) i2c_base;
+	else return false; // illegal argument
+
+	if(enable)
+		i2c -> CR1 |= I2C_CR1_RXIE; 
+ 	else 
+		i2c -> CR1 &= ~I2C_CR1_RXIE_Msk; 
+	return true; 	
+}
+
+bool I2C_Master_Config_slaveADDR(uint32_t i2c_base, bool ten_bit_mode, uint32_t slave_addr, bool head10R, bool autoend){
+	I2C_TypeDef * i2c = (I2C_TypeDef * ) i2c_base;
+	bool no_error;
+	no_error =  I2C_set10BitMode(ten_bit_mode, i2c_base)| 
+		    I2C_setSlaveAddr(slave_addr, i2c_base) |
+		    I2C_setHead10R(head10R,i2c_base)|
+		    I2C_setAutoend(autoend, i2c_base);	
+
+ 	i2c -> CR1 |= I2C_CR1_STOPIE  ; // Stop detection interrupt enable 
+
+   	i2c -> CR1 |= I2C_CR1_TXIE; 	// Transmit interrupt enable
+	i2c -> CR1 |= I2C_CR1_RXIE;   // Receive interrupt enable
+
+	return no_error;
+}
+
 /* Transmit data */
-bool transmit_byte_I2C_master(I2C_TypeDef* i2c)
+bool I2C_Master_Transmit_Byte(I2C_TypeDef* i2c)
 {
 	if(BUFFER_I2C != NULL)
 	{
@@ -270,7 +412,7 @@ bool transmit_byte_I2C_master(I2C_TypeDef* i2c)
 	else return false; // Todo: do something when the buffer is illegal address
 }
 
-bool receive_byte_I2C_master(I2C_TypeDef* i2c)
+bool I2C_Master_Receive_Byte(I2C_TypeDef* i2c)
 {
 	if(BUFFER_I2C != NULL)
 	{
@@ -282,15 +424,9 @@ bool receive_byte_I2C_master(I2C_TypeDef* i2c)
 	else return false; // Todo: do something when the buffer is illegal address
 }
 
-void check_I2C_busy(uint32_t i2c_base)
+void I2C_BusyCheck(uint32_t i2c_base)
 {	
-	I2C_TypeDef * i2c = NULL;
-
-	if(verify_I2C_base(i2c_base))
-	       i2c = (I2C_TypeDef *) i2c_base;
-	else return false; // illegal argument
-
-	switch(i2c_base)
+        switch(i2c_base)
 	{
 		case I2C1_BASE: 
 			while(I2C1_BUSY){};
@@ -305,41 +441,52 @@ void check_I2C_busy(uint32_t i2c_base)
 				I2C3_BUSY = true;
 				break;
 		case I2C4_BASE:
-			while(I2C4_BUSY){};
+				while(I2C4_BUSY){};
 				I2C4_BUSY = true;
 				break;
 		default: break;
-
 	}
 
 }
-bool master_i2c_trnsmt_rcv_data(uint32_t i2c_base, uint32_t nmbr_of_bytes, uint8_t* data_buffer, uint8_t rd_wrt)
-{
+
+bool I2C_transmit_receive_config(uint32_t i2c_base, uint32_t nBytes, uint8_t* data_buffer, bool read) 
+{ 
 	I2C_TypeDef * i2c = NULL;
 
-	if(verify_I2C_base(i2c_base))
+	if(I2C_verifyBase(i2c_base))
 	       i2c = (I2C_TypeDef *) i2c_base;
 	else return false; // illegal argument
 
-	check_I2C_busy(i2c_base);
+	I2C_BusyCheck(i2c_base);
 	
-	/*Sets the number of bytes to send*/
-	i2c -> CR2 &= ~(0XFF << 16);
-	i2c -> CR2 |=  nmbr_of_bytes << 16;
-	i2c -> CR2 &= ~(1<<10);
-    i2c -> CR2 |= rd_wrt << 10;
-	
+	i2c -> CR2 &= ~I2C_CR2_NBYTES_Msk; 
+	i2c -> CR2 |=  nBytes << I2C_CR2_NBYTES_Pos; // Set the number of bytes
+	i2c -> CR2 &= ~I2C_CR2_RD_WRN_Msk;  	     // Set read write bit to 0 
+	if(read)
+    		i2c -> CR2 |= I2C_CR2_RD_WRN; 
 	BUFFER_I2C = data_buffer;
-  
-    if(!rd_wrt)
-		transmit_byte_I2C_master(i2c); 		// put data into transmit buffer
 
-	i2c -> CR2 |= (1<<13); 				// START
+	if(!read)
+  		I2C_Master_Transmit_Byte(i2c); 		     // put data into transmit buffer
+	i2c -> CR2 |= I2C_CR2_START; 		     // START Transmitting
 
 	return true;
 }
 
-bool read_received_data_I2C(uint32_t i2c_base)
+bool I2C_Master_Transmit_Data(uint32_t i2c_base, uint32_t nBytes, uint8_t* data_buffer)
+{
+	bool transmit = I2C_transmit_receive_config(i2c_base,nBytes, data_buffer, false ); 
+	return transmit;
+}
+
+
+bool I2C_Master_Receive_Data(uint32_t i2c_base, uint32_t nBytes, uint8_t* data_buffer)
+{
+	bool receive =  I2C_transmit_receive_config(i2c_base,nBytes, data_buffer, true );
+	return receive;
+}
+
+void I2C_Read_Data_Ready(uint32_t i2c_base)
 {
 	switch(i2c_base)
 	{
@@ -357,77 +504,94 @@ bool read_received_data_I2C(uint32_t i2c_base)
 		case I2C4_BASE: 
 			while(!READ4_RDY){};
 			READ4_RDY = false;
-		default: false;
+		default: break;
 	}
-	return true;
+	
 }
 
 
 void I2C1_EV_IRQHandler()
 {
-	uint32_t irs = I2C1 -> ISR;
-	
+	uint32_t isr = I2C1 -> ISR;
+ 	
 	/* Transmitt Interrupt */
-	if(irs & (1<<1)) transmit_byte_I2C_master(I2C1);
-	else if(irs & (1<<2)) receive_byte_I2C_master(I2C1);
-	else if (irs & (1 << 5) )
-	{ 
-		I2C1->ICR |= 1<<5; 
+	if(isr & I2C_ISR_TXIS)
+	{
+		I2C_Master_Transmit_Byte(I2C1); 
+	}
+	else if(isr & I2C_ISR_RXNE) 
+	{
+		I2C_Master_Receive_Byte(I2C1);
+	}
+	else if (isr & I2C_ISR_STOPF )
+	{
+		I2C1->ICR |= I2C_ICR_STOPCF; 
 		I2C1_BUSY = false;
-
-		if( I2C1 -> CR2 & (1<<10)) READ1_RDY = true;
+			
+		if( I2C1 -> CR2 & I2C_CR2_RD_WRN) READ1_RDY = true;
 	}
 }
-
 void I2C2_EV_IRQHandler()
 {
-	uint32_t irs = I2C2 -> ISR;
-	
+	uint32_t isr = I2C2 -> ISR;
+ 	
 	/* Transmitt Interrupt */
-	if(irs & (1<<1)) transmit_byte_I2C_master(I2C2); 
-	else if(irs & (1<<2)) receive_byte_I2C_master(I2C2);
-	else if (irs & (1 << 5) )
-	{ 
-		I2C2->ICR |= 1<<5; 
+	if(isr & I2C_ISR_TXIS)
+	{
+		I2C_Master_Transmit_Byte(I2C2); 
+	}
+	else if(isr & I2C_ISR_RXNE) 
+	{
+		I2C_Master_Receive_Byte(I2C2);
+	}
+	else if (isr & I2C_ISR_STOPF )
+	{
+		I2C2->ICR |= I2C_ICR_STOPCF; 
 		I2C2_BUSY = false;
-
-		if( I2C2 -> CR2 & (1<<10)) READ2_RDY = true;
+			
+		if( I2C2 -> CR2 & I2C_CR2_RD_WRN) READ2_RDY = true;
 	}
 }
 void I2C3_EV_IRQHandler()
 {
-	uint32_t irs = I2C3 -> ISR;
-	
+	uint32_t isr = I2C3 -> ISR;
+ 	
 	/* Transmitt Interrupt */
-	if(irs & (1<<1)) transmit_byte_I2C_master(I2C3); 
-	else if(irs & (1<<2)) receive_byte_I2C_master(I2C3);
-    else if (irs & (1 << 5) )
-	{ 
-		I2C3->ICR |= 1<<5; 
+	if(isr & I2C_ISR_TXIS)
+	{
+		I2C_Master_Transmit_Byte(I2C3); 
+	}
+	else if(isr & I2C_ISR_RXNE) 
+	{
+		I2C_Master_Receive_Byte(I2C3);
+	}
+	else if (isr & I2C_ISR_STOPF )
+	{
+		I2C3->ICR |= I2C_ICR_STOPCF; 
 		I2C3_BUSY = false;
-		
-		if( I2C3 -> CR2 & (1<<10)) READ3_RDY = true;
+			
+		if( I2C3 -> CR2 & I2C_CR2_RD_WRN) READ3_RDY = true;
 	}
 }
 void I2C4_EV_IRQHandler()
 {
-	uint32_t irs = I2C4 -> ISR;
+	uint32_t isr = I2C4 -> ISR;
  	
 	/* Transmitt Interrupt */
-	if(irs & (1<<1))
+	if(isr & I2C_ISR_TXIS)
 	{
-		transmit_byte_I2C_master(I2C4); 
+		I2C_Master_Transmit_Byte(I2C4); 
 	}
-	else if(irs & (1<<2)) 
+	else if(isr & I2C_ISR_RXNE) 
 	{
-		receive_byte_I2C_master(I2C4);
+		I2C_Master_Receive_Byte(I2C4);
 	}
-	else if (irs & (1 << 5) )
+	else if (isr & I2C_ISR_STOPF )
 	{
-		I2C4->ICR |= 1<<5; 
+		I2C4->ICR |= I2C_ICR_STOPCF; 
 		I2C4_BUSY = false;
 			
-		if( I2C4 -> CR2 & (1<<10)) READ4_RDY = true;
+		if( I2C4 -> CR2 & I2C_CR2_RD_WRN) READ4_RDY = true;
 	}
 }
 
