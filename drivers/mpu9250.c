@@ -227,7 +227,7 @@ void initMPU9250(uint32_t i2c_base)
   // can join the I2C bus and all can be controlled by the Arduino as master
    writeByte(MPU9250_ADDRESS, INT_PIN_CFG, 0x22);    
    writeByte(MPU9250_ADDRESS, INT_ENABLE, 0x01);  // Enable data ready (bit 0) interrupt
-   delay(100); TODO 
+   delay(100);  
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,13 +244,13 @@ void calibrateMPU9250(float * gyroBias, float * accelBias)
   // reset device
   // Write a one to bit 7 reset bit; toggle reset device
   writeByte(MPU9250_ADDRESS, PWR_MGMT_1, 0x80);
-  delay(100); TODO
+  delay(100); 
    
  // get stable time source; Auto select clock source to be PLL gyroscope
  // reference if ready else use the internal oscillator, bits 2:0 = 001
   writeByte(MPU9250_ADDRESS, PWR_MGMT_1, 0x01);  
   writeByte(MPU9250_ADDRESS, PWR_MGMT_2, 0x00);
-  delay(200);TODO                              
+  delay(200);                             
 
   // Configure device for bias calculation
   writeByte(MPU9250_ADDRESS, INT_ENABLE, 0x00);   // Disable all interrupts
@@ -259,7 +259,7 @@ void calibrateMPU9250(float * gyroBias, float * accelBias)
   writeByte(MPU9250_ADDRESS, I2C_MST_CTRL, 0x00); // Disable I2C master
   writeByte(MPU9250_ADDRESS, USER_CTRL, 0x00);    // Disable FIFO and I2C master modes
   writeByte(MPU9250_ADDRESS, USER_CTRL, 0x0C);    // Reset FIFO and DMP
-  delay(15); TODO
+  delay(15); 
   
 // Configure MPU6050 gyro and accelerometer for bias calculation
   writeByte(MPU9250_ADDRESS, CONFIG, 0x01);      // Set low-pass filter to 188 Hz
