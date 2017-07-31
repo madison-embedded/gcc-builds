@@ -1,7 +1,5 @@
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "proc/defs.h"
+
 #include "i2c.h"
 
 

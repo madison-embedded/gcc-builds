@@ -123,9 +123,15 @@ COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
 
 command_status do_mw(int argc, char *argv[])
 {
-	printf("mw not implemented\r\n");
+	
+	if(argc != 3) return USAGE;
+	
+	if(argv[1][0] != '0' || argv[1][1] != 'x') return USAGE;
 	return USAGE;
 }
+
+
+
 COMMAND_ENTRY("mw", "mw <addr> <value> <count>", "Write data memory contents.", do_mw)
 
 
