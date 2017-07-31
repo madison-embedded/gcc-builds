@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-=======
-#include "proc/defs.h"
->>>>>>> b043b07ef888af35ec11ad7af755536eb0f08de8
-#include <stdint.h>
-#include <stdbool.h>
-#include "proc/defs.h"
+
 #include "i2c.h"
 
 

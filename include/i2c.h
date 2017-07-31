@@ -1,4 +1,8 @@
+#include <stdint.h>
+#include <stdbool.h>
+#include "proc/defs.h"
 
+ 
 /******************************************************************************************************************/
 /* I2C set Clock */
 bool I2C_setClock(uint32_t i2c_base, bool state);
