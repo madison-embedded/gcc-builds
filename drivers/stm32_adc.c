@@ -1,6 +1,27 @@
 #include "config.h"
 #include "adc.h"
 
+const ADC_INFO ADC_LUT[] = {
+	FILL_ADC(ADC3, 3,  'A', 3)
+	FILL_ADC(ADC1, 9,  'B', 1)
+	FILL_ADC(ADC3, 10, 'C', 0)
+	FILL_ADC(ADC3, 12, 'C', 2)
+	FILL_ADC(ADC3, 13, 'C', 3)
+	FILL_ADC(ADC3, 9,  'F', 3)
+	FILL_ADC(ADC3, 14, 'F', 4)
+	FILL_ADC(ADC3, 15, 'F', 5)
+	FILL_ADC(ADC3, 8,  'F', 10)
+	FILL_ADC(ADC3, 4,  'F', 6)
+	FILL_ADC(ADC3, 5,  'F', 7)
+	FILL_ADC(ADC3, 6,  'F', 8)
+	FILL_ADC(ADC3, 7,  'F', 9)
+	FILL_ADC(ADC1, 4,  'A', 4)
+	FILL_ADC(ADC1, 5,  'A', 5)
+	FILL_ADC(ADC1, 6,  'A', 6)
+};
+
+const uint8_t NUM_ADC = sizeof(ADC_LUT)/sizeof(ADC_INFO);
+
 uint32_t adcFreq = 0;
 
 static void adc_init_sampling(ADC_TypeDef *adc) {
@@ -49,7 +70,7 @@ static bool adc_init_clk(ADC_TypeDef *adc) {
 	return true;
 }
 
-uint16_t analogRead(ADC_TypeDef *adc, GPIO_TypeDef *port, uint8_t channel) {
+uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel) {
 	uint16_t retval = 0;
 	uint32_t curr_tick = (uint32_t) ticks;
 
@@ -59,7 +80,7 @@ uint16_t analogRead(ADC_TypeDef *adc, GPIO_TypeDef *port, uint8_t channel) {
 			return -1;
 
 	adc->CR2 = 0x0; adc->CR1 = 0x0;
-	adc->CR1 |= ADC_CR1_RES; /* 6-bit accuracy */
+	adc->CR1 |= ADC_CR1_RES_0; /* 10-bit accuracy */
 	adc->CR2 |= ADC_CR2_ADON;
 	while (curr_tick == ticks) {;} /* stabilization? */
 
@@ -68,6 +89,13 @@ uint16_t analogRead(ADC_TypeDef *adc, GPIO_TypeDef *port, uint8_t channel) {
 	
 	/* set channel */
 	adc->SQR3 |= channel & 0x1f;
+
+/*	ADC->CCR |= 0x11;*/
+/*	ADC->CCR |= 0x12;*/
+/*	ADC->CCR |= 0x15;*/
+/*	ADC->CCR |= 0x16;*/
+/*	ADC->CCR |= 0x17;*/
+/*	ADC->CCR |= 0x19;*/
 
 	/* start conversion */
 	adc->CR2 |= ADC_CR2_SWSTART;

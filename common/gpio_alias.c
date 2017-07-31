@@ -1,5 +1,6 @@
 #include "gpio_alias.h"
 #include "gpio.h"
+#include "exti.h"
 
 const GPIO GPIO_TABLE[] = {
 	
@@ -131,6 +132,9 @@ int gpioAliasInit(){
 			
 			if (GPIO_TABLE[i].group == I2C)
 				gpio_openDrainState(port, pin, true);
+
+			if (GPIO_TABLE[i].group == RETRO)
+				exti_config(port, pin, true, false, true);
 
 			if (GPIO_TABLE[i].mode == OUTPUT)
 				gpio_writePin(port, pin, 0);
