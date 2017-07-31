@@ -90,13 +90,6 @@ uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel) {
 	/* set channel */
 	adc->SQR3 |= channel & 0x1f;
 
-/*	ADC->CCR |= 0x11;*/
-/*	ADC->CCR |= 0x12;*/
-/*	ADC->CCR |= 0x15;*/
-/*	ADC->CCR |= 0x16;*/
-/*	ADC->CCR |= 0x17;*/
-/*	ADC->CCR |= 0x19;*/
-
 	/* start conversion */
 	adc->CR2 |= ADC_CR2_SWSTART;
 
