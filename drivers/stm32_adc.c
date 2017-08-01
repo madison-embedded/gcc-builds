@@ -85,8 +85,8 @@ uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel) {
 	adc->CR2 |= ADC_CR2_SWSTART;
 
 	/* wait to start, wait to end */
-	while (!(adc->SR & ADC_SR_STRT || ADC->CSR & 0x10)) {;}
-	while (!(adc->SR & ADC_SR_EOC || ADC->CSR & 0x2)) {;}
+	while (!(adc->SR & ADC_SR_STRT)) {;}
+	while (!(adc->SR & ADC_SR_EOC)) {;}
 
 	/* read data */
 	retval = adc->DR;
