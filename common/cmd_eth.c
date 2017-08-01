@@ -7,6 +7,7 @@
 
 #include "lwip/err.h"
 #include "lwip/dhcp.h"
+#include "lwip/timeouts.h"
 
 command_status do_eth(int argc, char *argv[]) {
 
@@ -37,22 +38,24 @@ command_status do_eth(int argc, char *argv[]) {
 		printf("register %d value: 0x%lx\r\n", phy_reg, regVal & 0xffff);
 	}
 	else if (!strcmp(argv[1], "init")) Netif_Config();
+	/*
 	else if (!strcmp(argv[1], "check")) {
-		/*
 		ret = HAL_ETH_GetReceivedFrame(&EthHandle);
 		printf("Return status: ");
 		hal_print_status(ret);
 		printf("\r\n");
-		*/
-		ethernetif_input(&gnetif);
 	}
+	*/
 	else if (!strcmp(argv[1], "status")) {
-		//printf("Link status: %lu\r\n", EthHandle.LinkStatus);
-		
+		printf("TODO\r\n");
 	}
 	else if (!strcmp(argv[1], "dhcp")) {
 		lwip_error = dhcp_start(&gnetif);
 		printf("return: %s\r\n", lwip_strerr(lwip_error));
+		while (1) {
+			ethernetif_input(&gnetif);
+			sys_check_timeouts();
+		}
 	}
 	else if (!strcmp(argv[1], "state")) {
 		printf("State: ");

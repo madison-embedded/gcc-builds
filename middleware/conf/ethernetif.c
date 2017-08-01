@@ -272,8 +272,6 @@ void ethernetif_input(struct netif *netif) {
 	/* if no packet could be read, silently ignore this */
 	if (p != NULL) {
 
-		printf("Packet available!\r\n");
-
 		/* pass all packets to ethernet_input, which decides what packets it supports */
 		if (netif->input(p, netif) != ERR_OK) {
 			LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
@@ -281,7 +279,6 @@ void ethernetif_input(struct netif *netif) {
 			p = NULL;
 		}
 	}
-	else printf("No packet available\r\n");
 }
 
 /* Define those to better describe your network interface. */
@@ -447,6 +444,8 @@ void eth_print_status(HAL_ETH_StateTypeDef stat) {
 
 sys_prot_t sys_arch_protect(void) { return 0; }
 void sys_arch_unprotect(sys_prot_t pval) { UNUSED(pval); }
+
+uint32_t sys_now(void) { return ticks; }
 
 void assert_printf(char *msg, int line, char *file) {
 	printf("%s %d: %s\r\n", file, line, msg);
