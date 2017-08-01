@@ -16,33 +16,9 @@ int isGroup(char * group){
 	return -1;
 }
 
-int hasGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, char * name) {
-	int i;
-	for (i = 0; i<NUM_GPIO_ALIAS;i++){
-		if (strcmp(GPIO_TABLE[i].name, name)==0) {
-			*pin = GPIO_TABLE[i].pin;
-			*port = GPIO_TABLE[i].port;
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int getAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
-	int i; 
-	for (i = 0; i<NUM_GPIO_ALIAS; i++){
-		if (GPIO_TABLE[i].pin == *pin && GPIO_TABLE[i].port == *port) {
-			*alias=	GPIO_TABLE[i];
-			return 1;
-		}	
-	}
-	return 0;
-
-}
-
 void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 	GPIO alias;
-	if (getAlias(&port, &pin, &alias)) {
+	if (getGpioAlias(&port, &pin, &alias)) {
 		if (alias.usable) printf("Yes");
 		else printf("NO");
 		printf("\t%-10s", alias.name);

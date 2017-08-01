@@ -1,6 +1,7 @@
 #include "gpio_alias.h"
 #include "gpio.h"
 #include "exti.h"
+#include <string.h>
 
 const GPIO GPIO_TABLE[] = {
 	
@@ -143,3 +144,30 @@ int gpioAliasInit(){
 
 	return 0;
 }
+
+int hasGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, char * name) {
+	int i;
+	for (i = 0; i<NUM_GPIO_ALIAS;i++){
+		if (strcmp(GPIO_TABLE[i].name, name)==0) {
+			*pin = GPIO_TABLE[i].pin;
+			*port = GPIO_TABLE[i].port;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int getGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
+	int i; 
+	for (i = 0; i<NUM_GPIO_ALIAS; i++){
+		if (GPIO_TABLE[i].pin == *pin && GPIO_TABLE[i].port == *port) {
+			*alias=	GPIO_TABLE[i];
+			return 1;
+		}	
+	}
+	return 0;
+
+}
+
+
+

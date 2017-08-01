@@ -20,7 +20,7 @@
 typedef struct adcInfo{
 	ADC_TypeDef *adc;
 	uint8_t channel;
-	char port;
+	GPIO_TypeDef *port;
 	uint8_t pin;
 } ADC_INFO;
 
