@@ -40,6 +40,7 @@ typedef struct adc_configuration {
 } adc_configuration_t;
 
 uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel);
+bool adc_init(ADC_TypeDef *adc);
 
 #endif
 

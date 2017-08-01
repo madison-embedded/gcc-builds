@@ -8,6 +8,8 @@ int main(void) {
 
 	if (!board_init())
 		fault();
+	adc_init(ADC3);
+	adc_init(ADC1);
 
 	while(1) {
 		/* Handle Button */
