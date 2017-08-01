@@ -38,33 +38,30 @@ command_status do_eth(int argc, char *argv[]) {
 		printf("register %d value: 0x%lx\r\n", phy_reg, regVal & 0xffff);
 	}
 	else if (!strcmp(argv[1], "init")) Netif_Config();
-	/*
 	else if (!strcmp(argv[1], "check")) {
-		ret = HAL_ETH_GetReceivedFrame(&EthHandle);
-		printf("Return status: ");
-		hal_print_status(ret);
-		printf("\r\n");
+		printf("TODO: read and parse some PHY registers\r\n");
 	}
-	*/
 	else if (!strcmp(argv[1], "status")) {
-		printf("TODO\r\n");
+		printf("Name:\t%c%c\r\n", gnetif.name[0], gnetif.name[1]);
+		printf("IP:\t%"U16_F".%"U16_F".%"U16_F".%"U16_F"\r\n",
+			ip4_addr1_16(netif_ip4_addr(&gnetif)), ip4_addr2_16(netif_ip4_addr(&gnetif)),
+			ip4_addr3_16(netif_ip4_addr(&gnetif)), ip4_addr4_16(netif_ip4_addr(&gnetif)));
+		printf("GW:\t%"U16_F".%"U16_F".%"U16_F".%"U16_F"\r\n",
+			ip4_addr1_16(netif_ip4_gw(&gnetif)), ip4_addr2_16(netif_ip4_gw(&gnetif)),
+			ip4_addr3_16(netif_ip4_gw(&gnetif)), ip4_addr4_16(netif_ip4_gw(&gnetif)));
+		printf("NM:\t%"U16_F".%"U16_F".%"U16_F".%"U16_F"\r\n",
+			ip4_addr1_16(netif_ip4_netmask(&gnetif)), ip4_addr2_16(netif_ip4_netmask(&gnetif)),
+			ip4_addr3_16(netif_ip4_netmask(&gnetif)), ip4_addr4_16(netif_ip4_netmask(&gnetif)));
+		printf("TODO: add more\r\n");
 	}
 	else if (!strcmp(argv[1], "dhcp")) {
 		lwip_error = dhcp_start(&gnetif);
 		printf("return: %s\r\n", lwip_strerr(lwip_error));
+		/* todo, enable networking calls in main loop */
 		while (1) {
 			ethernetif_input(&gnetif);
 			sys_check_timeouts();
 		}
-	}
-	else if (!strcmp(argv[1], "state")) {
-		printf("State: ");
-		eth_print_status(EthHandle.State);
-		printf("\r\n");
-	}
-	else if (!strcmp(argv[1], "send") && argc >= 3) {
-		printf("Not yet implemented\r\n");
-		//ret =  HAL_ETH_TransmitFrame(&EthHandle, uint32_t FrameLength);
 	}
 	else return USAGE;
 

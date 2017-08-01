@@ -69,6 +69,9 @@ void early_init(void) {
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
 
 	print_post_info();
+
+	/* uncomment when it's fully ready */
+	//Netif_Config();
 }
 
 /* instantiate UART & button + LEDs no matter what */
