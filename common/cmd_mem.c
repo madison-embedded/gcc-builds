@@ -6,12 +6,12 @@
 
 
 
-bool md_input_handler(unsigned char* mem_ptr, int length)
+bool md_input_handler(unsigned char* mem_ptr, int *length, uint8_t  mw)
 {
 	unsigned char* mem = (unsigned char*) mem_ptr;
 	int i;
 
-	for(i = 0; i < length; i++)
+	for(i = 0; i < *length; i++)
 	{	
 		mem = mem + i;
 		
@@ -36,47 +36,87 @@ bool md_input_handler(unsigned char* mem_ptr, int length)
 		if((unsigned int) mem >= 0x50060C00 && (unsigned int) mem <= 0x5FFFFFFF) return false; 
 
 		if((unsigned int) mem >= 0xE0100000 && (unsigned int) mem <= 0xFFFFFFFF) return false; 
+		/*This condition is only checked for mw command  */
+		if( (mw == 1) && (( unsigned int ) mem >= 0x20000000 && (unsigned int ) mem <= 0x2007FFFF )) return false; 
 	}
 
 	return true; 
 }
 
-
-command_status do_md(int argc, char *argv[]) {
-
+command_status md_mw_input_handler(int argc, char *argv[], unsigned char ** mem_ptr, uint32_t* data, int *length, uint8_t mw)
+{
 	if(argc != 3) return USAGE;
 	
 	if(argv[1][0] != '0' || argv[1][1] != 'x') return USAGE;
 
-	int i, j;
-	char content;
-	int temp;
-
 	char* address = (char*) malloc( 9 * sizeof(char)); 
-   
+	int i;
+   	/* Address and count handling*/
 	for(i = 0; i < 8; i++)
 		address[i] = argv[1][i+2];	
 	address[8] = '\0';
-
-	
-	unsigned char* mem_ptr = (unsigned char *) strtol(address, NULL, 16);
-    
-	if(mem_ptr == 0 && (strcmp(address, "00000000") != 0)) return USAGE;
-
-	int length = atoi(argv[2]);
-	if(length == 0 && (strcmp(argv[2], "0") != 0)) return USAGE;
-
-	//input handling 
-	if(!md_input_handler(mem_ptr, length)) 
+		
+	*mem_ptr = (unsigned char *) strtol(address, NULL, 16);
+    	*length = atoi(argv[2 + mw]);
+   
+	if(( *mem_ptr == 0 && (strcmp(address, "00000000") != 0)) || 
+	   (*length == 0 && (strcmp(argv[2 + mw], "0") != 0))) 
 	{	
+		free(address);
+		return USAGE;
+	}
+	
+	/*Check if the data for mw command is valid */
+        if(mw == 1)
+	{
+		for(i = 0; i < 8; i++)
+			address[i] = argv[1+mw][i+2];	
+		address[8] = '\0';
+		*data = (uint32_t) strtol(address, NULL, 16);
+
+		if( *data == 0 && (strcmp(address, "00000000") != 0))
+		{
+			free(address);
+			return USAGE;
+		}		
+	} 
+			
+	//input handling 
+	if(!md_input_handler(*mem_ptr, length, mw)) 
+	{	
+		free(address);
 		printf("Illegal Memory Access\r\n");
 		return FAIL;
 	}
+	
+	free(address); 
+	return SUCCESS; 
+
+}
+
+command_status do_md(int argc, char *argv[]) 
+{
+
+	int i, j;
+	char content;
+	int temp;
+	unsigned char ** mem_ptr_ = (unsigned char ** )malloc(sizeof (int) ) ; 
+	unsigned char * mem_ptr; 
+	uint32_t* data ; // Not Used  
+	int* length = (int*) malloc(sizeof(int));
+
+	command_status status = md_mw_input_handler(argc, argv, mem_ptr_, data, length, 0);
+	mem_ptr  = *mem_ptr_; // Can be changed. Too lazy to do that ) 
+
+	if(status == FAIL)
+		return FAIL;
+	else if ( status == USAGE )
+		return USAGE; 
 
 	char* ascii_content = (char*) malloc(17*sizeof(char));
 	ascii_content[16] = '\0';
       
-	for(i=0; i<length; i += 4)
+	for(i=0; i< *length; i += 4)
 	{
 		if(i % 16 == 0) //new line
 			printf("%8p:", &mem_ptr[i]);
@@ -101,12 +141,12 @@ command_status do_md(int argc, char *argv[]) {
 			printf(" %s\r\n", ascii_content);
 	}
 
-	if(length % 16 != 0) 
+	if(*length % 16 != 0) 
 	{	
-		temp = 16 - length%16;
+		temp = 16 - *length%16;
 		
 		for(i = 0; i < temp; i++)
-			ascii_content[length%16 + i] = ' ';
+			ascii_content[*length%16 + i] = ' ';
 
 		temp = 2*temp + temp / 4;
 		for(i = 0; i < temp; i++ )
@@ -114,6 +154,9 @@ command_status do_md(int argc, char *argv[]) {
 
 		printf(" %s\r\n", ascii_content);
 	}
+        free(length); 
+	free(mem_ptr);
+	free(mem_ptr_);
 
 	return SUCCESS;
 }
@@ -121,13 +164,41 @@ command_status do_md(int argc, char *argv[]) {
 COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
 
 
+
 command_status do_mw(int argc, char *argv[])
 {
 	
-	if(argc != 3) return USAGE;
+	 
+	unsigned char ** mem_ptr = (unsigned char ** )malloc(sizeof (int) ) ; 
+	int i; 
+	uint32_t* data = (uint32_t*)malloc(sizeof(int)); 
+	int* length = (int*)malloc(sizeof(int));
+	command_status status = md_mw_input_handler(argc, argv, mem_ptr, data, length, 1);
+
+
+	if(status == FAIL)
+	{	
+		free(mem_ptr);
+		free(data);
+		free(length);
+		return FAIL;
+	}
+	else if ( status == USAGE )
+	{
+		free(mem_ptr);
+		free(data);
+		free(length);
+		return USAGE; 
+	}
+
+	for( i = 0; i < *length; i +=4) 	
+		*mem_ptr[i] = *data; 
 	
-	if(argv[1][0] != '0' || argv[1][1] != 'x') return USAGE;
-	return USAGE;
+	
+	free(mem_ptr);
+	free(data);
+	free(length);
+	return SUCCESS;
 }
 
 
