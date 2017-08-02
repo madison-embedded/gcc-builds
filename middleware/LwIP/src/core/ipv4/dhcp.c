@@ -395,7 +395,7 @@ void
 dhcp_coarse_tmr(void)
 {
   struct netif *netif = netif_list;
-  LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE, ("dhcp_coarse_tmr()\r\n"));
+  //LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE, ("dhcp_coarse_tmr()\r\n"));
   /* iterate through all network interfaces */
   while (netif != NULL) {
     /* only act on DHCP configured interfaces */
