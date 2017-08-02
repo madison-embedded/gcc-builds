@@ -9,10 +9,11 @@ PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
 TERMINAL=gnome-terminal
 OBJDUMP_FILE=output.txt
-DEFINES := -D__STARTUP_CLEAR_BSS -D__START=main
+DEFINES:=-D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
-GIT_TIME= $(shell git log -n 1 --date=iso --format="%at")
-DEFINES+=-D_GIT_TIME='$(GIT_TIME)'
+GIT_TIME=$(shell git log -n 1 --date=iso --pretty=format:"%cd")
+GIT_VERSION=$(shell git log -n 1 --pretty=format:"%cn-%h")
+DEFINES+=-D_GIT_TIME="\"$(GIT_TIME)\"" -D_GIT_VERSION="\"$(GIT_VERSION)\""
 DEFINES+=-D_VERSION_MAJOR='$(VERSION_MAJOR)' -D_VERSION_MINOR='$(VERSION_MINOR)'
 ###############################################################################
 
@@ -66,7 +67,6 @@ OBJECTS += drivers/$(PROC_PREFIX)tim.o
 #OBJECTS += drivers/mpu9250.c
 
 # HAL Drivers
-#OBJECTS += drivers/hal/$(PROC_PREFIX)eth.o
 OBJECTS += drivers/hal/stm32f7xx_hal.o
 OBJECTS += drivers/hal/stm32f7xx_hal_eth.o
 OBJECTS += drivers/hal/stm32f7xx_hal_cortex.o

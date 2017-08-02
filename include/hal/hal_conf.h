@@ -89,6 +89,11 @@
 #define ETH_RXBUFNB                    4U       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
 #define ETH_TXBUFNB                    4U       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
 
+/* STMicro default MAC address */
+#define MAC0	0x00
+#define MAC1	0x80
+#define MAC2	0xE1
+
 /* Section 2: PHY configuration section */
 
 /* DP83848 PHY Address*/ 

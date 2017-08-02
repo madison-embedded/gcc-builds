@@ -8,11 +8,21 @@ const unsigned int *UID = (const unsigned int *) UID_BASE;
 
 void print_post_info(void) {
 	int i;
+	uint8_t MACAddr[3];
+
+    MACAddr[0] = (UID[0] & 0x00ff0000) >> 16;
+    MACAddr[1] = (UID[0] & 0x0000ff00) >> 8;
+    MACAddr[2] = (UID[0] & 0x000000ff);
+
 	printf("\r\n----------------------------------------------------------------------\r\n");
 	printf("-        University of Wisconsin-Madison Embedded Engineering        -\r\n");
+	printf("-        Version %02d.%02d | %.16s | %.19s      -\r\n",
+		_VERSION_MAJOR, _VERSION_MINOR, _GIT_VERSION, _GIT_TIME);
 	printf("----------------------------------------------------------------------\r\n");
 	printf("Board:\t\t%s\r\n", BOARD);
 	printf("Processor:\t%s (%08x-%08x-%08x)\r\n", PROCESSOR, UID[0], UID[1], UID[2]);
+	printf("MAC (Prog.):\t%02X:%02X:%02X:%02X:%02X:%02X\r\n",
+		MAC0, MAC1, MAC2, MACAddr[0], MACAddr[1], MACAddr[2]);
 	printf("Flash Size:\t%uK\r\n\n", *((const unsigned int*) FLASHSIZE_BASE) & 0xffff);
 
 	printf("Oscillator Settings:\r\n");
@@ -31,11 +41,7 @@ void print_post_info(void) {
 	printf("APB1:\t%lu kHz\r\n", (APB1_F) / 1000);
 	printf("APB2:\t%lu kHz\r\n", (APB2_F) / 1000);
 
-	char buff[40];
-/*	strftime(buff, sizeof(_GIT_TIME), "%c", _GIT_TIME);*/
-	printf("GitHub date: %s\r\n", buff);
-	printf("Verson %d.%d compiled on: %s %s\r\n", _VERSION_MAJOR, _VERSION_MINOR, __DATE__, __TIME__);
-
 	printf("\nUse 'help' for a list of commands.\r\n");
+
 	printf("----------------------------------------------------------------------\r\n\r\n");
 }
