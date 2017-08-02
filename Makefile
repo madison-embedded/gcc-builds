@@ -3,7 +3,7 @@ include makefile.conf
 ###############################################################################
 # Default Settings
 PROJECT=e2c
-.PHONY: clean
+.PHONY: clean FORCE
 .DEFAULT_GOAL := $(PROJECT).bin
 PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
@@ -13,7 +13,9 @@ DEFINES:=-D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
 GIT_TIME=$(shell git log -n 1 --date=iso --pretty=format:"%cd")
 GIT_VERSION=$(shell git log -n 1 --pretty=format:"%cn-%h")
+SHELL_TIME=$(shell date)
 DEFINES+=-D_GIT_TIME="\"$(GIT_TIME)\"" -D_GIT_VERSION="\"$(GIT_VERSION)\""
+DEFINES+=-D_SHELL_TIME="\"$(SHELL_TIME)\""
 DEFINES+=-D_VERSION_MAJOR='$(VERSION_MAJOR)' -D_VERSION_MINOR='$(VERSION_MINOR)'
 ###############################################################################
 
@@ -82,6 +84,9 @@ INCLUDES += -I middleware/conf
 include middleware/LwIP/makefile.conf
 ###############################################################################
 
+FORCE:
+	+@echo "Re-building timestamps"
+	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o common/post.o common/post.c
 
 ###############################################################################
 # Source Rules
@@ -102,7 +107,7 @@ $(PROJECT).bin: $(PROJECT).elf
 	+@echo "Ready to flash $@."
 
 # Project Rules
-$(OBJECTS): | $(CPUDIR)
+$(OBJECTS): | FORCE $(CPUDIR)
 
 $(OBJDUMP_FILE): $(PROJECT).bin
 	$(TOOLCHAIN)objdump -D $(PROJECT).elf > $(OBJDUMP_FILE)

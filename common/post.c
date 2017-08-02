@@ -18,6 +18,7 @@ void print_post_info(void) {
 	printf("-        University of Wisconsin-Madison Embedded Engineering        -\r\n");
 	printf("-        Version %02d.%02d | %.16s | %.19s      -\r\n",
 		_VERSION_MAJOR, _VERSION_MINOR, _GIT_VERSION, _GIT_TIME);
+	printf("-            Image Timestamp: %.28s           -\r\n", _SHELL_TIME);
 	printf("----------------------------------------------------------------------\r\n");
 	printf("Board:\t\t%s\r\n", BOARD);
 	printf("Processor:\t%s (%08x-%08x-%08x)\r\n", PROCESSOR, UID[0], UID[1], UID[2]);
