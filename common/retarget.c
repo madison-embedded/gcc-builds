@@ -2,6 +2,8 @@
 #include "config.h"
 #include "pcbuffer.h"
 
+#define BLOCK	1
+
 int _write(int fd, const void *buf, size_t count) {
 	for (fd = 0; fd < count; fd++) {
 		if (pc_buffer_full(&usart3_tx)) {
@@ -13,6 +15,9 @@ int _write(int fd, const void *buf, size_t count) {
 		__enable_irq();
 	}
 	USB_UART->CR1 |= USART_CR1_TXEIE;
+#if BLOCK
+	while (!pc_buffer_empty(&usart3_tx)) {;}
+#endif
 	return count;
 }
 

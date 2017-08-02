@@ -34,7 +34,8 @@ typedef enum {
 	SOLENOID = 0x2,
 	RETRO = 0x5,
 	LED = 0x8,
-	I2C = 0x11
+	I2C = 0x11,
+	PRESSURE = 0x21
 } GPIO_GROUP;
 
 typedef struct _GPIO{

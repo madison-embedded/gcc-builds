@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "config.h"
 #include "rcc.h"
+#include "hal/stm32f7xx_hal.h"
 
 void setup_osc(void) {
 
@@ -53,9 +54,12 @@ void setup_osc(void) {
 }
 
 /* static initializations that don't fail */
+extern void print_post_info(void);
 void early_init(void) {
 
 	uint32_t init_regs[3] = {0, 0, 0};
+
+	HAL_Init();
 
 	setup_osc();
 
@@ -63,17 +67,25 @@ void early_init(void) {
 	
 	init_regs[0] = USART_CR1_RXNEIE;
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
+
+	print_post_info();
+
+	/* uncomment when it's fully ready */
+	//Netif_Config();
 }
 
 /* instantiate UART & button + LEDs no matter what */
+extern void printPrompt(void);
+extern void lwip_init(void);
 bool board_init(void) {
 
 	early_init();
 
 	/* TODO: I2C */
 
-	/* TODO: Ethernet */
+	lwip_init();
 
+	printPrompt();
 	return true;
 }
 

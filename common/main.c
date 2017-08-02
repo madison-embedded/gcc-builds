@@ -3,7 +3,12 @@
 #include "cli.h"
 #include "timer.h"
 
-extern void print_post_info(void);
+/*****************************************************************************/
+#include "ethernetif.h"
+#include "lwip/timeouts.h"
+extern int eth_inited;
+#define LINK_UP_CHECK_TIME	5000
+/*****************************************************************************/
 
 int main(void) {
 /** enable interrupts 
@@ -34,9 +39,6 @@ End of interrupt tests
 	if (!board_init())
 		fault();
 
-	print_post_info();
-	printPrompt();
-
 	while(1) {
 		/* Handle Button */
 		if (readButton()){
@@ -49,6 +51,21 @@ End of interrupt tests
 		}
 
 		check_input();
+
+		/*********************************************************************/
+		if (eth_inited) {
+			if (!(ticks % LINK_UP_CHECK_TIME)) {
+				// ready PHY to check link status
+				// if link down, clear link_up in netif
+			}
+			if (gnetif.flags & NETIF_FLAG_LINK_UP) {
+				__disable_irq();
+				ethernetif_input(&gnetif);
+				__enable_irq();
+			}
+			sys_check_timeouts();
+		}
+		/*********************************************************************/
 
 		/* Blink Red LED */
 		curr = ticks / 250;

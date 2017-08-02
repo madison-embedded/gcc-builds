@@ -119,3 +119,5 @@ void HAL_DisableMemorySwappingBank(void);
 
 #endif /* __STM32F7xx_HAL_H */
 
+void hal_print_status(HAL_StatusTypeDef stat);
+

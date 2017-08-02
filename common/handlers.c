@@ -7,6 +7,7 @@ volatile uint8_t interrupt_test_mode = 1;
 /* this 32-bit count overflows after 49.7 days */
 volatile unsigned int ticks = 0;
 void SysTick_Handler(void) { ticks++; }
+uint32_t HAL_GetTick(void) { return ticks; }
 
 void fault(void) {
 	
@@ -21,6 +22,10 @@ void fault(void) {
 		setLED(1, false);
 		delay_ms(1000);
 	}
+}
+
+void assert_failed(uint8_t* file, uint32_t line) {
+	fault();
 }
 
 /* helpful: http://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html */
@@ -123,5 +128,18 @@ void UsageFault_Handler(void) {
 	{
 		printf("UsageFault_Handler test checked \n");
 	}
+}
+
+#include "hal/stm32f7xx_hal.h"
+extern ETH_HandleTypeDef EthHandle;
+
+/**
+ * Ethernet IRQ Handler
+ *
+ * @param  None
+ * @retval None
+ */
+void ETH_IRQHandler(void) {
+    HAL_ETH_IRQHandler(&EthHandle);
 }
 

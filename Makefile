@@ -9,8 +9,11 @@ PROC_DIR=proc/$(PROCESSOR)
 INCLUDES=-I include -I include/cmsis
 TERMINAL=gnome-terminal
 OBJDUMP_FILE=output.txt
-DEFINES=-D__STARTUP_CLEAR_BSS -D__START=main
+DEFINES := -D__STARTUP_CLEAR_BSS -D__START=main
 CORE=CM$(CORTEX_M)
+GIT_TIME= $(shell git log -n 1 --date=iso --format="%at")
+DEFINES+=-D_GIT_TIME='$(GIT_TIME)'
+DEFINES+=-D_VERSION_MAJOR='$(VERSION_MAJOR)' -D_VERSION_MINOR='$(VERSION_MINOR)'
 ###############################################################################
 
 
@@ -20,7 +23,7 @@ CORE=CM$(CORTEX_M)
 FPU = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 
 TOOLCHAIN=arm-none-eabi-
-CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os 
+CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os
 # -Os -nostdlib -lnosys
 
 # Linker Settings
@@ -30,7 +33,8 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 
 ###############################################################################
 # Global Objects
-OBJECTS += common/main.o 
+OBJECTS += common/main.o
+OBJECTS += common/badgerloop.o
 OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
@@ -45,6 +49,8 @@ OBJECTS += common/cmd_gpio.o
 OBJECTS += common/cmd_analog.o
 OBJECTS += common/cmd_reset.o
 OBJECTS += common/cmd_float.o
+OBJECTS += common/cmd_eth.o
+OBJECTS += common/cmd_exti.o
 OBJECTS += drivers/timer.o
 
 # Conditional Objects
@@ -56,6 +62,8 @@ OBJECTS += drivers/$(PROC_PREFIX)rcc.o
 OBJECTS += drivers/$(PROC_PREFIX)usart.o
 OBJECTS += drivers/$(PROC_PREFIX)adc.o
 OBJECTS += drivers/$(PROC_PREFIX)exti.o
+OBJECTS += drivers/$(PROC_PREFIX)tim.o
+#OBJECTS += drivers/mpu9250.c
 
 # HAL Drivers
 #OBJECTS += drivers/hal/$(PROC_PREFIX)eth.o
@@ -67,22 +75,30 @@ OBJECTS += drivers/hal/stm32f7xx_hal_rcc.o
 OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
 
 CPUDIR := include/proc
+
+#Middleware
+INCLUDES += -I middleware/conf
+include middleware/LwIP/makefile.conf
 ###############################################################################
 
 
 ###############################################################################
 # Source Rules
 %.o: %.S
-	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	+@echo "building $(notdir $<)"
+	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
 %.o: %.c
-	$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	+@echo "building $(notdir $<)"
+	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
 
 $(PROJECT).elf: $(OBJECTS)
-	$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
+	+@echo "linking $(notdir $@)"
+	@$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
 
 $(PROJECT).bin: $(PROJECT).elf
-	$(TOOLCHAIN)objcopy -O binary $< $@
+	@$(TOOLCHAIN)objcopy -O binary $< $@
+	+@echo "Ready to flash $@."
 
 # Project Rules
 $(OBJECTS): | $(CPUDIR)
@@ -91,11 +107,12 @@ $(OBJDUMP_FILE): $(PROJECT).bin
 	$(TOOLCHAIN)objdump -D $(PROJECT).elf > $(OBJDUMP_FILE)
 
 $(CPUDIR):
-	ln -s ../$(PROC_DIR) $@
+	+@echo "Creating $@"
+	@ln -s ../$(PROC_DIR) $@
 
-clean: 
-	rm -f *.bin *.map *.elf $(CPUDIR) output.txt
-	find . -name '*.o' -delete
+clean:
+	@rm -f *.bin *.map *.elf $(CPUDIR) output.txt
+	@find . -name '*.o' -delete
 
 install: $(PROJECT).bin
 	./$(PROC_DIR)/install.sh
@@ -109,4 +126,3 @@ dump: $(OBJDUMP_FILE)
 %_config:
 	@echo $@
 ###############################################################################
-
