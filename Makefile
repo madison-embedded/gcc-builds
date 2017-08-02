@@ -107,7 +107,7 @@ $(PROJECT).bin: $(PROJECT).elf
 	+@echo "Ready to flash $@."
 
 # Project Rules
-$(OBJECTS): | FORCE $(CPUDIR)
+$(OBJECTS): | $(CPUDIR) FORCE
 
 $(OBJDUMP_FILE): $(PROJECT).bin
 	$(TOOLCHAIN)objdump -D $(PROJECT).elf > $(OBJDUMP_FILE)
