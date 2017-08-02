@@ -1,12 +1,34 @@
 #include <stdio.h>
-//#include "config.h"
+#include "config.h"
 #include "cli.h"
 #include "timer.h"
 
 extern void print_post_info(void);
 
 int main(void) {
-
+/** enable interrupts 
+*/
+//18 enables UsageFault
+//17 enables BusFault
+//16 enables MeManage Fault
+	//interrupt_test_mode = 1;
+	SCB->SHCSR = (1<<18) | (1<<17) | (1<<16); 
+/*
+Perform interrupt tests 
+*/
+	SCB->ICSR &= (1<<31); //NMI
+	SCB->HFSR &= (1<<30); //HardFault
+	SCB->SHCSR &= 1<<13; //MemManage
+	SCB->SHCSR &= 1<<14; //BusFault
+	SCB->SHCSR &= 1<<12; //UsageFault
+	int i;
+	for( i = 0; i < 50; i++)
+	{
+	}
+		interrupt_test_mode = 0;
+/*
+End of interrupt tests 
+*/
 	unsigned int curr = 0, prev = 0;
 
 	if (!board_init())

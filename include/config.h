@@ -39,6 +39,7 @@ extern volatile unsigned int ticks;
 extern void SystemCoreClockUpdate(void);
 extern const uint8_t AHBPrescTable[16];
 extern const uint8_t APBPrescTable[8];
+extern volatile uint8_t interrupt_test_mode; 
 #define BOARD "STM32 Nucleo144 F767ZI"
 #define PROCESSOR "STM32F767ZI"
 /******************************************************************************/
