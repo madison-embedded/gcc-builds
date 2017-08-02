@@ -2,6 +2,13 @@
 #include "cli.h"
 #include "timer.h"
 
+/*****************************************************************************/
+#include "ethernetif.h"
+#include "lwip/timeouts.h"
+extern int eth_inited;
+#define LINK_UP_CHECK_TIME	5000
+/*****************************************************************************/
+
 int main(void) {
 
 	unsigned int curr = 0, prev = 0;
@@ -22,19 +29,20 @@ int main(void) {
 
 		check_input();
 
-		/* LwIP main loop structure
-		if (eth_initialized) {
-			if (!(ticks % link_up_check_time)) {
+		/*********************************************************************/
+		if (eth_inited) {
+			if (!(ticks % LINK_UP_CHECK_TIME)) {
 				// ready PHY to check link status
 				// if link down, clear link_up in netif
 			}
-			if (link_up) {
-				// disable interrupts
+			if (gnetif.flags & NETIF_FLAG_LINK_UP) {
+				__disable_irq();
 				ethernetif_input(&gnetif);
-				// enable interrupts
+				__enable_irq();
 			}
 			sys_check_timeouts();
-		}*/
+		}
+		/*********************************************************************/
 
 		/* Blink Red LED */
 		curr = ticks / 250;

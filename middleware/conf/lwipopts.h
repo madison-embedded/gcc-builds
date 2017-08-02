@@ -122,7 +122,7 @@
 #define IP6_DEBUG                   LWIP_DBG_ON
 
 #define PPP_DEBUG                   LWIP_DBG_ON
-#define ETHARP_DEBUG                LWIP_DBG_ON
+#define ETHARP_DEBUG                LWIP_DBG_OFF
 #define UDP_LPC_EMAC                LWIP_DBG_ON
 
 #ifdef LWIP_DEBUG

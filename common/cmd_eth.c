@@ -9,6 +9,8 @@
 #include "lwip/dhcp.h"
 #include "lwip/timeouts.h"
 
+int eth_inited = 0; // temporary
+
 command_status do_eth(int argc, char *argv[]) {
 
 	uint16_t phy_reg;
@@ -37,7 +39,10 @@ command_status do_eth(int argc, char *argv[]) {
 		}
 		printf("register %d value: 0x%lx\r\n", phy_reg, regVal & 0xffff);
 	}
-	else if (!strcmp(argv[1], "init")) Netif_Config();
+	else if (!strcmp(argv[1], "init")) {
+		Netif_Config();
+		eth_inited = 1; // temporary
+	}
 	else if (!strcmp(argv[1], "check")) {
 		printf("TODO: read and parse some PHY registers\r\n");
 	}
@@ -57,11 +62,6 @@ command_status do_eth(int argc, char *argv[]) {
 	else if (!strcmp(argv[1], "dhcp")) {
 		lwip_error = dhcp_start(&gnetif);
 		printf("return: %s\r\n", lwip_strerr(lwip_error));
-		/* todo, enable networking calls in main loop */
-		while (1) {
-			ethernetif_input(&gnetif);
-			sys_check_timeouts();
-		}
 	}
 	else return USAGE;
 
