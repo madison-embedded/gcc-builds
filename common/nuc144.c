@@ -78,66 +78,30 @@ void early_init(void) {
 extern void printPrompt(void);
 extern void lwip_init(void);
 bool board_init(void) {
-//	int16_t a[3];
-	uint8_t a[10];
-//	int b;	
-//	float * dest = ( float * ) malloc(sizeof(float));
+   
+ 	float * dest = ( float * ) malloc(sizeof(float));
 	early_init();
-
-	gpio_openDrainState(GPIOF, 0, true);
-	gpio_openDrainState(GPIOF, 1, true);
 
 	/* TODO: I2C */
 	I2C_init(I2C2_BASE);
-	
-	I2C_setSlaveAddr(0x70, I2C2_BASE);
-//	b = readByte(0x68, WHO_AM_I_MPU9250);
-//	printf("IM a = %x ", b);
-//	initAK8963(dest,I2C2_BASE);
-//	resetMPU9250();
-// 	initMPU9250(I2C2_BASE);
-	//initAK8963(dest,I2C2_BASE);
-			
-//	MPU9250SelfTest(dest);
-//	readGyroData(a);
-//	printf("x = %d, y = %d , z = %d deviation = %f\r\n", a[0], a[1],a[2], *dest);
+	/* MPU9250  */
+	initAK8963(dest,I2C2_BASE);
+ 	initMPU9250(I2C2_BASE);
+	MPU9250SelfTest(dest);
+	printf("MPU9250 deviation = %f\r\n", *dest);	
 
-	a[0]= 0x21; 
-	I2C_Master_Transmit_Data(I2C2_BASE, 1, a);
-	a[0] = 0xA0;
-	I2C_Master_Transmit_Data(I2C2_BASE, 1, a);
-	a[0] = 0xEF;
-	I2C_Master_Transmit_Data(I2C2_BASE, 1, a);
-	a[0] = 0x80;
-	I2C_Master_Transmit_Data(I2C2_BASE, 1, a);
-	a[0] = 0x00;
-	a[1] = 0x3F;
-	writeByte(0x70, a[0], a[1]);
-	a[2] = 0x02;
-	a[3] = 0x06;
-
-	writeByte(0x70, a[2], a[3]);
-	a[4] = 0x04;
-	a[5] = 0x00;
-
-	writeByte(0x70, a[4], a[5]);
-	a[6] = 0x06;
-	a[7] = 0x66;
-
-	writeByte(0x70, a[6], a[7]);
-	a[8] = 0x08;
-	a[9] = 0x5B;
-
-	writeByte(0x70, a[8], a[9]);
-
-	I2C_Master_Transmit_Data(I2C2_BASE, 10, a);
-	
-	a[0] = 0x81;
-	I2C_Master_Transmit_Data(I2C2_BASE, 1, a);
+	/* Should be 0x71 otherwise MPU9250 not working properly */
+   	if ( 0x71 !=  readByte(0x68, WHO_AM_I_MPU9250))
+	{
+		printf("MPU9250 Fail\r\n");
+		return false;
+	}
 
 	lwip_init();
 
-	printPrompt();
+    printPrompt();
+	free(dest); 
+
 	return true;
 }
 

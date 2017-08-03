@@ -25,7 +25,7 @@ FPU = -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 TOOLCHAIN=arm-none-eabi-
 CFLAGS=$(FPU) $(ARCH_FLAGS) $(DEFINES) $(CPU_DEFINES) $(INCLUDES) -Wall -ffunction-sections -fdata-sections -fno-builtin -Os
 # -Os -nostdlib -lnosys
-
+LDLIBS = -lm
 # Linker Settings
 LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DIR)/link.ld
 ###############################################################################
@@ -62,7 +62,8 @@ OBJECTS += drivers/$(PROC_PREFIX)usart.o
 OBJECTS += drivers/$(PROC_PREFIX)adc.o
 OBJECTS += drivers/$(PROC_PREFIX)exti.o
 OBJECTS += drivers/$(PROC_PREFIX)tim.o
-#OBJECTS += drivers/mpu9250.c
+OBJECTS += drivers/$(PROC_PREFIX)i2c.o
+OBJECTS += drivers/mpu9250.o
 
 # HAL Drivers
 #OBJECTS += drivers/hal/$(PROC_PREFIX)eth.o
@@ -85,15 +86,15 @@ include middleware/LwIP/makefile.conf
 # Source Rules
 %.o: %.S
 	+@echo "building $(notdir $<)"
-	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	@$(TOOLCHAIN)gcc $(CFLAGS) $(LDLIBS) -c -o $@ $<
 
 %.o: %.c
 	+@echo "building $(notdir $<)"
-	@$(TOOLCHAIN)gcc $(CFLAGS) -c -o $@ $<
+	@$(TOOLCHAIN)gcc $(CFLAGS) $(LDLIBS) -c -o $@ $<
 
 $(PROJECT).elf: $(OBJECTS)
 	+@echo "linking $(notdir $@)"
-	@$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) -o $@
+	@$(TOOLCHAIN)gcc $(LFLAGS) $^ $(CFLAGS) $(LDLIBS) -o  $@
 
 $(PROJECT).bin: $(PROJECT).elf
 	@$(TOOLCHAIN)objcopy -O binary $< $@

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 #include "i2c.h"
+#include "timer.h"
+
 /*Magnitometer Registers*/
 
 #define AK8963_ADDRESS   0x0C
@@ -185,7 +187,7 @@ enum Mscale_ {
     };
 
     // Specify sensor full scale
-typedef struct MPU9250_config{
+struct MPU9250_config_type{
     uint32_t I2C_BASE;
     uint8_t Gscale ;
     uint8_t Ascale ;
@@ -194,10 +196,9 @@ typedef struct MPU9250_config{
     // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
     uint8_t Mmode  ;
 
-} MPU9250_config_typedef; 
+}; 
 
-
-typedef struct MPU9250_fields{
+struct MPU9250_fields_type{
 
     float pitch, yaw, roll;
     float temperature;   // Stores the real internal chip temperature in Celsius
@@ -223,10 +224,10 @@ typedef struct MPU9250_fields{
     // Stores the 16-bit signed accelerometer sensor output
     int16_t accelCount[3];
 
-} MPU9250_fields_typedef;  
+};  
 
-MPU9250_config_typedef MPU9250_config = {0 ,GFS_250DPS, AFS_2G,MFS_16BITS, 0x02 }; // stores configuration data
-MPU9250_fields_typedef MPU9250_fields; // stores differeny variables
+extern struct MPU9250_config_type MPU9250_config; // stores configuration data
+extern struct MPU9250_fields_type MPU9250_fields; // stores differeny variables
 
 
     void getMres();
