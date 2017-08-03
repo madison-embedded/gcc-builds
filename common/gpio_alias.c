@@ -127,10 +127,10 @@ int gpioAliasInit(){
 			gpio_setClock(port, true);
 			gpio_setMode(port, pin, GPIO_TABLE[i].mode);
 			gpio_setSpeed(port, pin, GPIO_TABLE[i].speed);
-			
+
 			if (GPIO_TABLE[i].mode == ALT)
 				gpio_setAlternateFunc(port, pin, GPIO_TABLE[i].af_val);
-			
+
 			if (GPIO_TABLE[i].group == I2C)
 				gpio_openDrainState(port, pin, true);
 

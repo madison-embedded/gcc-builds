@@ -26,7 +26,7 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 	else printf("Probs\t-\t");
 
 	printf("\t%c%2d\t", gpio_getGpioPortChar(port), pin);
-	
+
 	switch (gpio_getMode(port, pin)) {
 		case OUTPUT:	printf("out %x", gpio_readPin(port, pin)); break;
 		case INPUT:		printf("in  %x", gpio_readPin(port, pin)); break;
@@ -71,7 +71,7 @@ command_status do_pin(int argc, char *argv[]) {
 		printf("USABLE\tNAME\t\tPIN\tMODE\tSPEED\tPULLUP\r\n");	
 		for (i=0; i<NUM_GPIO_ALIAS; i++) {
 			if (group & GPIO_TABLE[i].group)
-			gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
+				gpio_printPinInfo(GPIO_TABLE[i].port, GPIO_TABLE[i].pin);
 		}
 		return SUCCESS;
 	}

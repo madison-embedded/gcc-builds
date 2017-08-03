@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "config.h"
 #include "rcc.h"
+#include "adc.h"
 #include "hal/stm32f7xx_hal.h"
 
 void setup_osc(void) {
@@ -82,7 +83,8 @@ bool board_init(void) {
 	early_init();
 
 	/* TODO: I2C */
-
+	adc_init(ADC1);
+	adc_init(ADC3);
 	lwip_init();
 
 	printPrompt();

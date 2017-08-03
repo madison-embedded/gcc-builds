@@ -53,7 +53,7 @@ static bool adc_init_clk(ADC_TypeDef *adc) {
 		case ADC3_BASE: mask = RCC_APB2ENR_ADC3EN; break;
 	}
 	RCC->APB2ENR |= mask;
-	
+
 	if(adcFreq == 0){
 		while (divisor <= 8 && APB2_F / divisor > ADC_TARGET_FREQ)
 			divisor += 2;
@@ -77,7 +77,7 @@ uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel) {
 
 	/* single conversion */
 	adc->SQR1 = 0x0; adc->SQR3 = 0x0;
-	
+
 	/* set channel */
 	adc->SQR3 |= channel & 0x1f;
 

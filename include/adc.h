@@ -9,7 +9,7 @@
 #define ADC_SMP_BITS		5 /* TODO: change */
 
 #define FILL_ADC(_adc, _channel, _port, _pin) \
-	 {\
+	{\
 		.adc = _adc,\
 		.channel = _channel,\
 		.port = _port,\
