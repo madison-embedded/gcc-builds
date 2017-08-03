@@ -7,7 +7,15 @@
 
 command_status do_exti(int argc, char *argv[]) {
 	if (argc < 2) return USAGE;
-	uint8_t pin = atoi((const char *) argv[1]);
+	uint8_t pin = 0;
+	GPIO_TypeDef * port; 
+
+	if(hasGpioAlias(&port, &pin, argv[1])){
+		getTimeStamps(pin);
+		return SUCCESS;
+	}
+
+	pin = atoi((const char *) argv[1]);
  	
 	getTimeStamps(pin);
 
