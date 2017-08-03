@@ -6,6 +6,9 @@
 #include "rcc.h"
 #include "adc.h"
 #include "hal/stm32f7xx_hal.h"
+#include "i2c.h"
+#include "mpu9250.h" 
+
 
 void setup_osc(void) {
 
@@ -79,15 +82,33 @@ void early_init(void) {
 extern void printPrompt(void);
 extern void lwip_init(void);
 bool board_init(void) {
-
+   
+ 	float * dest = ( float * ) malloc(sizeof(float));
 	early_init();
+  
+  I2C_init(I2C2_BASE);
+	/* MPU9250  */
+	initAK8963(dest,I2C2_BASE);
+ 	initMPU9250(I2C2_BASE);
+	MPU9250SelfTest(dest);
+	printf("MPU9250 deviation = %f\r\n", *dest);	
 
-	/* TODO: I2C */
+	/* Should be 0x71 otherwise MPU9250 not working properly */
+   	if ( 0x71 !=  readByte(0x68, WHO_AM_I_MPU9250))
+	{
+		printf("MPU9250 Fail\r\n");
+		return false;
+	}
+
+
 	adc_init(ADC1);
 	adc_init(ADC3);
+
 	lwip_init();
 
-	printPrompt();
+    printPrompt();
+	free(dest); 
+
 	return true;
 }
 
