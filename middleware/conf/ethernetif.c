@@ -25,21 +25,19 @@ __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethe
   *        for this ethernetif
   */
 static void low_level_init(struct netif *netif) {
-    unsigned char ST_mac_addr[3] = {0x00, 0x80, 0xe1}; // default STMicro mac address
 	uint32_t word0 = *(uint32_t *) UID_BASE;
     uint8_t MACAddr[6];
     HAL_StatusTypeDef hal_eth_init_status;
 
-    MACAddr[0] = ST_mac_addr[0];
-    MACAddr[1] = ST_mac_addr[1];
-    MACAddr[2] = ST_mac_addr[2];
+    MACAddr[0] = MAC0;
+    MACAddr[1] = MAC1;
+    MACAddr[2] = MAC2;
     MACAddr[3] = (word0 & 0x00ff0000) >> 16;
     MACAddr[4] = (word0 & 0x0000ff00) >> 8;
     MACAddr[5] = (word0 & 0x000000ff);
 
     /* Init ETH */
     EthHandle.Instance = ETH;
-	//ETH_LOOPBACKMODE_ENABLE
     EthHandle.Init.AutoNegotiation = ETH_AUTONEGOTIATION_ENABLE;
     EthHandle.Init.Speed = ETH_SPEED_100M;
     EthHandle.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
@@ -272,8 +270,6 @@ void ethernetif_input(struct netif *netif) {
 	/* if no packet could be read, silently ignore this */
 	if (p != NULL) {
 
-		printf("Packet available!\r\n");
-
 		/* pass all packets to ethernet_input, which decides what packets it supports */
 		if (netif->input(p, netif) != ERR_OK) {
 			LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
@@ -281,7 +277,6 @@ void ethernetif_input(struct netif *netif) {
 			p = NULL;
 		}
 	}
-	else printf("No packet available\r\n");
 }
 
 /* Define those to better describe your network interface. */
@@ -447,6 +442,8 @@ void eth_print_status(HAL_ETH_StateTypeDef stat) {
 
 sys_prot_t sys_arch_protect(void) { return 0; }
 void sys_arch_unprotect(sys_prot_t pval) { UNUSED(pval); }
+
+uint32_t sys_now(void) { return ticks; }
 
 void assert_printf(char *msg, int line, char *file) {
 	printf("%s %d: %s\r\n", file, line, msg);

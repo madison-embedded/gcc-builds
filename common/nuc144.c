@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "config.h"
 #include "rcc.h"
+#include "adc.h"
 #include "hal/stm32f7xx_hal.h"
 #include "i2c.h"
 #include "mpu9250.h" 
@@ -72,6 +73,9 @@ void early_init(void) {
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
 
 	print_post_info();
+
+	/* uncomment when it's fully ready */
+	//Netif_Config();
 }
 
 /* instantiate UART & button + LEDs no matter what */
@@ -81,9 +85,8 @@ bool board_init(void) {
    
  	float * dest = ( float * ) malloc(sizeof(float));
 	early_init();
-
-	/* TODO: I2C */
-	I2C_init(I2C2_BASE);
+  
+  I2C_init(I2C2_BASE);
 	/* MPU9250  */
 	initAK8963(dest,I2C2_BASE);
  	initMPU9250(I2C2_BASE);
@@ -96,6 +99,10 @@ bool board_init(void) {
 		printf("MPU9250 Fail\r\n");
 		return false;
 	}
+
+
+	adc_init(ADC1);
+	adc_init(ADC3);
 
 	lwip_init();
 

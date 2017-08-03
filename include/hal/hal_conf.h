@@ -12,7 +12,7 @@
 /* #define HAL_CRYP_MODULE_ENABLED */ 
 /* #define HAL_DAC_MODULE_ENABLED */ 
 /* #define HAL_DCMI_MODULE_ENABLED */ 
-/* #define HAL_DMA_MODULE_ENABLED */
+#define HAL_DMA_MODULE_ENABLED
 /* #define HAL_DMA2D_MODULE_ENABLED */
 #define HAL_ETH_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
@@ -22,7 +22,7 @@
 /* #define HAL_SDRAM_MODULE_ENABLED */ 
 /* #define HAL_HASH_MODULE_ENABLED */ 
 #define HAL_GPIO_MODULE_ENABLED
-/* #define HAL_I2C_MODULE_ENABLED  */
+#define HAL_I2C_MODULE_ENABLED
 /* #define HAL_I2S_MODULE_ENABLED */
 /* #define HAL_IWDG_MODULE_ENABLED */
 /* #define HAL_LPTIM_MODULE_ENABLED */
@@ -88,6 +88,11 @@
 #define ETH_TX_BUF_SIZE                ETH_MAX_PACKET_SIZE /* buffer size for transmit              */
 #define ETH_RXBUFNB                    4U       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
 #define ETH_TXBUFNB                    4U       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
+
+/* STMicro default MAC address */
+#define MAC0	0x00
+#define MAC1	0x80
+#define MAC2	0xE1
 
 /* Section 2: PHY configuration section */
 
