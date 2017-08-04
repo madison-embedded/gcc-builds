@@ -8,6 +8,7 @@
 #include "lwip/err.h"
 #include "lwip/dhcp.h"
 #include "lwip/timeouts.h"
+#include "lwip/udp.h"
 
 int eth_inited = 0; // temporary
 
@@ -62,6 +63,30 @@ command_status do_eth(int argc, char *argv[]) {
 	else if (!strcmp(argv[1], "dhcp")) {
 		lwip_error = dhcp_start(&gnetif);
 		printf("return: %s\r\n", lwip_strerr(lwip_error));
+	}
+	else if (!strcmp(argv[1], "udp")) {
+		char *message = "Hello!";
+		ip_addr_t to_send;
+		struct udp_pcb *test = udp_new();
+		struct pbuf *data = pbuf_alloc(PBUF_TRANSPORT, 7, PBUF_RAM);
+		if (test == NULL || data == NULL) {
+			printf("Could not allocate struct udp_pcb or pbuf\r\n");
+			return FAIL;
+		}
+		memcpy(data->payload, message, 7);
+		IP4_ADDR(&to_send, 255, 255, 255, 255); // broadcast?
+		lwip_error = udp_connect(test, &to_send, 3000); // listen over any ip?
+		if (lwip_error != ERR_OK) {
+			printf("udp_connect failed\r\n"); // should only happen if multiple connections
+			return FAIL;
+		}
+		lwip_error = udp_send(test, data);
+		if (lwip_error != ERR_OK) {
+			printf("udp_send failed\r\n");
+			return FAIL;
+		}
+		pbuf_free(data);
+		udp_remove(test);
 	}
 	else return USAGE;
 

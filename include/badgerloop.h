@@ -15,14 +15,11 @@ typedef struct req_telem {
 #define BRAKING	0x5
 	int acceleration,
 		position,
-		velocity;
-} req_telem_t;
-
-typedef struct ex_telem {
-	int v_batt, i_batt;
-	int t_batt, t_pod;
+		velocity,
+		v_batt, i_batt,
+		t_batt, t_pod;
 	uint32_t s_count;
-} ex_telem_t;
+} req_telem_t;
 
 typedef struct d_telem {
 	uint16_t p_amb;
@@ -40,13 +37,12 @@ typedef struct d_telem {
 
 typedef struct badgerloop_telemetry {
 	req_telem_t	req;
-	ex_telem_t	ex;
 	d_telem_t	dash;
 } badgerloop_telemetry_t;
 
 int badgerloop_init(void);
-int send_telemetry_to_SpaceX(badgerloop_telemetry_t *data);
-int send_telemetry_to_Dashboard(badgerloop_telemetry_t *data);
+int send_telemetry_to_SpaceX(void);
+int send_telemetry_to_Dashboard(void);
 
 extern badgerloop_telemetry_t data;
 

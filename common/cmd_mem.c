@@ -4,8 +4,7 @@
 #include "proc/defs.h" 
 #include "cli.h"
 
-
-
+/*
 bool md_input_handler(unsigned char* mem_ptr, int length)
 {
 	unsigned char* mem = (unsigned char*) mem_ptr;
@@ -41,7 +40,6 @@ bool md_input_handler(unsigned char* mem_ptr, int length)
 	return true; 
 }
 
-
 command_status do_md(int argc, char *argv[]) {
 
 	if(argc != 3) return USAGE;
@@ -72,6 +70,30 @@ command_status do_md(int argc, char *argv[]) {
 		printf("Illegal Memory Access\r\n");
 		return FAIL;
 	}
+	
+	free(address); 
+	return SUCCESS; 
+
+}
+
+command_status do_md(int argc, char *argv[]) 
+{
+
+	int i, j;
+	char content;
+	int temp;
+	unsigned char ** mem_ptr_ = (unsigned char ** )malloc(sizeof (int) ) ; 
+	unsigned char * mem_ptr; 
+	uint32_t data; // Not Used  
+	int* length = (int*) malloc(sizeof(int));
+
+	command_status status = md_mw_input_handler(argc, argv, mem_ptr_, &data, length, 0);
+	mem_ptr  = *mem_ptr_; // Can be changed. Too lazy to do that ) 
+
+	if(status == FAIL)
+		return FAIL;
+	else if ( status == USAGE )
+		return USAGE; 
 
 	char* ascii_content = (char*) malloc(17*sizeof(char));
 	ascii_content[16] = '\0';
@@ -117,9 +139,7 @@ command_status do_md(int argc, char *argv[]) {
 
 	return SUCCESS;
 }
-
 COMMAND_ENTRY("md", "md <addr> <count>", "View raw memory contents.", do_md)
-
 
 command_status do_mw(int argc, char *argv[])
 {
@@ -133,7 +153,7 @@ command_status do_mw(int argc, char *argv[])
 
 
 COMMAND_ENTRY("mw", "mw <addr> <value> <count>", "Write data memory contents.", do_mw)
-
+*/
 
 command_status do_memmap(int argc, char*argv[]) {
 	printf("Bus\t\tPhysical\t\tTarget\t\t Size \r\n\n");
@@ -230,22 +250,5 @@ command_status do_memmap(int argc, char*argv[]) {
 	printf("APB1\t\tTIM2\t\t\t%x \t %d bytes \r\n\n",TIM2_BASE      ,0x400003FF   - TIM2_BASE);
 	return SUCCESS; 
 }
- 
-
 COMMAND_ENTRY("memmap", "memmap", "Display where different physical hardware peripherals", do_memmap); 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
