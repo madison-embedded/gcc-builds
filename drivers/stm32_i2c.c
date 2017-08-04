@@ -14,23 +14,6 @@ volatile bool I2C2_BUSY = false;
 volatile bool I2C3_BUSY = false;
 volatile bool I2C4_BUSY = false;
 
-void I2C_init(uint32_t i2c_base)
-{
-	I2C_setClock(i2c_base, true); // Enable clock
-	I2C_enable(false,i2c_base);   // Disable I2C 
- 	/*Set timing t0 100kHz*/
-	I2C_setPreScaler(0xB,i2c_base);
-	I2C_setSCLDEL(0x4, i2c_base);
-	I2C_setSDADEL(0x2, i2c_base);
-	I2C_setSCLH(0xf, i2c_base);
-	I2C_setSCLL(0x13, i2c_base);
-	I2C_clockStretch_off(false, i2c_base);
-	I2C_enable(true, i2c_base); 
-	I2C_Master_Config_slaveADDR(i2c_base, false, 0x70, false, true);
-	I2C_enable_NVIC(i2c_base);
-}
-
-
 bool I2C_setClock(uint32_t i2c_base, bool state )
 {
 
@@ -501,7 +484,6 @@ bool I2C_Master_Transmit_Data(uint32_t i2c_base, uint32_t nBytes, uint8_t* data_
 bool I2C_Master_Receive_Data(uint32_t i2c_base, uint32_t nBytes, uint8_t* data_buffer)
 {
 	bool receive =  I2C_transmit_receive_config(i2c_base,nBytes, data_buffer, true );
-
 	return receive;
 }
 
@@ -512,15 +494,14 @@ void I2C_Read_Data_Ready(uint32_t i2c_base)
 		case I2C1_BASE: 
 			while(!READ1_RDY){};
 			READ1_RDY = false;
-			break;		
+		
 		case I2C2_BASE: 
 			while(!READ2_RDY){};
 			READ2_RDY = false;
-			break;
 		case I2C3_BASE: 
 			while(!READ3_RDY){};
 			READ3_RDY = false;
-			break;
+	
 		case I2C4_BASE: 
 			while(!READ4_RDY){};
 			READ4_RDY = false;
@@ -567,10 +548,9 @@ void I2C2_EV_IRQHandler()
 	else if (isr & I2C_ISR_STOPF )
 	{
 		I2C2->ICR |= I2C_ICR_STOPCF; 
-		I2C2_BUSY = false;	
-		if( I2C2 -> CR2 & I2C_CR2_RD_WRN){
-		 READ2_RDY = true;
-		 }
+		I2C2_BUSY = false;
+			
+		if( I2C2 -> CR2 & I2C_CR2_RD_WRN) READ2_RDY = true;
 	}
 }
 void I2C3_EV_IRQHandler()
