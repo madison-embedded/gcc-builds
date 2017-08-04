@@ -64,5 +64,5 @@ Note: This function checks if the data_buffer passed to I2C_Master_Receive_Data 
 After returning from this function, data_buffer contains the valid received data
 */
 void I2C_Read_Data_Ready(uint32_t i2c_base);
-void I2C_init(uint32_t i2c_base); 
+
 

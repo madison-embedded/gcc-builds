@@ -98,8 +98,8 @@ const GPIO GPIO_TABLE[] = {
 	FILL_AFIO("Retro3",		GPIOE, 13, ALT, 1, LOW_SPEED, NONE, true, RETRO)
 
 	/* Application I2C */
-	FILL_AFIO("SDA",		GPIOF, 0, ALT, 4, MEDIUM_SPEED, NONE, true, I2C)
-	FILL_AFIO("SCL",		GPIOF, 1, ALT, 4, MEDIUM_SPEED, NONE, true, I2C)
+	FILL_AFIO("SDA",		GPIOF, 0, ALT, 4, LOW_SPEED, NONE, true, I2C)
+	FILL_AFIO("SCL",		GPIOF, 1, ALT, 4, LOW_SPEED, NONE, true, I2C)
 
 	/* Application SDMMC */
 	FILL_GPIO("SDMMC1 D0",		GPIOC,  8, ALT, LOW_SPEED, NONE, false, OTHER)
@@ -141,8 +141,6 @@ int gpioAliasInit(){
 				gpio_writePin(port, pin, 0);
 		}
 	}
-//	gpio_openDrainState(GPIOF, 0, true); // set SDA as open drain 
-//	gpio_openDrainState(GPIOF, 1, true); // set SDA as open drain 
 
 	return 0;
 }
