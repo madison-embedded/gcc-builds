@@ -6,6 +6,8 @@
 #include "rcc.h"
 #include "adc.h"
 #include "hal/stm32f7xx_hal.h"
+#include "ethernetif.h"
+#include "badgerloop.h"
 
 void setup_osc(void) {
 
@@ -56,6 +58,7 @@ void setup_osc(void) {
 
 /* static initializations that don't fail */
 extern void print_post_info(void);
+extern void lwip_init(void);
 void early_init(void) {
 
 	uint32_t init_regs[3] = {0, 0, 0};
@@ -71,13 +74,14 @@ void early_init(void) {
 
 	print_post_info();
 
-	/* uncomment when it's fully ready */
-	//Netif_Config();
+	/* Networking */
+	lwip_init();
+	Netif_Config();
+	badgerloop_init();
 }
 
 /* instantiate UART & button + LEDs no matter what */
 extern void printPrompt(void);
-extern void lwip_init(void);
 bool board_init(void) {
 
 	early_init();
@@ -85,7 +89,6 @@ bool board_init(void) {
 	/* TODO: I2C */
 	adc_init(ADC1);
 	adc_init(ADC3);
-	lwip_init();
 
 	printPrompt();
 	return true;

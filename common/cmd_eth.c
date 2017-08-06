@@ -10,14 +10,12 @@
 #include "lwip/timeouts.h"
 #include "lwip/udp.h"
 
-int eth_inited = 0; // temporary
-
 command_status do_eth(int argc, char *argv[]) {
 
 	uint16_t phy_reg;
 	uint32_t regVal;
 	HAL_StatusTypeDef ret;
-	err_t lwip_error = ERR_OK;
+	//err_t lwip_error = ERR_OK;
 
 	if (argc < 2) return USAGE;
 
@@ -40,10 +38,7 @@ command_status do_eth(int argc, char *argv[]) {
 		}
 		printf("register %d value: 0x%lx\r\n", phy_reg, regVal & 0xffff);
 	}
-	else if (!strcmp(argv[1], "init")) {
-		Netif_Config();
-		eth_inited = 1; // temporary
-	}
+	//else if (!strcmp(argv[1], "init")) Netif_Config();
 	else if (!strcmp(argv[1], "check")) {
 		printf("TODO: read and parse some PHY registers\r\n");
 	}
@@ -61,32 +56,12 @@ command_status do_eth(int argc, char *argv[]) {
 		printf("TODO: add more\r\n");
 	}
 	else if (!strcmp(argv[1], "dhcp")) {
+#if LWIP_DHCP == 0
+		printf("dhcp not built\r\n");
+#else
 		lwip_error = dhcp_start(&gnetif);
 		printf("return: %s\r\n", lwip_strerr(lwip_error));
-	}
-	else if (!strcmp(argv[1], "udp")) {
-		char *message = "Hello!";
-		ip_addr_t to_send;
-		struct udp_pcb *test = udp_new();
-		struct pbuf *data = pbuf_alloc(PBUF_TRANSPORT, 7, PBUF_RAM);
-		if (test == NULL || data == NULL) {
-			printf("Could not allocate struct udp_pcb or pbuf\r\n");
-			return FAIL;
-		}
-		memcpy(data->payload, message, 7);
-		IP4_ADDR(&to_send, 255, 255, 255, 255); // broadcast?
-		lwip_error = udp_connect(test, &to_send, 3000); // listen over any ip?
-		if (lwip_error != ERR_OK) {
-			printf("udp_connect failed\r\n"); // should only happen if multiple connections
-			return FAIL;
-		}
-		lwip_error = udp_send(test, data);
-		if (lwip_error != ERR_OK) {
-			printf("udp_send failed\r\n");
-			return FAIL;
-		}
-		pbuf_free(data);
-		udp_remove(test);
+#endif
 	}
 	else return USAGE;
 

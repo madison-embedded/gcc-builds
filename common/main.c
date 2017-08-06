@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include "cli.h"
 #include "timer.h"
-
-/*****************************************************************************/
 #include "ethernetif.h"
-#include "lwip/timeouts.h"
-extern int eth_inited;
-#define LINK_UP_CHECK_TIME	5000
-/*****************************************************************************/
 
 int main(void) {
 
@@ -29,20 +23,7 @@ int main(void) {
 
 		check_input();
 
-		/*********************************************************************/
-		if (eth_inited) {
-			if (!(ticks % LINK_UP_CHECK_TIME)) {
-				// ready PHY to check link status
-				// if link down, clear link_up in netif
-			}
-			if (gnetif.flags & NETIF_FLAG_LINK_UP) {
-				__disable_irq();
-				ethernetif_input(&gnetif);
-				__enable_irq();
-			}
-			sys_check_timeouts();
-		}
-		/*********************************************************************/
+		lwip_loop_handler();
 
 		/* Blink Red LED */
 		curr = ticks / 250;

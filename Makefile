@@ -54,6 +54,7 @@ OBJECTS += common/cmd_reset.o
 OBJECTS += common/cmd_float.o
 OBJECTS += common/cmd_eth.o
 OBJECTS += common/cmd_exti.o
+OBJECTS += common/cmd_badgerloop.o
 OBJECTS += drivers/timer.o
 
 # Conditional Objects

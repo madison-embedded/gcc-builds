@@ -14,6 +14,8 @@ __ALIGN_BEGIN ETH_DMADescTypeDef DMATxDscrTab[ETH_TXBUFNB] __ALIGN_END; /* Ether
 __ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethernet Receive Buffer */
 __ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
 
+static int curr_link_status = 0, prev_link_status = 0;
+
 /*******************************************************************************
                        LL Driver Interface ( LwIP stack --> ETH) 
 *******************************************************************************/
@@ -62,6 +64,8 @@ static void low_level_init(struct netif *netif) {
 
 	/* Set netif link flag */
 	netif->flags |= NETIF_FLAG_LINK_UP;
+	curr_link_status = PHY_LINKED_STATUS;
+	prev_link_status = PHY_LINKED_STATUS;
 
     /* Initialize Tx Descriptors list: Chain Mode */
     HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
@@ -264,6 +268,8 @@ static struct pbuf * low_level_input(struct netif *netif) {
 void ethernetif_input(struct netif *netif) {
 	struct pbuf *p;
 
+	__disable_irq();
+
 	/* move received packet into a new pbuf */
 	p = low_level_input(netif);
 
@@ -277,6 +283,7 @@ void ethernetif_input(struct netif *netif) {
 			p = NULL;
 		}
 	}
+	__enable_irq();
 }
 
 /* Define those to better describe your network interface. */
@@ -327,10 +334,16 @@ void Netif_Config(void) {
 	ip_addr_t netmask;
 	ip_addr_t gw;
 
-	/* need to use DHCP */
+#if LWIP_DHCP == 0
+	/* static IP */
+	IP4_ADDR(&ipaddr, 192, 168, 0, 10);
+	IP4_ADDR(&netmask, 255, 255, 255, 0);
+	IP4_ADDR(&gw, 192, 168, 0, 1);
+#else
 	ip_addr_set_zero_ip4(&ipaddr);
 	ip_addr_set_zero_ip4(&netmask);
 	ip_addr_set_zero_ip4(&gw);
+#endif
 
 	/* add the network interface */    
 	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &netif_input);
@@ -438,6 +451,33 @@ void eth_print_status(HAL_ETH_StateTypeDef stat) {
 		case HAL_ETH_STATE_TIMEOUT: printf("TIMEOUT"); break;
 		case HAL_ETH_STATE_ERROR: printf("ERROR"); break;
 	}
+}
+
+static int eth_check_link(void) {
+	uint32_t phyreg = 0;
+	HAL_ETH_ReadPHYRegister(&EthHandle, PHY_BSR, &phyreg);
+	return phyreg & PHY_LINKED_STATUS;
+}
+
+inline void lwip_loop_handler(void) {
+	if (!(ticks % LINK_UP_CHECK_TIME)) {
+		curr_link_status = eth_check_link();
+		if (curr_link_status != prev_link_status) {
+			if (curr_link_status == PHY_LINKED_STATUS) {
+				printf("link up!\r\n");
+				gnetif.flags |= NETIF_FLAG_LINK_UP;
+				netif_set_up(&gnetif);
+			} else {
+				printf("link down!\r\n");
+				gnetif.flags &= ~NETIF_FLAG_LINK_UP;
+				netif_set_down(&gnetif);
+			}
+		}
+		prev_link_status = curr_link_status;
+	}
+	if (gnetif.flags & NETIF_FLAG_LINK_UP)
+		ethernetif_input(&gnetif);
+	sys_check_timeouts();
 }
 
 sys_prot_t sys_arch_protect(void) { return 0; }
