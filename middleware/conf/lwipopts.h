@@ -64,9 +64,9 @@
 #define TCP_OVERSIZE                0
 
 #define LWIP_DHCP                   0
-#define LWIP_DNS                    1
+#define LWIP_DNS                    0
 #define LWIP_UDP					1
-#define LWIP_TCP					1
+#define LWIP_TCP					0
 #define LWIP_SOCKET                 0
 #define LWIP_NETCONN                0
 
@@ -74,7 +74,7 @@
 
 // Support Multicast
 #include "stdlib.h"
-#define LWIP_IGMP                   LWIP_IPV4
+//#define LWIP_IGMP                   LWIP_IPV4
 #define LWIP_RAND()                 rand()
 
 #define LWIP_COMPAT_SOCKETS         0

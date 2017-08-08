@@ -1,6 +1,8 @@
 MEMORY
 {
-RAM (rwx)	: ORIGIN = 0x20000000, LENGTH = 0x80000		/* 128K */
+DTCM (rwx)	: ORIGIN = 0x20000000, LENGTH = 0x20000		/* 128K  */
+SRAM1 (rwx)	: ORIGIN = 0x20020000, LENGTH = 0x5C000		/* 368K  */
+SRAM2 (rwx)	: ORIGIN = 0x2007C000, LENGTH = 0x4000		/* 16K   */
 FLASH (rx)	: ORIGIN = 0x00200000, LENGTH = 0x200000	/* 2048K */
 }
 
@@ -153,7 +155,7 @@ SECTIONS
 		/* All data end */
 		__data_end__ = .;
 
-	} > RAM
+	} > SRAM1
 
 	.bss :
 	{
@@ -163,7 +165,7 @@ SECTIONS
 		*(COMMON)
 		. = ALIGN(4);
 		__bss_end__ = .;
-	} > RAM
+	} > SRAM1
 	
 	.heap (COPY):
 	{
@@ -171,7 +173,7 @@ SECTIONS
 		PROVIDE(end = .);
 		*(.heap*)
 		__HeapLimit = .;
-	} > RAM
+	} > DTCM
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign
@@ -179,11 +181,11 @@ SECTIONS
 	.stack_dummy (COPY):
 	{
 		*(.stack*)
-	} > RAM
+	} > DTCM
 
 	/* Set stack top to end of RAM, and stack limit move down by
 	 * size of stack_dummy section */
-	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	__StackTop = ORIGIN(DTCM) + LENGTH(DTCM);
 	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
 	PROVIDE(__stack = __StackTop);
 	
