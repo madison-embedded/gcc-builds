@@ -7,6 +7,9 @@
 #define DASHBOARD_IP	10
 #define DEV_IP			105
 
+#define SPACEXP_SIZ		34
+#define DASHBOARDP_SIZ	47
+
 #define TEAM_ID	0xab
 
 extern uint32_t last_telem_timestamp;

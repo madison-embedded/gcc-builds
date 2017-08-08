@@ -8,7 +8,7 @@
 /*****************************************************************************/
 /*                                 Data Buffer                               */
 /*****************************************************************************/
-uint8_t telemetry_buffer[47];
+uint8_t telemetry_buffer[DASHBOARDP_SIZ];
 
 /* Team ID, Status */
 uint8_t *team_id = &telemetry_buffer[0];
@@ -104,10 +104,10 @@ int badgerloop_init(void) {
 
 int send_telemetry_to_SpaceX(void) {
 
-	spacex_payload = pbuf_alloc(PBUF_TRANSPORT, 34, PBUF_RAM);
+	spacex_payload = pbuf_alloc(PBUF_TRANSPORT, SPACEXP_SIZ, PBUF_RAM);
 	if (spacex_payload == NULL) return -1;
 
-	memcpy(spacex_payload->payload, telemetry_buffer, 34);
+	memcpy(spacex_payload->payload, telemetry_buffer, SPACEXP_SIZ);
 
 	last_telem_timestamp = ticks;
 
@@ -121,10 +121,10 @@ int send_telemetry_to_SpaceX(void) {
 
 int send_telemetry_to_Dashboard(void) {
 
-	dashboard_payload = pbuf_alloc(PBUF_TRANSPORT, 48, PBUF_RAM);
+	dashboard_payload = pbuf_alloc(PBUF_TRANSPORT, DASHBOARDP_SIZ, PBUF_RAM);
 	if (dashboard_payload == NULL) return -1;
 
-	memcpy(dashboard_payload->payload, telemetry_buffer, 48);
+	memcpy(dashboard_payload->payload, telemetry_buffer, DASHBOARDP_SIZ);
 
 	last_telem_timestamp = ticks;
 
