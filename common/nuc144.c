@@ -6,8 +6,12 @@
 #include "rcc.h"
 #include "adc.h"
 #include "hal/stm32f7xx_hal.h"
+#include "hal/stm32f7xx_hal_i2c.h"
 #include "ethernetif.h"
 #include "badgerloop.h"
+
+#define I2C_TIMING        0xB0420f13  /* (Rise time = 120ns, Fall time = 25ns) */
+I2C_HandleTypeDef hi2c;
 
 void setup_osc(void) {
 
@@ -85,8 +89,14 @@ extern void printPrompt(void);
 bool board_init(void) {
 
 	early_init();
+	
+	/* i2c init */
+	hi2c.Instance = I2C2;
+	hi2c.Init.Timing = I2C_TIMING;
+	hi2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
 
-	/* TODO: I2C */
+	__HAL_RCC_I2C2_CLK_ENABLE();
+
 	adc_init(ADC1);
 	adc_init(ADC3);
 

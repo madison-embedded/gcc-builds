@@ -54,6 +54,7 @@ OBJECTS += common/cmd_reset.o
 OBJECTS += common/cmd_float.o
 OBJECTS += common/cmd_eth.o
 OBJECTS += common/cmd_exti.o
+OBJECTS += common/cmd_i2c.o
 OBJECTS += common/cmd_badgerloop.o
 OBJECTS += drivers/timer.o
 
@@ -76,7 +77,7 @@ OBJECTS += drivers/hal/stm32f7xx_hal_cortex.o
 OBJECTS += drivers/hal/stm32f7xx_hal_flash.o
 OBJECTS += drivers/hal/stm32f7xx_hal_rcc.o
 OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
-#OBJECTS += drivers/hal/stm32f7xx_hal_i2c.o
+OBJECTS += drivers/hal/stm32f7xx_hal_i2c.o
 
 CPUDIR := include/proc
 
