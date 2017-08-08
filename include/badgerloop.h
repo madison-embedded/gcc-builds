@@ -15,6 +15,8 @@
 extern uint32_t last_telem_timestamp;
 
 extern uint8_t *status;
+#define SET_STATUS(val)	\
+	*status = val
 #define FAULT	0x0
 #define IDLE	0x1
 #define READY	0x2
@@ -60,14 +62,25 @@ extern uint16_t *pr_p1, *pr_p2, *br_p1, *br_p2, *br_p3;
 
 extern uint8_t *lim_states;
 #define PLIM1 0x1
+#define SET_PLIM1	*lim_states |= PLIM1
+#define CLR_PLIM1	*lim_states &= PLIM1
 #define PLIM2 0x2
+#define SET_PLIM2	*lim_states |= PLIM2
+#define CLR_PLIM2	*lim_states &= PLIM2
 #define BLIM1 0x4
+#define SET_BLIM1	*lim_states |= BLIM1
+#define CLR_BLIM1	*lim_states &= BLIM1
 #define BLIM2 0x8
+#define SET_BLIM2	*lim_states |= BLIM2
+#define CLR_BLIM2	*lim_states &= BLIM2
 #define DLIM 0x10
+#define SET_DLIM	*lim_states |= DLIM
+#define CLR_DLIM	*lim_states &= DLIM
 
 int badgerloop_init(void);
 int send_telemetry_to_SpaceX(void);
 int send_telemetry_to_Dashboard(void);
+void badgerloop_update_data(void);
 
 #endif
 

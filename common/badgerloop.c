@@ -47,6 +47,47 @@ uint8_t *lim_states = &telemetry_buffer[46];
 /*****************************************************************************/
 /*****************************************************************************/
 
+void badgerloop_update_data(void) {
+
+	/* combination of strips and accelerometer */
+	SET_ACCEL(1);
+	SET_VEL(-1);
+	SET_POS(-4);
+
+	/* I2C temp/pressure sensor */
+	SET_PAMP(1);
+	SET_TPOD(-2);
+
+	/* analog voltages */
+	SET_VBATT(-3);
+	SET_IBATT(2);
+	SET_TBATT(-5);
+	SET_PRP1(1);
+	SET_PRP2(1);
+	SET_BRP1(1);
+	SET_BRP2(1);
+	SET_BRP3(1);
+
+	/* strip count */
+	SET_SCOUNT(4);
+
+	/* digital I/O */
+	if (0) SET_PLIM1;
+	else CLR_PLIM1;
+
+	if (0) SET_PLIM2;
+	else CLR_PLIM2;
+
+	if (0) SET_BLIM1;
+	else CLR_BLIM1;
+
+	if (0) SET_BLIM2;
+	else CLR_BLIM2;
+
+	if (0) SET_DLIM;
+	else CLR_DLIM;
+}
+
 /* Networking */
 ip_addr_t to_spacex, to_dashboard;
 struct udp_pcb *udp_spacex, *udp_dashboard;
@@ -86,18 +127,11 @@ int badgerloop_init(void) {
 	udp_recv(udp_dashboard, udp_echo_recv, NULL);
 
 	/* default values */
-	*team_id = 3; // TEAM_ID
-	*status = FAULT; // IDLE
+	*team_id = TEAM_ID;
+	SET_STATUS(IDLE);
 
 	/* for endianness testing */
-	SET_ACCEL(1);
-	SET_POS(-4);
-	SET_VEL(-1);
-	SET_VBATT(-3);
-	SET_IBATT(2);
-	SET_TBATT(-5);
-	SET_TPOD(-2);
-	SET_SCOUNT(4);
+	badgerloop_update_data();
 
 	return 0;
 }
