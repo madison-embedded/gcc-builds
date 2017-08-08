@@ -22,7 +22,13 @@ void print_post_info(void) {
 	printf("----------------------------------------------------------------------\r\n");
 	printf("Board:\t\t%s\r\n", BOARD);
 	printf("Processor:\t%s (%08x-%08x-%08x)\r\n", PROCESSOR, UID[0], UID[1], UID[2]);
-	printf("MAC (Prog.):\t%02X:%02X:%02X:%02X:%02X:%02X\r\n",
+	printf("FPU:\t\t");
+	switch (SCB_GetFPUType()) {
+	case 0: printf("None Present"); break;
+	case 1: printf("Single-Precision"); break;
+	case 2: printf("Double-Precision"); break;
+	}
+	printf("\r\nMAC (Prog.):\t%02X:%02X:%02X:%02X:%02X:%02X\r\n",
 		MAC0, MAC1, MAC2, MACAddr[0], MACAddr[1], MACAddr[2]);
 	printf("Flash Size:\t%uK\r\n\n", *((const unsigned int*) FLASHSIZE_BASE) & 0xffff);
 

@@ -21,11 +21,6 @@ void setup_osc(void) {
 	
 	/* configure PLLs */
 	RCC->PLLCFGR = 0x24003010;	/* set PLL bits to default	*/
-
-	/* 5 flash wait states */
-	FLASH->ACR &= 0xf;
-	FLASH->ACR |= 5;
-	while ((FLASH->ACR & 5) != 5) {;}
 		
 	/* set HSE as PLL clock src	*/
 	RCC->PLLCFGR = RCC_PLLCFGR_PLLSRC_HSE | PLLN_VAL |
@@ -63,6 +58,12 @@ void early_init(void) {
 	uint32_t init_regs[3] = {0, 0, 0};
 
 	HAL_Init();
+
+	/* increasing frequency */
+	__HAL_FLASH_SET_LATENCY(5);
+	__HAL_FLASH_ART_ENABLE();
+	__HAL_FLASH_PREFETCH_BUFFER_ENABLE();
+	SCB_EnableICache();
 
 	setup_osc();
 
