@@ -17,11 +17,39 @@ bool swapReady = false;
 /* reference to command table */
 command_t *commands = (command_t *) &__COMMANDS_START;
 
-void check_input(void) {
-	unsigned int i, args_index = 0, initial_buf_len;
-	int command_index;
+void process_input(char *buffer) {
+	unsigned int initial_buf_len, args_index = 0;
+	int command_index, i;
 	command_status result;
-	char *args[MAX_ARGS], temp;
+	char *args[MAX_ARGS];
+
+	/* tokenize input for argv */
+	args[args_index++] = &buffer[0];
+	initial_buf_len = strlen(buffer);
+	for (i = 0; i < initial_buf_len; i++) {
+		if (buffer[i] == ' ') {
+			buffer[i] = '\0';
+			args[args_index++] = &buffer[i + 1];
+		}
+		if (args_index >= MAX_ARGS) break;
+	}
+
+	/* search for matching command name */
+	command_index = get_command_index(args[0]);
+
+	if (command_index >= 0) {
+		result = commands[command_index].fp(args_index, args);
+		if (result == FAIL)
+			printf("%s failed\r\n", buffer);
+		if (result == USAGE)
+			printf("%s usage: %s\r\n", buffer, commands[command_index].usage);
+	}
+	else
+		printf("unknown command: '%s' - try 'help'\r\n", buffer);
+}
+
+void check_input(void) {
+	int i; char temp;
 
 	/* erase current contents of line */
 	if (upArrowFlag || downArrowFlag) {
@@ -47,34 +75,10 @@ void check_input(void) {
 	}
 
 	else if (pc_buffer_messageAvailable(&USB_RX)) {
-		pc_buffer_getMessage(&USB_RX, buffer, BUFSIZ);
-
+		pc_buffer_getMessage(&USB_RX, buffer, USART_BUF);
 		if (buffer[0] != '\0') {
 			swapReady = true;
-
-			/* tokenize input for argv */
-			args[args_index++] = &buffer[0];
-			initial_buf_len = strlen(buffer);
-			for (i = 0; i < initial_buf_len; i++) {
-				if (buffer[i] == ' ') {
-					buffer[i] = '\0';
-					args[args_index++] = &buffer[i + 1];
-				}
-				if (args_index >= MAX_ARGS) break;
-			}
-
-			/* search for matching command name */
-			command_index = get_command_index(args[0]);
-
-			if (command_index >= 0) {
-				result = commands[command_index].fp(args_index, args);
-				if (result == FAIL)
-					printf("%s failed\r\n", buffer);
-				if (result == USAGE)
-					printf("%s usage: %s\r\n", buffer, commands[command_index].usage);
-			}
-			else
-				printf("unknown command: '%s' - try 'help'\r\n", buffer);
+			process_input(buffer);
 		}
 		printPrompt();
 	}

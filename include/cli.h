@@ -4,6 +4,7 @@
 void printPrompt(void);
 void check_input(void);
 int get_command_index(char *command);
+void process_input(char *buffer);
 
 typedef enum {
 	SUCCESS = 0,

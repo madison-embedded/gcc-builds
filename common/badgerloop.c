@@ -4,6 +4,7 @@
 #include "lwip/err.h"
 #include "lwip/udp.h"
 #include "ethernetif.h"
+#include "cli.h"
 
 /*****************************************************************************/
 /*                                 Data Buffer                               */
@@ -99,11 +100,13 @@ static err_t lwip_error = ERR_OK;
 /* for accepting commands from the dashboard */
 void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 	const ip_addr_t *dst_ip, u16_t dst_port) {
-	printf("got a packet from %"U16_F".%"U16_F".%"U16_F".%"U16_F" on port %d\r\n",
-		ip4_addr1_16(dst_ip), ip4_addr2_16(dst_ip),
-		ip4_addr3_16(dst_ip), ip4_addr4_16(dst_ip), dst_port);
-	printf("contents: %s\r\n", (char *) p->payload);
+	//printf("got a packet from %"U16_F".%"U16_F".%"U16_F".%"U16_F" on port %d\r\n",
+	//	ip4_addr1_16(dst_ip), ip4_addr2_16(dst_ip),
+	//	ip4_addr3_16(dst_ip), ip4_addr4_16(dst_ip), dst_port);
+	printf("%s\r\n", (char *) p->payload);
+	process_input((char *) p->payload);
 	pbuf_free(p);
+	printPrompt();
 }
 
 int badgerloop_init(void) {

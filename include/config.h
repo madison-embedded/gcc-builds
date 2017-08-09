@@ -33,6 +33,7 @@ extern int _write(int fd, const void *buf, size_t count);
 #define USB_UART	USART3
 #define USB_RX		usart3_rx
 #define USB_TX		usart3_tx
+#define USART_BUF	128
 extern PC_Buffer	USB_RX;
 extern uint32_t SystemCoreClock;
 extern volatile unsigned int ticks;
