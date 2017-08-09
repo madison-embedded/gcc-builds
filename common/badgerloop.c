@@ -150,11 +150,9 @@ int send_telemetry_to_SpaceX(void) {
 	last_telem_timestamp = ticks;
 
 	lwip_error = udp_send(udp_spacex, spacex_payload);
-	if (lwip_error != ERR_OK) return -1;
-
 	pbuf_free(spacex_payload);
 
-	return 0;
+	return (lwip_error != ERR_OK) ? -1 : 0;
 }
 
 int send_telemetry_to_Dashboard(void) {
@@ -167,10 +165,8 @@ int send_telemetry_to_Dashboard(void) {
 	last_telem_timestamp = ticks;
 
 	lwip_error = udp_send(udp_dashboard, dashboard_payload);
-	if (lwip_error != ERR_OK) return -1;
-
 	pbuf_free(dashboard_payload);
 
-	return 0;
+	return (lwip_error != ERR_OK) ? -1 : 0;
 }
 

@@ -78,3 +78,47 @@ void ETH_IRQHandler(void) {
     HAL_ETH_IRQHandler(&EthHandle);
 }
 
+/* void void */
+void get_performanceVV(void (*func)(void)) {
+
+	uint64_t before = 0, after = 0, clocks_elapsed, time_elapsed;
+
+	before = SysTick->VAL;
+	func();
+	after = SysTick->VAL;
+
+	/* check for timer overflow (timer counts down) */
+	if (after > before)
+		clocks_elapsed = before * (ticks * (uint64_t) 16000) - after * (ticks * (uint64_t) 16000);
+	else clocks_elapsed = before - after;
+
+	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
+
+	/* @160MHz, 1 cycle = 6.25 ns */
+	printf("Took %llu clock cycles (%llu ns)\r\n",
+		clocks_elapsed, time_elapsed);
+}
+
+/* int void */
+int get_performanceIV(int (*func)(void)) {
+
+	uint64_t before = 0, after = 0, clocks_elapsed, time_elapsed;
+	int retval;
+
+	before = SysTick->VAL;
+	retval = func();
+	after = SysTick->VAL;
+
+	/* check for timer overflow (timer counts down) */
+	if (after > before)
+		clocks_elapsed = before * (ticks * (uint64_t) 16000) - after * (ticks * (uint64_t) 16000);
+	else clocks_elapsed = before - after;
+
+	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
+
+	/* @160MHz, 1 cycle = 6.25 ns */
+	printf("Took %llu clock cycles (%llu ns)\r\n",
+		clocks_elapsed, time_elapsed);
+	return retval;
+}
+
