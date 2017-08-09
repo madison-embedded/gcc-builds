@@ -1,5 +1,6 @@
 #include "badgerloop.h"
 #include <stdio.h>
+#include <string.h>
 #include "config.h"
 #include "cli.h"
 
@@ -7,8 +8,8 @@ command_status do_badgerloop(int argc, char *argv[]) {
 
 	int ret = 0;
 
-	if (argc == 1)
-		return USAGE;
+	if (argc == 1) return USAGE;
+
 	switch (argv[1][0]) {
 	/* test dashboard functionality */
 	case 'd':
@@ -21,6 +22,10 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	/* perform DAQ / update values */
 	case 'r':
 		get_performanceVV(badgerloop_update_data);
+		break;
+	case 'm':
+		if (argc < 3) return USAGE;
+		ret = send_message_to_Dashboard(argv[2], strlen(argv[2]));
 		break;
 	}
 	printf("returned %d\r\n", ret);

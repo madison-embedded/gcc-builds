@@ -92,7 +92,7 @@ void badgerloop_update_data(void) {
 /* Networking */
 ip_addr_t to_spacex, to_dashboard;
 struct udp_pcb *udp_spacex, *udp_dashboard;
-struct pbuf *spacex_payload, *dashboard_payload;
+struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 uint32_t last_telem_timestamp;
 static err_t lwip_error = ERR_OK;
@@ -166,6 +166,23 @@ int send_telemetry_to_Dashboard(void) {
 
 	lwip_error = udp_send(udp_dashboard, dashboard_payload);
 	pbuf_free(dashboard_payload);
+
+	return (lwip_error != ERR_OK) ? -1 : 0;
+}
+
+int send_message_to_Dashboard(char *buf, int length) {
+
+	message_payload = pbuf_alloc(PBUF_TRANSPORT, length + 5, PBUF_POOL);
+	if (message_payload == NULL) return -1;
+
+	/* indicate to dashboard this is a message */
+	memcpy(message_payload->payload, "MSG: ", 5);
+	memcpy(message_payload->payload + 5, buf, length);
+
+	last_telem_timestamp = ticks;
+
+	lwip_error = udp_send(udp_dashboard, message_payload);
+	pbuf_free(message_payload);
 
 	return (lwip_error != ERR_OK) ? -1 : 0;
 }

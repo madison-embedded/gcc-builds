@@ -80,6 +80,7 @@ extern uint8_t *lim_states;
 int badgerloop_init(void);
 int send_telemetry_to_SpaceX(void);
 int send_telemetry_to_Dashboard(void);
+int send_message_to_Dashboard(char *buf, int length);
 void badgerloop_update_data(void);
 
 #endif
