@@ -103,6 +103,7 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 		ip4_addr1_16(dst_ip), ip4_addr2_16(dst_ip),
 		ip4_addr3_16(dst_ip), ip4_addr4_16(dst_ip), dst_port);
 	printf("contents: %s\r\n", (char *) p->payload);
+	pbuf_free(p);
 }
 
 int badgerloop_init(void) {
@@ -138,7 +139,7 @@ int badgerloop_init(void) {
 
 int send_telemetry_to_SpaceX(void) {
 
-	spacex_payload = pbuf_alloc(PBUF_TRANSPORT, SPACEXP_SIZ, PBUF_RAM);
+	spacex_payload = pbuf_alloc(PBUF_TRANSPORT, SPACEXP_SIZ, PBUF_POOL);
 	if (spacex_payload == NULL) return -1;
 
 	memcpy(spacex_payload->payload, telemetry_buffer, SPACEXP_SIZ);
@@ -155,7 +156,7 @@ int send_telemetry_to_SpaceX(void) {
 
 int send_telemetry_to_Dashboard(void) {
 
-	dashboard_payload = pbuf_alloc(PBUF_TRANSPORT, DASHBOARDP_SIZ, PBUF_RAM);
+	dashboard_payload = pbuf_alloc(PBUF_TRANSPORT, DASHBOARDP_SIZ, PBUF_POOL);
 	if (dashboard_payload == NULL) return -1;
 
 	memcpy(dashboard_payload->payload, telemetry_buffer, DASHBOARDP_SIZ);
