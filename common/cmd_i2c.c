@@ -37,7 +37,7 @@ command_status do_i2c(int argc, char *argv[]) {
 		}
 		return SUCCESS;
 	}
-
+	
 	if (argc != 4 && argc != 5)
 		return USAGE;
 
@@ -63,7 +63,7 @@ command_status do_i2c(int argc, char *argv[]) {
 			return USAGE;
 		}
 
-		printf("%s\r\n",getStatus(HAL_I2C_Mem_Read(&hi2c, address<<1, MemAdd, 1, &pData, 2, 500)));
+		printf("%s\r\n",getStatus(HAL_I2C_Mem_Read(&hi2c, address<<1, MemAdd, 1, &pData, 1, 500)));
 		printf("address: 0x%x Data: 0x%x\r\n", address, pData);
 		return SUCCESS;
 	}
