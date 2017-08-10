@@ -1,7 +1,12 @@
+#ifndef __MPU9250_H
+#define __MPU9250_H
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "i2c.h"
+#include "hal/stm32f7xx_hal_dma.h"
+#include "hal/stm32f7xx_hal_i2c.h"
+#include "hal/stm32f7xx_hal.h"
+
 /*Magnitometer Registers*/
 
 #define AK8963_ADDRESS   0x0C
@@ -237,8 +242,8 @@ MPU9250_fields_typedef MPU9250_fields; // stores differeny variables
     void readMagData(int16_t *);
     int16_t readTempData();
     void updateTime();
-    void initAK8963(float *, uint32_t);
-    void initMPU9250(uint32_t);
+    void initAK8963(float *);
+    void initMPU9250();
     void calibrateMPU9250(float * gyroBias, float * accelBias);
     void MPU9250SelfTest(float * destination);
     void writeByte(uint8_t, uint8_t, uint8_t);
@@ -246,4 +251,4 @@ MPU9250_fields_typedef MPU9250_fields; // stores differeny variables
     void readBytes(uint8_t, uint8_t, uint8_t, uint8_t *);
 
 
-
+#endif

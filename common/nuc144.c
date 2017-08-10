@@ -10,7 +10,7 @@
 #include "ethernetif.h"
 #include "badgerloop.h"
 
-#define I2C_TIMING        0xB0420f13  /* (Rise time = 120ns, Fall time = 25ns) */
+#define I2C_TIMING        0x00400E40 
 I2C_HandleTypeDef hi2c;
 
 void setup_osc(void) {
@@ -92,6 +92,8 @@ bool board_init(void) {
 	hi2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
 
 	__HAL_RCC_I2C2_CLK_ENABLE();
+
+    HAL_I2C_Init(&hi2c);
 
 	adc_init(ADC1);
 	adc_init(ADC3);
