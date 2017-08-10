@@ -46,7 +46,7 @@ static void low_level_init(struct netif *netif) {
     EthHandle.Init.DuplexMode = ETH_MODE_FULLDUPLEX;
     EthHandle.Init.PhyAddress = 0x0;
     EthHandle.Init.MACAddr = MACAddr;
-    EthHandle.Init.RxMode = ETH_RXPOLLING_MODE;
+    EthHandle.Init.RxMode = ETH_RXINTERRUPT_MODE;
     EthHandle.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
     EthHandle.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
 
@@ -165,7 +165,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p) {
 
 	/* Prepare transmit descriptors to give to DMA */ 
 	HAL_ETH_TransmitFrame(&EthHandle, framelength);
-
 	errval = ERR_OK;
   
 error:
@@ -174,7 +173,6 @@ error:
 		EthHandle.Instance->DMASR = ETH_DMASR_TUS; /* Clear TUS ETHERNET DMA flag */
 		EthHandle.Instance->DMATPDR = 0; /* Resume DMA transmission*/
 	}
-
 	return errval;
 }
 

@@ -114,7 +114,7 @@
 #define TCP_RST_DEBUG               LWIP_DBG_ON
 #define TCP_QLEN_DEBUG              LWIP_DBG_OFF
 #define UDP_DEBUG                   LWIP_DBG_OFF
-#define TCPIP_DEBUG                 LWIP_DBG_ON
+#define TCPIP_DEBUG                 LWIP_DBG_OFF
 #define SLIP_DEBUG                  LWIP_DBG_ON
 #define DHCP_DEBUG                  LWIP_DBG_OFF
 #define AUTOIP_DEBUG                LWIP_DBG_ON

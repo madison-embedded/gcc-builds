@@ -84,7 +84,9 @@ void get_performanceVV(void (*func)(void)) {
 	uint64_t before = 0, after = 0, clocks_elapsed, time_elapsed;
 
 	before = SysTick->VAL;
+	__disable_irq();
 	func();
+	__enable_irq();
 	after = SysTick->VAL;
 
 	/* check for timer overflow (timer counts down) */
@@ -106,7 +108,9 @@ int get_performanceIV(int (*func)(void)) {
 	int retval;
 
 	before = SysTick->VAL;
+	__disable_irq();
 	retval = func();
+	__enable_irq();
 	after = SysTick->VAL;
 
 	/* check for timer overflow (timer counts down) */
