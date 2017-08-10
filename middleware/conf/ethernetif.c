@@ -5,6 +5,7 @@
 #include "netif/etharp.h"
 #include "ethernetif.h"
 #include <string.h>
+#include "badgerloop.h"
 
 /* Global Ethernet handle*/
 ETH_HandleTypeDef EthHandle;
@@ -475,8 +476,16 @@ inline void lwip_loop_handler(void) {
 		}
 		prev_link_status = curr_link_status;
 	}
-	if (gnetif.flags & NETIF_FLAG_LINK_UP)
+	if (gnetif.flags & NETIF_FLAG_LINK_UP) {
 		ethernetif_input(&gnetif);
+		/* dashboard query */
+		if (check_query_active()) {
+			if (check_query_response())
+				handle_query_response();
+			else if (ticks - get_query_start() > QUERY_TO)
+				handle_query_to();
+		}
+	}
 	sys_check_timeouts();
 }
 

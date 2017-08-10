@@ -1,10 +1,25 @@
 #include <stdio.h>
 #include "config.h"
 #include "pcbuffer.h"
+#include "cli.h"
+#include "badgerloop.h"
 
 #define BLOCK	1
 
+stdio_target tar = USB_SERIAL;
+
+void set_stdio_target(stdio_target t) {
+	tar = t;
+}
+
 int _write(int fd, const void *buf, size_t count) {
+	/* UDP Port 3000 */
+	if (tar == UDP) {
+		if (send_message_to_Dashboard((char *) buf, count) == -1)
+			tar = USB_SERIAL;
+		return count;
+	}
+	/* USB Serial */
 	for (fd = 0; fd < count; fd++) {
 		if (pc_buffer_full(&usart3_tx)) {
 			USB_UART->CR1 |= USART_CR1_TXEIE;

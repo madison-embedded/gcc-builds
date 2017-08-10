@@ -94,8 +94,12 @@ ip_addr_t to_spacex, to_dashboard;
 struct udp_pcb *udp_spacex, *udp_dashboard;
 struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
-uint32_t last_telem_timestamp;
+/* Globals */
+uint32_t last_telem_timestamp, query_start;
 static err_t lwip_error = ERR_OK;
+static uint8_t badgerloop_flags = 0;
+#define OUTGOING_QUERY	1
+#define DASH_RESPONSE	2
 
 /* for accepting commands from the dashboard */
 void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
@@ -103,6 +107,14 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 	//printf("got a packet from %"U16_F".%"U16_F".%"U16_F".%"U16_F" on port %d\r\n",
 	//	ip4_addr1_16(dst_ip), ip4_addr2_16(dst_ip),
 	//	ip4_addr3_16(dst_ip), ip4_addr4_16(dst_ip), dst_port);
+
+	/* check for query response */
+	if (badgerloop_flags & OUTGOING_QUERY) {
+		if (!strcmp((char *) p->payload, "new phone who dis")) {
+			badgerloop_flags |= DASH_RESPONSE;
+			return;
+		}
+	}
 	printf("%s\r\n", (char *) p->payload);
 	process_input((char *) p->payload);
 	pbuf_free(p);
@@ -181,6 +193,37 @@ int send_message_to_Dashboard(char *buf, int length) {
 
 	last_telem_timestamp = ticks;
 
+	lwip_error = udp_send(udp_dashboard, message_payload);
+	pbuf_free(message_payload);
+
+	return (lwip_error != ERR_OK) ? -1 : 0;
+}
+
+int check_query_response(void) { return (badgerloop_flags & DASH_RESPONSE); }
+int check_query_active(void) { return (badgerloop_flags & OUTGOING_QUERY); }
+int get_query_start(void) { return query_start; }
+
+void handle_query_to(void) {
+	printf("query timed out\r\n");
+	badgerloop_flags &= ~OUTGOING_QUERY;
+}
+
+void handle_query_response(void) {
+	printf("got the response\r\n");
+	badgerloop_flags &= ~(DASH_RESPONSE | OUTGOING_QUERY);
+}
+
+int start_query_Dashboard(void) {
+
+	const char *message = "MSG: dashboard?";
+	message_payload = pbuf_alloc(PBUF_TRANSPORT, strlen(message), PBUF_POOL);
+	if (message_payload == NULL) return -1;
+
+	memcpy(message_payload->payload, message, strlen(message));
+
+	query_start = ticks;
+
+	badgerloop_flags |= OUTGOING_QUERY;
 	lwip_error = udp_send(udp_dashboard, message_payload);
 	pbuf_free(message_payload);
 

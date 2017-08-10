@@ -27,6 +27,13 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		if (argc < 3) return USAGE;
 		ret = send_message_to_Dashboard(argv[2], strlen(argv[2]));
 		break;
+	case 'p':
+		set_stdio_target(UDP);
+		break;
+	case 'q':
+		ret = get_performanceIV(start_query_Dashboard);
+		break;
+	default: return USAGE;
 	}
 	printf("returned %d\r\n", ret);
 	return SUCCESS;
