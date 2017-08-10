@@ -1,16 +1,22 @@
 #ifndef _CLI__H__
 #define _CLI__H__
 
-void printPrompt(void);
-void check_input(void);
-int get_command_index(char *command);
-void process_input(char *buffer);
-
 typedef enum {
 	SUCCESS = 0,
 	USAGE,
 	FAIL
 } command_status;
+
+typedef enum {
+	USB_SERIAL,
+	UDP
+} stdio_target;
+
+void printPrompt(void);
+void check_input(void);
+int get_command_index(char *command);
+void process_input(char *buffer);
+void set_stdio_target(stdio_target t);
 
 typedef struct command {
 	const char *name;
