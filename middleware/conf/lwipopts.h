@@ -74,7 +74,7 @@
 
 // Support Multicast
 #include "stdlib.h"
-//#define LWIP_IGMP                   LWIP_IPV4
+#define LWIP_IGMP                   LWIP_IPV4
 #define LWIP_RAND()                 rand()
 
 #define LWIP_COMPAT_SOCKETS         0
