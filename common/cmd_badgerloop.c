@@ -31,7 +31,8 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		set_stdio_target(UDP);
 		break;
 	case 'q':
-		ret = get_performanceIV(start_query_Dashboard);
+		ret = get_performanceIV(query_Dashboard);
+		// TODO: if ret, retarget printf
 		break;
 	default: return USAGE;
 	}

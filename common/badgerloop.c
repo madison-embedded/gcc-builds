@@ -95,7 +95,7 @@ struct udp_pcb *udp_spacex, *udp_dashboard;
 struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 /* Globals */
-uint32_t last_telem_timestamp, query_start;
+uint32_t last_telem_timestamp;
 static err_t lwip_error = ERR_OK;
 static uint8_t badgerloop_flags = 0;
 #define OUTGOING_QUERY	1
@@ -199,34 +199,43 @@ int send_message_to_Dashboard(char *buf, int length) {
 	return (lwip_error != ERR_OK) ? -1 : 0;
 }
 
-int check_query_response(void) { return (badgerloop_flags & DASH_RESPONSE); }
-int check_query_active(void) { return (badgerloop_flags & OUTGOING_QUERY); }
-int get_query_start(void) { return query_start; }
-
-void handle_query_to(void) {
-	printf("query timed out\r\n");
-	badgerloop_flags &= ~OUTGOING_QUERY;
-}
-
-void handle_query_response(void) {
-	printf("got the response\r\n");
-	badgerloop_flags &= ~(DASH_RESPONSE | OUTGOING_QUERY);
-}
-
-int start_query_Dashboard(void) {
+int query_Dashboard(void) {
 
 	const char *message = "MSG: dashboard?";
+	uint32_t query_start;
+
 	message_payload = pbuf_alloc(PBUF_TRANSPORT, strlen(message), PBUF_POOL);
-	if (message_payload == NULL) return -1;
+	if (message_payload == NULL) return 0;
 
 	memcpy(message_payload->payload, message, strlen(message));
-
 	query_start = ticks;
-
 	badgerloop_flags |= OUTGOING_QUERY;
-	lwip_error = udp_send(udp_dashboard, message_payload);
-	pbuf_free(message_payload);
 
-	return (lwip_error != ERR_OK) ? -1 : 0;
+	/* blocking poll */
+	do {
+		lwip_loop_handler();
+
+		/* check if response arrived */
+		if (badgerloop_flags & DASH_RESPONSE) {
+			pbuf_free(message_payload);
+			printf("%s: got the response\r\n", __func__);
+			badgerloop_flags &= ~(DASH_RESPONSE | OUTGOING_QUERY);
+			return 1;
+		}
+		/* continue to send periodically */
+		if ((ticks - query_start) % QUERY_RETRY == 0) {
+			lwip_error = udp_send(udp_dashboard, message_payload);
+			if (lwip_error != ERR_OK) {
+				pbuf_free(message_payload);
+				return 0;
+			}
+		}
+	} while (ticks - query_start < QUERY_TO);
+
+	/* did not get a response */
+	printf("%s: query timed out\r\n", __func__);
+	badgerloop_flags &= ~OUTGOING_QUERY;
+	pbuf_free(message_payload);
+	return 0;
 }
 
