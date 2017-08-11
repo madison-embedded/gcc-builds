@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ADC_TARGET_FREQ		36000000 /* TODO: print this out */
+#define ADC_TARGET_FREQ		360000000 /* TODO: print this out */
 #define ADC_SMP_BITS		5 /* TODO: change */
 
 #define FILL_ADC(_adc, _channel, _port, _pin) \
