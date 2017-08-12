@@ -55,7 +55,7 @@ static bool adc_init_clk(ADC_TypeDef *adc) {
 	RCC->APB2ENR |= mask;
 
 	if(adcFreq == 0){
-		while (divisor <= 8 && APB2_F / divisor > ADC_TARGET_FREQ)
+		while (divisor <= 8 && ((APB2_F / divisor) > ADC_TARGET_FREQ))
 			divisor += 2;
 		if (divisor > 8) return false;
 		adcFreq = APB2_F / divisor;
