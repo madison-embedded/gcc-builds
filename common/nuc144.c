@@ -72,12 +72,15 @@ void early_init(void) {
 	init_regs[0] = USART_CR1_RXNEIE;
 	usart_config(USB_UART, SYSCLK, init_regs, DEBUG_BAUD, true);
 
-	print_post_info();
-
 	/* Networking */
 	lwip_init();
 	Netif_Config();
+
+	/* warning: this will re-target printf */
 	badgerloop_init();
+
+	print_post_info();
+
 }
 
 /* instantiate UART & button + LEDs no matter what */

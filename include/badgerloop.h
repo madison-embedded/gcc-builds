@@ -9,8 +9,8 @@
 
 #define SPACEXP_SIZ		34
 #define DASHBOARDP_SIZ	47
-#define QUERY_TO		5000
-#define QUERY_RETRY		500
+#define QUERY_TO		7000
+#define QUERY_RETRY		1000
 
 #define TEAM_ID	0xab
 

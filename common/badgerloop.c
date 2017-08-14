@@ -108,12 +108,15 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 	//	ip4_addr1_16(dst_ip), ip4_addr2_16(dst_ip),
 	//	ip4_addr3_16(dst_ip), ip4_addr4_16(dst_ip), dst_port);
 
-	/* check for query response */
-	if (badgerloop_flags & OUTGOING_QUERY) {
-		if (!strcmp((char *) p->payload, "new phone who dis")) {
+	/* check for query response, it's highly unfortunate
+	   we check this every time but the only way would
+	   be to create some kind of tick window that checks
+	   for a recent query because we "spam" the output
+	   and may get this twice */
+	if (!strcmp((char *) p->payload, "new phone who dis")) {
+		if (badgerloop_flags & OUTGOING_QUERY)
 			badgerloop_flags |= DASH_RESPONSE;
-			return;
-		}
+		return;
 	}
 	printf("%s\r\n", (char *) p->payload);
 	process_input((char *) p->payload);
@@ -148,6 +151,9 @@ int badgerloop_init(void) {
 
 	/* for endianness testing */
 	badgerloop_update_data();
+
+	if (query_Dashboard())
+		set_stdio_target(UDP);
 
 	return 0;
 }
@@ -199,15 +205,23 @@ int send_message_to_Dashboard(char *buf, int length) {
 	return (lwip_error != ERR_OK) ? -1 : 0;
 }
 
-int query_Dashboard(void) {
-
+static err_t sendQueryMessage(void) {
+	err_t err;
 	const char *message = "MSG: dashboard?";
-	uint32_t query_start;
-
 	message_payload = pbuf_alloc(PBUF_TRANSPORT, strlen(message), PBUF_POOL);
 	if (message_payload == NULL) return 0;
-
 	memcpy(message_payload->payload, message, strlen(message));
+	err = udp_send(udp_dashboard, message_payload);
+	pbuf_free(message_payload);
+	if (err != ERR_OK)
+		printf("couldn't send again: %s\r\n", lwip_strerr(lwip_error));
+	return err;
+}
+
+int query_Dashboard(void) {
+
+	uint32_t query_start, last_retry_tick = 0, attempts = 0;
+
 	query_start = ticks;
 	badgerloop_flags |= OUTGOING_QUERY;
 
@@ -217,23 +231,21 @@ int query_Dashboard(void) {
 
 		/* check if response arrived */
 		if (badgerloop_flags & DASH_RESPONSE) {
-			pbuf_free(message_payload);
-			printf("%s: got the response\r\n", __func__);
 			badgerloop_flags &= ~(DASH_RESPONSE | OUTGOING_QUERY);
 			return 1;
 		}
 		/* continue to send periodically */
-		if ((ticks - query_start) % QUERY_RETRY == 0) {
-			lwip_error = udp_send(udp_dashboard, message_payload);
-			if (lwip_error != ERR_OK) {
-				pbuf_free(message_payload);
+		if (((ticks - query_start) % QUERY_RETRY == 0) && last_retry_tick != ticks) {
+			last_retry_tick = ticks;
+			attempts++;
+			lwip_error = sendQueryMessage();
+			if (lwip_error != ERR_OK)
 				return 0;
-			}
 		}
 	} while (ticks - query_start < QUERY_TO);
 
 	/* did not get a response */
-	printf("%s: query timed out\r\n", __func__);
+	printf("%s: query timed out after %lu attempts\r\n", __func__, attempts);
 	badgerloop_flags &= ~OUTGOING_QUERY;
 	pbuf_free(message_payload);
 	return 0;
