@@ -152,7 +152,7 @@ int badgerloop_init(void) {
 	/* for endianness testing */
 	badgerloop_update_data();
 
-	if (query_Dashboard())
+	if (eth_check_link() && query_Dashboard())
 		set_stdio_target(UDP);
 
 	return 0;
