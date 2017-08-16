@@ -7,39 +7,26 @@
 #include "hal/stm32f7xx_hal_i2c.h"
 #include "hal/stm32f7xx_hal.h"
 
-/*Magnitometer Registers*/
+#define MPU_ADDRESS     0x68
 
-#define AK8963_ADDRESS   0x0C
-#define WHO_AM_I_AK8963  0x00 // should return 0x48
-#define INFO             0x01
-#define AK8963_ST1       0x02  // data ready status bit 0
-#define AK8963_XOUT_L    0x03  // data
-#define AK8963_XOUT_H    0x04
-#define AK8963_YOUT_L    0x05
-#define AK8963_YOUT_H    0x06
-#define AK8963_ZOUT_L    0x07
-#define AK8963_ZOUT_H    0x08
-#define AK8963_ST2       0x09  // Data overflow bit 3 and data read error status bit 2
-#define AK8963_CNTL      0x0A  // Power down (0000), single-measurement (0001), self-test (1000) and Fuse ROM (1111) modes on bits 3:0
-#define AK8963_ASTC      0x0C  // Self test control
-#define AK8963_I2CDIS    0x0F  // I2C disable
-#define AK8963_ASAX      0x10  // Fuse ROM x-axis sensitivity adjustment value
-#define AK8963_ASAY      0x11  // Fuse ROM y-axis sensitivity adjustment value
-#define AK8963_ASAZ      0x12  // Fuse ROM z-axis sensitivity adjustment value
+typedef enum {
+    SAMPLING, WAIT, GET_FIFO_COUNT, GET_VALUES, IDLE
+} MPU_STATE;
 
+extern uint8_t mpuBytes[14];
+extern MPU_STATE mpuState;
+bool MPU_ready;
+
+// Functions
+bool MPUinitialize(void);
+void MPUread(void);
+void printOffsets(void);
+void MPU_step(void);
+
+// From SparkFun
 #define SELF_TEST_X_GYRO 0x00
 #define SELF_TEST_Y_GYRO 0x01
 #define SELF_TEST_Z_GYRO 0x02
-
-/*#define X_FINE_GAIN      0x03 // [7:0] fine gain
-#define Y_FINE_GAIN      0x04
-#define Z_FINE_GAIN      0x05
-#define XA_OFFSET_H      0x06 // User-defined trim values for accelerometer
-#define XA_OFFSET_L_TC   0x07
-#define YA_OFFSET_H      0x08
-#define YA_OFFSET_L_TC   0x09
-#define ZA_OFFSET_H      0x0A
-#define ZA_OFFSET_L_TC   0x0B */
 
 #define SELF_TEST_X_ACCEL 0x0D
 #define SELF_TEST_Y_ACCEL 0x0E
@@ -158,97 +145,5 @@
 #define YA_OFFSET_L        0x7B
 #define ZA_OFFSET_H        0x7D
 #define ZA_OFFSET_L        0x7E
-
-// Using the MPU-9250 breakout board, ADO is set to 0
-// Seven-bit device address is 110100 for ADO = 0 and 110101 for ADO = 1
-#define ADO 0
-#if ADO
-#define MPU9250_ADDRESS 0x69  // Device address when ADO = 1
-#else
-#define MPU9250_ADDRESS 0x68  // Device address when ADO = 0
-#define AK8963_ADDRESS  0x0C   // Address of magnetometer
-#endif // AD0
-
-
-enum scale_ {
-      AFS_2G = 0,
-      AFS_4G,
-      AFS_8G,
-      AFS_16G
-    };
-
-enum Gscale_ {
-      GFS_250DPS = 0,
-      GFS_500DPS,
-      GFS_1000DPS,
-      GFS_2000DPS
-    };
-
-enum Mscale_ {
-      MFS_14BITS = 0, // 0.6 mG per LSB
-      MFS_16BITS      // 0.15 mG per LSB
-    };
-
-    // Specify sensor full scale
-typedef struct MPU9250_config{
-    uint32_t I2C_BASE;
-    uint8_t Gscale ;
-    uint8_t Ascale ;
-    // Choose either 14-bit or 16-bit magnetometer resolution
-    uint8_t Mscale ;
-    // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
-    uint8_t Mmode  ;
-
-} MPU9250_config_typedef; 
-
-
-typedef struct MPU9250_fields{
-
-    float pitch, yaw, roll;
-    float temperature;   // Stores the real internal chip temperature in Celsius
-    int16_t tempCount;   // Temperature raw count output
-    uint32_t delt_t ; // Used to control display output rate
-
-    uint32_t count , sumCount ; // used to control display output rate
-    float deltat , sum ;  // integration interval for both filter schemes
-    uint32_t lastUpdate , firstUpdate ; // used to calculate integration interval
-    uint32_t Now ;        // used to calculate integration interval
-
-    int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
-    int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
-    // Scale resolutions per LSB for the sensors
-    float aRes, gRes, mRes;
-    // Variables to hold latest sensor data values
-    float ax, ay, az, gx, gy, gz, mx, my, mz;
-    // Factory mag calibration and mag bias
-    float magCalibration[3] , magbias[3];
-    // Bias corrections for gyro and accelerometer
-    float gyroBias[3], accelBias[3] ;
-    float SelfTest[6];
-    // Stores the 16-bit signed accelerometer sensor output
-    int16_t accelCount[3];
-
-} MPU9250_fields_typedef;  
-
-MPU9250_config_typedef MPU9250_config = {0 ,GFS_250DPS, AFS_2G,MFS_16BITS, 0x02 }; // stores configuration data
-MPU9250_fields_typedef MPU9250_fields; // stores differeny variables
-
-
-    void getMres();
-    void getGres();
-    void getAres();
-    void readAccelData(int16_t *);
-    void readGyroData(int16_t *);
-    void readMagData(int16_t *);
-    int16_t readTempData();
-    void updateTime();
-    void initAK8963(float *);
-    void initMPU9250();
-    void calibrateMPU9250(float * gyroBias, float * accelBias);
-    void MPU9250SelfTest(float * destination);
-    void writeByte(uint8_t, uint8_t, uint8_t);
-    uint8_t readByte(uint8_t, uint8_t);
-    void readBytes(uint8_t, uint8_t, uint8_t, uint8_t *);
-
 
 #endif

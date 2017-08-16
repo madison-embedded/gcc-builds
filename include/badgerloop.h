@@ -9,7 +9,8 @@
 
 #define SPACEXP_SIZ		34
 #define DASHBOARDP_SIZ	47
-#define QUERY_TO		1000
+#define QUERY_TO		7000
+#define QUERY_RETRY		1000
 
 #define TEAM_ID	0xab
 
@@ -83,12 +84,7 @@ int send_telemetry_to_SpaceX(void);
 int send_telemetry_to_Dashboard(void);
 int send_message_to_Dashboard(char *buf, int length);
 void badgerloop_update_data(void);
-int start_query_Dashboard(void);
-int check_query_response(void);
-int check_query_active(void);
-void handle_query_to(void);
-int get_query_start(void);
-void handle_query_response(void);
+int query_Dashboard(void);
 
 #endif
 

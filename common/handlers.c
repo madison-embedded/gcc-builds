@@ -78,51 +78,62 @@ void ETH_IRQHandler(void) {
     HAL_ETH_IRQHandler(&EthHandle);
 }
 
+void print_elapsed_time(uint64_t before_timer, uint64_t after_timer,
+						uint64_t before_tick, uint64_t after_tick) {
+	uint64_t clocks_elapsed, time_elapsed;
+	/* count down timer */
+	clocks_elapsed = before_timer - after_timer;
+	if (before_tick != after_tick)
+		clocks_elapsed += SystemCoreClock*(after_tick - before_tick);  
+
+	/* @160MHz, 1 cycle = 6.25 ns */
+	// TODO: calculate clocks / nano-second manually, potentially
+	// use a float here
+	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
+
+	if (time_elapsed > 1000000)
+		printf("Took %lluM clock cycles (%llu ms)\r\n",
+			clocks_elapsed/1000000, time_elapsed/1000000);
+	else if (time_elapsed > 1000)
+		printf("Took %lluk clock cycles (%llu us)\r\n",
+			clocks_elapsed/1000, time_elapsed/1000);
+	else
+		printf("Took %llu clock cycles (%llu ns)\r\n",
+			clocks_elapsed, time_elapsed);
+}
+
 /* void void */
 void get_performanceVV(void (*func)(void)) {
 
-	uint64_t before = 0, after = 0, clocks_elapsed, time_elapsed;
+	uint64_t before, after, before_tick, after_tick;
 
+	before_tick = ticks;
 	before = SysTick->VAL;
 	__disable_irq();
 	func();
 	__enable_irq();
 	after = SysTick->VAL;
+	after_tick = ticks;
 
-	/* check for timer overflow (timer counts down) */
-	if (after > before)
-		clocks_elapsed = before * (ticks * (uint64_t) 16000) - after * (ticks * (uint64_t) 16000);
-	else clocks_elapsed = before - after;
-
-	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
-
-	/* @160MHz, 1 cycle = 6.25 ns */
-	printf("Took %llu clock cycles (%llu ns)\r\n",
-		clocks_elapsed, time_elapsed);
+	print_elapsed_time(before, after, before_tick, after_tick);
 }
 
 /* int void */
 int get_performanceIV(int (*func)(void)) {
 
-	uint64_t before = 0, after = 0, clocks_elapsed, time_elapsed;
+	uint64_t before, after, before_tick, after_tick;
 	int retval;
 
+	before_tick = ticks;
 	before = SysTick->VAL;
 	__disable_irq();
 	retval = func();
 	__enable_irq();
 	after = SysTick->VAL;
+	after_tick = ticks;
 
-	/* check for timer overflow (timer counts down) */
-	if (after > before)
-		clocks_elapsed = before * (ticks * (uint64_t) 16000) - after * (ticks * (uint64_t) 16000);
-	else clocks_elapsed = before - after;
+	print_elapsed_time(before, after, before_tick, after_tick);
 
-	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
-
-	/* @160MHz, 1 cycle = 6.25 ns */
-	printf("Took %llu clock cycles (%llu ns)\r\n",
-		clocks_elapsed, time_elapsed);
 	return retval;
 }
 

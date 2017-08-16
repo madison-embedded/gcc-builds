@@ -57,6 +57,7 @@ OBJECTS += common/cmd_eth.o
 OBJECTS += common/cmd_exti.o
 OBJECTS += common/cmd_i2c.o
 OBJECTS += common/cmd_badgerloop.o
+OBJECTS += common/cmd_mpu9250.o
 OBJECTS += drivers/timer.o
 
 # Conditional Objects
