@@ -19,18 +19,18 @@ bool MPU_ready = false;
 uint8_t mpuBytes[14];
 
 void I2CRead(unsigned int addr, uint8_t subAddr, uint8_t* buffer, unsigned int rlen) {
-	HAL_I2C_Mem_Read(&hi2c, addr<<1, subAddr, 1, buffer, rlen, 500);
+	HAL_I2C_Mem_Read_IT(&hi2c, addr<<1, subAddr, 1, buffer, rlen);
 }
 
 void I2CWrite(unsigned int addr, uint8_t subAddr, uint8_t* buffer, unsigned int wlen) {
-	HAL_I2C_Mem_Write(&hi2c, addr<<1, subAddr, 1, buffer, wlen, 500);
+	HAL_I2C_Mem_Write_IT(&hi2c, addr<<1, subAddr, 1, buffer, wlen);
 }
 inline void startFIFOread(void) {
 	I2CRead(MPU_ADDRESS, FIFO_COUNTH, fifoCountBytes, 2);
 }
 
 bool MPUwriteReg(uint8_t reg, uint8_t value, bool block) {
-	return HAL_I2C_Mem_Write(&hi2c, MPU_ADDRESS<<1, reg, 1, &value, 1, 500);
+	return HAL_I2C_Mem_Write_IT(&hi2c, MPU_ADDRESS<<1, reg, 1, &value, 1);
 }
 
 inline void MPU_startSampling(void) {
@@ -41,36 +41,14 @@ bool MPU_stopSampling(void) {
 	return MPUwriteReg(FIFO_EN, 0x00, false) == HAL_OK;
 }
 
-void MPU_step(void) {
-	switch (mpuState) {
 
-		case IDLE:
-			MPU_startSampling();
-			mpuState = WAIT;
-			break;
-
-		case WAIT:
-			if (HAL_I2C_IsDeviceReady(&hi2c, MPU_ADDRESS<<1, 1, 500) == HAL_OK) {
-				startFIFOread();
-				mpuState = GET_FIFO_COUNT;
-			}
-			break;
-
-		case GET_FIFO_COUNT:
-			if (HAL_I2C_IsDeviceReady(&hi2c, MPU_ADDRESS<<1, 1, 500) == HAL_OK) {
-				totalCount = (uint16_t) fifoCountBytes[0] << 8 | (fifoCountBytes[1]);
-				packetCount = totalCount / 12;
-				mpuState = GET_VALUES;
-			}
-			break;
-
-		case GET_VALUES:
-
-			if (HAL_I2C_IsDeviceReady(&hi2c, MPU_ADDRESS<<1, 1, 500) == HAL_OK)
-				break;
-		case SAMPLING:
-			break;
-	}
+void readAccelData(int16_t * destination)
+{
+  uint8_t rawData[6];  // x/y/z accel register data stored here
+  I2CRead(MPU_ADDRESS, ACCEL_XOUT_H, &rawData[0], 6);  // Read the six raw data registers into data array
+  destination[0] = ((int16_t)rawData[0] << 8) | rawData[1] ;  // Turn the MSB and LSB into a signed 16-bit value
+  destination[1] = ((int16_t)rawData[2] << 8) | rawData[3] ;  
+  destination[2] = ((int16_t)rawData[4] << 8) | rawData[5] ; 
 }
 
 void printOffsets(void) {
@@ -122,7 +100,7 @@ bool calibrateMPU9250(float * gyroBias, float * accelBias) {
 	// Set gyro full-scale to 250 degrees per second, maximum sensitivity
 	MPUwriteReg(GYRO_CONFIG, 0x00, true);
 	// Set accelerometer full-scale to 2 g, maximum sensitivity
-	MPUwriteReg(ACCEL_CONFIG, 0x00, true);
+	MPUwriteReg(ACCEL_CONFIG, 0x18, true);
 
 	// Configure FIFO to capture accelerometer and gyro data for bias calculation
 	MPUwriteReg(USER_CTRL, 0x40, true);  // Enable FIFO

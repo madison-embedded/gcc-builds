@@ -67,7 +67,7 @@ void UsageFault_Handler(void) {
 
 #include "hal/stm32f7xx_hal.h"
 extern ETH_HandleTypeDef EthHandle;
-
+extern I2C_HandleTypeDef hi2c;
 /**
  * Ethernet IRQ Handler
  *
@@ -137,3 +137,12 @@ int get_performanceIV(int (*func)(void)) {
 	return retval;
 }
 
+void I2C2_EV_IRQHandler(void)
+{
+  HAL_I2C_EV_IRQHandler(&hi2c);
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+  HAL_I2C_ER_IRQHandler(&hi2c);
+}

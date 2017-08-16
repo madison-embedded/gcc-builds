@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "hal/stm32f7xx_hal_dma.h"
-#include "hal/stm32f7xx_hal_i2c.h"
 #include "hal/stm32f7xx_hal.h"
+#include "hal/stm32f7xx_hal_i2c.h"
 
 #define MPU_ADDRESS     0x68
 
@@ -21,7 +20,7 @@ bool MPU_ready;
 bool MPUinitialize(void);
 void MPUread(void);
 void printOffsets(void);
-void MPU_step(void);
+void readAccelData(int16_t * destination);
 
 // From SparkFun
 #define SELF_TEST_X_GYRO 0x00

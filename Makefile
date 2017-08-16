@@ -80,6 +80,8 @@ OBJECTS += drivers/hal/stm32f7xx_hal_flash.o
 OBJECTS += drivers/hal/stm32f7xx_hal_rcc.o
 OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
 OBJECTS += drivers/hal/stm32f7xx_hal_i2c.o
+OBJECTS += drivers/hal/stm32f7xx_hal_dma.o
+
 
 CPUDIR := include/proc
 
