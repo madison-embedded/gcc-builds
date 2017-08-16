@@ -91,12 +91,12 @@ void print_elapsed_time(uint64_t before_timer, uint64_t after_timer,
 	// use a float here
 	time_elapsed = (clocks_elapsed * 6) + (clocks_elapsed / 4);
 
-	if (time_elapsed > 1000)
-		printf("Took %lluk clock cycles (%llu us)\r\n",
-			clocks_elapsed/1000, time_elapsed/1000);
-	else if (time_elapsed > 1000000)
+	if (time_elapsed > 1000000)
 		printf("Took %lluM clock cycles (%llu ms)\r\n",
 			clocks_elapsed/1000000, time_elapsed/1000000);
+	else if (time_elapsed > 1000)
+		printf("Took %lluk clock cycles (%llu us)\r\n",
+			clocks_elapsed/1000, time_elapsed/1000);
 	else
 		printf("Took %llu clock cycles (%llu ns)\r\n",
 			clocks_elapsed, time_elapsed);
