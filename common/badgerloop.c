@@ -126,8 +126,8 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 
 int badgerloop_init(void) {
 
-	IP4_ADDR(&to_spacex, 192, 168, 0, DEV_IP);
-	IP4_ADDR(&to_dashboard, 192, 168, 0, DEV_IP);
+	IP4_ADDR(&to_spacex, 192, 168, 0, 100);
+	IP4_ADDR(&to_dashboard, 192, 168, 0, 100);
 
 	udp_spacex = udp_new();
 	udp_dashboard = udp_new();

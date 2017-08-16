@@ -451,7 +451,7 @@ void eth_print_status(HAL_ETH_StateTypeDef stat) {
 	}
 }
 
-static int eth_check_link(void) {
+int eth_check_link(void) {
 	uint32_t phyreg = 0;
 	HAL_ETH_ReadPHYRegister(&EthHandle, PHY_BSR, &phyreg);
 	return phyreg & PHY_LINKED_STATUS;
