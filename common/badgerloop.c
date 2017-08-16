@@ -63,11 +63,11 @@ void badgerloop_update_data(void) {
 	SET_VBATT(-3);
 	SET_IBATT(2);
 	SET_TBATT(-5);
-	SET_PRP1(1);
+	SET_PRP1(-1);
 	SET_PRP2(1);
-	SET_BRP1(1);
+	SET_BRP1(-1);
 	SET_BRP2(1);
-	SET_BRP3(1);
+	SET_BRP3(-1);
 
 	/* strip count */
 	SET_SCOUNT(4);
