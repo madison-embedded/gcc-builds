@@ -49,18 +49,18 @@ static void low_level_init(struct netif *netif) {
     EthHandle.Init.ChecksumMode = ETH_CHECKSUM_BY_HARDWARE;
     EthHandle.Init.MediaInterface = ETH_MEDIA_INTERFACE_RMII;
 
-	printf("Initializing ethernet . . . ");
-	fflush(stdout);
+	//printf("Initializing ethernet . . . ");
+	//fflush(stdout);
 
     hal_eth_init_status = HAL_ETH_Init(&EthHandle);
 
 	if (hal_eth_init_status != HAL_OK) {
-		printf("failed: ");
-		eth_print_status(hal_eth_init_status);
-		printf("\r\n\n");
+		//printf("failed: ");
+		//eth_print_status(hal_eth_init_status);
+		//printf("\r\n\n");
 		return;
 	}
-	printf("success!\r\n\n");
+	//printf("success!\r\n\n");
 
 	/* Set netif link flag */
 	netif->flags |= NETIF_FLAG_LINK_UP;

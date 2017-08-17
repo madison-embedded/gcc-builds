@@ -2,6 +2,27 @@
 #include "state_machine.h"
 #include <stdio.h>
 
+const unsigned int state_intervals[] = {
+	2500, /* FAULT */
+	2500, /* IDLE */
+	2500, /* FAULT */
+	2500, /* FAULT */
+	2500, /* FAULT */
+	2500  /* FAULT */
+};
+
+extern unsigned int ticks;
+int check_interval(STATE_NAME state) {
+	if (!(ticks % GET_INTERVAL(state)) && ticks != GET_TIMESTAMP(state)) {
+		SET_TIMESTAMP(state);
+		return 1;
+	}
+	return 0;
+}
+
+void print_time(void) {
+	printf("(%4d.%03d) ", ticks / 1000, ticks % 1000);
+}
 
 /*****************************************************************************/
 /*                              Fault Handlers                               */
@@ -11,9 +32,11 @@ void to_fault(STATE_NAME from, uint32_t flags) {
 }
 
 void in_fault(uint32_t flags) {
-
+	if (check_interval(FAULT)) {
+		print_time();
+		printf("curr fault: %s\r\n", fault_message);
+	}
 }
-
 void from_fault(STATE_NAME to, uint32_t flags) {
 	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 }
@@ -29,7 +52,10 @@ void to_idle(STATE_NAME from, uint32_t flags) {
 }
 
 void in_idle(uint32_t flags) {
-
+	if (check_interval(IDLE)) {
+		print_time();
+		printf("%s\r\n", __func__);
+	}
 }
 
 void from_idle(STATE_NAME to, uint32_t flags) {
@@ -47,7 +73,10 @@ void to_ready(STATE_NAME from, uint32_t flags) {
 }
 
 void in_ready(uint32_t flags) {
-
+	if (check_interval(READY)) {
+		print_time();
+		printf("%s\r\n", __func__);
+	}
 }
 
 void from_ready(STATE_NAME to, uint32_t flags) {
@@ -65,7 +94,10 @@ void to_pushing(STATE_NAME from, uint32_t flags) {
 }
 
 void in_pushing(uint32_t flags) {
-
+	if (check_interval(PUSHING)) {
+		print_time();
+		printf("%s\r\n", __func__);
+	}
 }
 
 void from_pushing(STATE_NAME to, uint32_t flags) {
@@ -83,7 +115,10 @@ void to_coast(STATE_NAME from, uint32_t flags) {
 }
 
 void in_coast(uint32_t flags) {
-
+	if (check_interval(COAST)) {
+		print_time();
+		printf("%s\r\n", __func__);
+	}
 }
 
 void from_coast(STATE_NAME to, uint32_t flags) {
@@ -101,7 +136,10 @@ void to_braking(STATE_NAME from, uint32_t flags) {
 }
 
 void in_braking(uint32_t flags) {
-
+	if (check_interval(BRAKING)) {
+		print_time();
+		printf("%s\r\n", __func__);
+	}
 }
 
 void from_braking(STATE_NAME to, uint32_t flags) {
@@ -110,6 +148,7 @@ void from_braking(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 /*****************************************************************************/
 
+unsigned int state_event_timestamps[NUM_STATES];
 
 state_transition_t * const to_handlers[] = {
 	to_fault, to_idle, to_ready, to_pushing, to_coast, to_braking

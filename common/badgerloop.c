@@ -108,8 +108,9 @@ struct udp_pcb *udp_spacex, *udp_dashboard;
 struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 /* Globals */
-uint32_t last_telem_timestamp;
+uint32_t last_telem_timestamp, last_daq_timestamp;
 state_t state_handle;
+char *fault_message = "INITIAL_VAL";
 static err_t lwip_error = ERR_OK;
 static uint8_t badgerloop_flags = 0;
 
@@ -172,7 +173,8 @@ int badgerloop_init(void) {
 		set_stdio_target(UDP);
 
 	initialize_state_machine(&state_handle, IDLE,
-							to_handlers, in_handlers, from_handlers);
+		to_handlers, in_handlers, from_handlers,
+		state_event_timestamps, state_intervals);
 
 	/* initial capture */
 	badgerloop_update_data();
@@ -272,3 +274,31 @@ int query_Dashboard(void) {
 	return 0;
 }
 
+void application_handler(void) {
+
+	/* do DAQ */
+	if (!(ticks % DAQ_INT) && last_daq_timestamp != ticks) {
+		last_daq_timestamp = ticks;
+		badgerloop_update_data();
+	}
+
+	/* do telemetry */
+	if (!(ticks % TELEM_INT) && last_telem_timestamp != ticks) {
+		last_telem_timestamp = ticks;
+		if (gnetif.flags & NETIF_FLAG_LINK_UP) {
+			if (!send_telemetry_to_SpaceX() || !send_telemetry_to_Dashboard()) {
+				state_handle.next_state = FAULT;
+				fault_message = "Sending telemetry failed!";
+				state_handle.change_state = true;
+			}
+		/* No link, enter fault */
+		} else {
+			state_handle.next_state = FAULT;
+			fault_message = "No network link!";
+			state_handle.change_state = true;
+		}
+	}
+
+	state_machine_handler(&state_handle);
+
+}

@@ -17,12 +17,23 @@ typedef struct state {
 	state_transition_t * const *to_state_table;
 	state_handler_t * const *in_state_table;
 	state_transition_t * const *from_state_table;
+	unsigned int *state_timestamp_table;
+	const unsigned int *event_interval_table;
 } state_t;
 
 extern const char *state_strings[];
 
 /* State handling */
 extern state_t state_handle;
+extern unsigned int state_event_timestamps[NUM_STATES];
+extern const unsigned int state_intervals[];
+#define GET_TIMESTAMP(state)	\
+	(state_handle.state_timestamp_table[state])
+#define SET_TIMESTAMP(state)	\
+	state_handle.state_timestamp_table[state] = ticks
+#define GET_INTERVAL(state)	\
+	(state_handle.event_interval_table[state])
+
 extern state_transition_t * const to_handlers[];
 extern state_handler_t * const in_handlers[];
 extern state_transition_t * const from_handlers[];
@@ -30,7 +41,9 @@ extern state_transition_t * const from_handlers[];
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
 							state_handler_t * const *in_states,
-							state_transition_t * const *from_states);
+							state_transition_t * const *from_states,
+							unsigned int *timestamp_table,
+							const unsigned int *interval_table);
 void state_machine_handler(state_t *handle);
 
 #endif

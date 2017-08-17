@@ -20,6 +20,8 @@
 
 /* Constant fields */
 #define TEAM_ID	0xab
+#define DAQ_INT			250
+#define TELEM_INT		500
 
 /* State definitions */
 #define NUM_STATES 6
@@ -31,8 +33,9 @@ typedef enum asdf {
 	COAST = 4,
 	BRAKING = 5
 } STATE_NAME;
+extern char *fault_message;
 
-extern uint32_t last_telem_timestamp;
+//extern uint32_t last_telem_timestamp;
 
 extern uint8_t *status;
 #define SET_STATUS(val)	\
