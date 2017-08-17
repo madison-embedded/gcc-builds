@@ -51,9 +51,9 @@ const GPIO GPIO_TABLE[] = {
 	FILL_GPIO("LIMITSWITCH2",		GPIOG,  3, INPUT, LOW_SPEED, NONE, true, SOLENOID)
 
 	/* OUTPUT */
-	FILL_GPIO("GPIO1",		GPIOD,  0, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
-	FILL_GPIO("GPIO2",		GPIOD,  1, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
-	FILL_GPIO("GPIO3",		GPIOD,  3, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("GPIO1",		GPIOD,  0, INPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("GPIO2",		GPIOD,  1, INPUT, LOW_SPEED, NONE, true, SOLENOID)
+	FILL_GPIO("GPIO3",		GPIOD,  3, INPUT, LOW_SPEED, NONE, true, SOLENOID)
 	FILL_GPIO("GPIO4",		GPIOD,  4, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
 	FILL_GPIO("GPIO5",		GPIOD,  5, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
 	FILL_GPIO("GPIO6",		GPIOD,  6, OUTPUT, LOW_SPEED, NONE, true, SOLENOID)
@@ -119,7 +119,7 @@ int gpioAliasInit(){
 	GPIO_TypeDef * port;
 	uint8_t pin;
 
-	for(i =0; i < NUM_GPIO_ALIAS; i++){
+	for(i = 0; i < NUM_GPIO_ALIAS; i++){
 		if (GPIO_TABLE[i].usable){
 			port = GPIO_TABLE[i].port;
 			pin = GPIO_TABLE[i].pin;
@@ -141,7 +141,6 @@ int gpioAliasInit(){
 				gpio_writePin(port, pin, 0);
 		}
 	}
-
 	return 0;
 }
 
@@ -166,8 +165,5 @@ int getGpioAlias(GPIO_TypeDef ** port, uint8_t * pin, GPIO * alias) {
 		}	
 	}
 	return 0;
-
 }
-
-
 

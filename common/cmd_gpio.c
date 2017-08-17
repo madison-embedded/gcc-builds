@@ -30,7 +30,8 @@ void gpio_printPinInfo(GPIO_TypeDef* port, uint8_t pin){
 	switch (gpio_getMode(port, pin)) {
 		case OUTPUT:	printf("out %x", gpio_readPin(port, pin)); break;
 		case INPUT:		printf("in  %x", gpio_readPin(port, pin)); break;
-		case ALT:		printf("alt"); break;
+		case ALT:		printf("af%2d", gpio_getAlternateFunc(port, pin));
+							break;
 		case ANALOG:	printf("ana"); break;
 		default:		printf("UNKNOWN");
 	}
