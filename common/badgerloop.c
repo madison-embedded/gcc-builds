@@ -77,21 +77,21 @@ void badgerloop_update_data(void) {
 	/*************************************************************************/
 	/*                            digital I/O                                */
 	/*************************************************************************/
-	/* LIM1, pusher limit switch 1? */
-	if (gpio_readPin(GPIOG, 2)) SET_PLIM1;
-	else CLR_PLIM1;
-
-	/* LIM2, pusher limit switch 2? */
-	if (gpio_readPin(GPIOG, 3)) SET_PLIM2;
-	else CLR_PLIM2;
-
-	/* GPIO1, braking limit switch 1? */
-	if (gpio_readPin(GPIOD, 0)) SET_BLIM1;
+	/* LIM1, braking limit switch 1 */
+	if (gpio_readPin(GPIOG, 2)) SET_BLIM1;
 	else CLR_BLIM1;
 
-	/* GPIO2, braking limit switch 2? */
-	if (gpio_readPin(GPIOD, 1)) SET_BLIM2;
+	/* LIM2, braking limit switch 2 */
+	if (gpio_readPin(GPIOG, 3)) SET_BLIM2;
 	else CLR_BLIM2;
+
+	/* GPIO1, pusher limit switch 1 */
+	if (gpio_readPin(GPIOD, 0)) SET_PLIM1;
+	else CLR_PLIM1;
+
+	/* GPIO2, pusher limit switch 2 */
+	if (gpio_readPin(GPIOD, 1)) SET_PLIM2;
+	else CLR_PLIM2;
 
 	/* GPIO3, door limit switch? */
 	if (gpio_readPin(GPIOD, 3)) SET_DLIM;
