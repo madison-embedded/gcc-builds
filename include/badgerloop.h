@@ -5,7 +5,7 @@
 
 #define SPACEX_IP		1
 #define DASHBOARD_IP	10
-#define DEV_IP			105
+#define DEV_IP			104
 
 #define SPACEXP_SIZ		34
 #define DASHBOARDP_SIZ	47
