@@ -2,22 +2,22 @@
 #include "adc.h"
 
 const ADC_INFO ADC_LUT[] = {
-	FILL_ADC(ADC3, 3,  GPIOA, 3)
-	FILL_ADC(ADC1, 9,  GPIOB, 1)
-	FILL_ADC(ADC3, 10, GPIOC, 0)
-	FILL_ADC(ADC3, 12, GPIOC, 2)
-	FILL_ADC(ADC3, 13, GPIOC, 3)
-	FILL_ADC(ADC3, 9,  GPIOF, 3)
-	FILL_ADC(ADC3, 14, GPIOF, 4)
-	FILL_ADC(ADC3, 15, GPIOF, 5)
-	FILL_ADC(ADC3, 8,  GPIOF, 10)
-	FILL_ADC(ADC3, 4,  GPIOF, 6)
-	FILL_ADC(ADC3, 5,  GPIOF, 7)
-	FILL_ADC(ADC3, 6,  GPIOF, 8)
-	FILL_ADC(ADC3, 7,  GPIOF, 9)
-	FILL_ADC(ADC1, 4,  GPIOA, 4)
-	FILL_ADC(ADC1, 5,  GPIOA, 5)
-	FILL_ADC(ADC1, 6,  GPIOA, 6)
+	FILL_ADC(ADC3, 3,  GPIOA, 3)  /* A3:   Analog1 - Primary Battery Current */
+	FILL_ADC(ADC1, 9,  GPIOB, 1)  /* B1:   Analog2 - Secondary Battery Voltage */
+	FILL_ADC(ADC3, 10, GPIOC, 0)  /* C0:   Analog3 - Pressure 1 (CN5) */
+	FILL_ADC(ADC3, 12, GPIOC, 2)  /* C2:   Analog4 - Pressure 2 (CN5) */
+	FILL_ADC(ADC3, 13, GPIOC, 3)  /* C3:   Analog5 - Primary Battery Voltage */
+	FILL_ADC(ADC3, 9,  GPIOF, 3)  /* F3:   Analog6 - Pressure 3 (CN5) */
+	FILL_ADC(ADC3, 14, GPIOF, 4)  /* F4:   Analog7 - Pressure 4 (CN5) */
+	FILL_ADC(ADC3, 15, GPIOF, 5)  /* F5:   Analog8 - Pressure 1 (CN6) */
+	FILL_ADC(ADC3, 8,  GPIOF, 10) /* F10:  Analog9 - Pressure 2 (CN6) */
+	FILL_ADC(ADC3, 4,  GPIOF, 6)  /* F6:  Analog10 - Accelerometer X */
+	FILL_ADC(ADC3, 5,  GPIOF, 7)  /* F7:  Analog11 - Thermistor 3 */
+	FILL_ADC(ADC3, 6,  GPIOF, 8)  /* F8:  Analog12 - Thermistor 4 */
+	FILL_ADC(ADC3, 7,  GPIOF, 9)  /* F9:  Analog13 - Secondary Battery Current */
+	FILL_ADC(ADC1, 4,  GPIOA, 4)  /* A4:  Analog14 - Thermistor 1 */
+	FILL_ADC(ADC1, 5,  GPIOA, 5)  /* A5:  Analog15 - Thermistor 2 */
+	//FILL_ADC(ADC1, 6,  GPIOA, 6)  /* A6:  Analog16 - */
 };
 
 const uint8_t NUM_ADC = sizeof(ADC_LUT)/sizeof(ADC_INFO);

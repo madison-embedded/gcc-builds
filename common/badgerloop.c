@@ -64,14 +64,25 @@ void badgerloop_update_data(void) {
 	SET_TPOD(-2);
 
 	/* analog voltages */
-	SET_VBATT(-3);
-	SET_IBATT(2);
-	SET_TBATT(-5);
-	SET_PRP1(-1);
-	SET_PRP2(1);
-	SET_BRP1(-1);
-	SET_BRP2(1);
-	SET_BRP3(-1);
+	SET_VBATT(-3);	/* C3:   Analog5 - Primary Battery Voltage */
+	SET_IBATT(2);	/* A3:   Analog1 - Primary Battery Current */
+	SET_TBATT(-5);	/* A4:  Analog14 - Thermistor 1 */
+	SET_PRP1(-1);	/* C0:   Analog3 - Pressure 1 (CN5) */
+	SET_PRP2(1);	/* C2:   Analog4 - Pressure 2 (CN5) */
+	SET_BRP1(-1);	/* F3:   Analog6 - Pressure 3 (CN5) */
+	SET_BRP2(1);	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP3(-1);	/* F5:   Analog8 - Pressure 1 (CN6) */
+
+	/* B1:   Analog2 - Secondary Battery Voltage */
+	/* F9:  Analog13 - Secondary Battery Current */
+
+	/* F10:  Analog9 - Pressure 2 (CN6) */
+
+	/* F6:  Analog10 - Accelerometer X */
+
+	/* A5:  Analog15 - Thermistor 2 */
+	/* F7:  Analog11 - Thermistor 3 */
+	/* F8:  Analog12 - Thermistor 4 */
 
 	/* strip count */
 	SET_SCOUNT(4);
