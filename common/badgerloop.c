@@ -52,6 +52,8 @@ uint8_t *lim_states = &telemetry_buffer[46];
 
 void badgerloop_update_data(void) {
 
+	SET_STATUS(state_handle.curr_state);
+
 	/* combination of strips and accelerometer */
 	SET_ACCEL(1);
 	SET_VEL(-1);
@@ -136,6 +138,14 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 
 int badgerloop_init(void) {
 
+	/* don't initialize twice, only query dashboard */
+	if (udp_spacex != NULL && udp_dashboard != NULL) {
+		if (eth_check_link() && query_Dashboard())
+			set_stdio_target(UDP);
+		return;
+	}
+
+	/* TODO: make configurable */
 	IP4_ADDR(&to_spacex, 192, 168, 0, DEV_IP);
 	IP4_ADDR(&to_dashboard, 192, 168, 0, DEV_IP);
 
@@ -157,16 +167,15 @@ int badgerloop_init(void) {
 
 	/* default values */
 	*team_id = TEAM_ID;
-	SET_STATUS(IDLE);
-
-	/* for endianness testing */
-	badgerloop_update_data();
 
 	if (eth_check_link() && query_Dashboard())
 		set_stdio_target(UDP);
 
 	initialize_state_machine(&state_handle, IDLE, NUM_STATES,
 							to_handlers, from_handlers);
+
+	/* initial capture */
+	badgerloop_update_data();
 
 	return 0;
 }
