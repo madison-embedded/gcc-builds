@@ -4,84 +4,108 @@
 
 
 /*****************************************************************************/
-/*                         Fault Transition Handlers                         */
+/*                              Fault Handlers                               */
 /*****************************************************************************/
-void to_fault(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void to_fault(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
 }
 
-void from_fault(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
-}
-/*****************************************************************************/
-/*****************************************************************************/
+void in_fault(uint32_t flags) {
 
-
-/*****************************************************************************/
-/*                          Idle Transition Handlers                         */
-/*****************************************************************************/
-void to_idle(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
 }
 
-void from_idle(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void from_fault(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 }
 /*****************************************************************************/
 /*****************************************************************************/
 
 
 /*****************************************************************************/
-/*                         Ready Transition Handlers                         */
+/*                                 Idle Handlers                             */
 /*****************************************************************************/
-void to_ready(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void to_idle(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
 }
 
-void from_ready(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
-}
-/*****************************************************************************/
-/*****************************************************************************/
+void in_idle(uint32_t flags) {
 
-
-/*****************************************************************************/
-/*                        Pushing Transition Handlers                        */
-/*****************************************************************************/
-void to_pushing(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
 }
 
-void from_pushing(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void from_idle(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 }
 /*****************************************************************************/
 /*****************************************************************************/
 
 
 /*****************************************************************************/
-/*                          Coast Transition Handlers                        */
+/*                             Ready Handlers                                */
 /*****************************************************************************/
-void to_coast(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void to_ready(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
 }
 
-void from_coast(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void in_ready(uint32_t flags) {
+
+}
+
+void from_ready(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 }
 /*****************************************************************************/
 /*****************************************************************************/
 
 
 /*****************************************************************************/
-/*                        Braking Transition Handlers                        */
+/*                               Pushing Handlers                            */
 /*****************************************************************************/
-void to_braking(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void to_pushing(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
 }
 
-void from_braking(uint32_t flags) {
-	printf("executing %s\r\n", __func__);
+void in_pushing(uint32_t flags) {
+
+}
+
+void from_pushing(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+}
+/*****************************************************************************/
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+/*                                 Coast Handlers                            */
+/*****************************************************************************/
+void to_coast(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+}
+
+void in_coast(uint32_t flags) {
+
+}
+
+void from_coast(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+}
+/*****************************************************************************/
+/*****************************************************************************/
+
+
+/*****************************************************************************/
+/*                               Braking Handlers                            */
+/*****************************************************************************/
+void to_braking(STATE_NAME from, uint32_t flags) {
+	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+}
+
+void in_braking(uint32_t flags) {
+
+}
+
+void from_braking(STATE_NAME to, uint32_t flags) {
+	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -89,6 +113,10 @@ void from_braking(uint32_t flags) {
 
 state_transition_t * const to_handlers[] = {
 	to_fault, to_idle, to_ready, to_pushing, to_coast, to_braking
+};
+
+state_handler_t * const in_handlers[] = {
+	in_fault, in_idle, in_ready, in_pushing, in_coast, in_braking
 };
 
 state_transition_t * const from_handlers[] = {

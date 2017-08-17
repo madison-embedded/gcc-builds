@@ -142,7 +142,7 @@ int badgerloop_init(void) {
 	if (udp_spacex != NULL && udp_dashboard != NULL) {
 		if (eth_check_link() && query_Dashboard())
 			set_stdio_target(UDP);
-		return;
+		return 0;
 	}
 
 	/* TODO: make configurable */
@@ -171,8 +171,8 @@ int badgerloop_init(void) {
 	if (eth_check_link() && query_Dashboard())
 		set_stdio_target(UDP);
 
-	initialize_state_machine(&state_handle, IDLE, NUM_STATES,
-							to_handlers, from_handlers);
+	initialize_state_machine(&state_handle, IDLE,
+							to_handlers, in_handlers, from_handlers);
 
 	/* initial capture */
 	badgerloop_update_data();
