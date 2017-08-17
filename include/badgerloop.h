@@ -3,28 +3,40 @@
 
 #include <stdint.h>
 
+/* IP addresses */
 #define SPACEX_IP		1
 #define DASHBOARD_IP	10
 #define DEV_IP			104
 
+/* Packet sizes */
 #define SPACEXP_SIZ		34
 #define DASHBOARDP_SIZ	47
+
+/* Dashboard query parameters */
+#define OUTGOING_QUERY	1
+#define DASH_RESPONSE	2
 #define QUERY_TO		7000
 #define QUERY_RETRY		1000
 
+/* Constant fields */
 #define TEAM_ID	0xab
+
+/* State definitions */
+#define NUM_STATES 6
+typedef enum asdf {
+	FAULT = 0,
+	IDLE = 1,
+	READY = 2,
+	PUSHING = 3,
+	COAST = 4,
+	BRAKING = 5
+} STATE_NAME;
 
 extern uint32_t last_telem_timestamp;
 
 extern uint8_t *status;
 #define SET_STATUS(val)	\
-	*status = val
-#define FAULT	0x0
-#define IDLE	0x1
-#define READY	0x2
-#define PUSHING	0x3
-#define COAST	0x4
-#define BRAKING	0x5
+	*status = (uint8_t) val
 
 extern int *acceleration, *velocity, *position;
 #define SET_ACCEL(val)	\
@@ -79,6 +91,7 @@ extern uint8_t *lim_states;
 #define SET_DLIM	*lim_states |= DLIM
 #define CLR_DLIM	*lim_states &= DLIM
 
+/* Exposed functions */
 int badgerloop_init(void);
 int send_telemetry_to_SpaceX(void);
 int send_telemetry_to_Dashboard(void);

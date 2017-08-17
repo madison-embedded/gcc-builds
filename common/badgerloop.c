@@ -5,6 +5,8 @@
 #include "lwip/udp.h"
 #include "ethernetif.h"
 #include "cli.h"
+#include "gpio.h"
+#include "state_machine.h"
 
 /*****************************************************************************/
 /*                                 Data Buffer                               */
@@ -72,21 +74,30 @@ void badgerloop_update_data(void) {
 	/* strip count */
 	SET_SCOUNT(4);
 
-	/* digital I/O */
-	if (0) SET_PLIM1;
+	/*************************************************************************/
+	/*                            digital I/O                                */
+	/*************************************************************************/
+	/* LIM1, pusher limit switch 1? */
+	if (gpio_readPin(GPIOG, 2)) SET_PLIM1;
 	else CLR_PLIM1;
 
-	if (0) SET_PLIM2;
+	/* LIM2, pusher limit switch 2? */
+	if (gpio_readPin(GPIOG, 3)) SET_PLIM2;
 	else CLR_PLIM2;
 
-	if (0) SET_BLIM1;
+	/* GPIO1, braking limit switch 1? */
+	if (gpio_readPin(GPIOD, 0)) SET_BLIM1;
 	else CLR_BLIM1;
 
-	if (0) SET_BLIM2;
+	/* GPIO2, braking limit switch 2? */
+	if (gpio_readPin(GPIOD, 1)) SET_BLIM2;
 	else CLR_BLIM2;
 
-	if (0) SET_DLIM;
+	/* GPIO3, door limit switch? */
+	if (gpio_readPin(GPIOD, 3)) SET_DLIM;
 	else CLR_DLIM;
+	/*************************************************************************/
+	/*************************************************************************/
 }
 
 /* Networking */
@@ -96,10 +107,9 @@ struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 /* Globals */
 uint32_t last_telem_timestamp;
+state_t state_handle;
 static err_t lwip_error = ERR_OK;
 static uint8_t badgerloop_flags = 0;
-#define OUTGOING_QUERY	1
-#define DASH_RESPONSE	2
 
 /* for accepting commands from the dashboard */
 void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
@@ -154,6 +164,9 @@ int badgerloop_init(void) {
 
 	if (eth_check_link() && query_Dashboard())
 		set_stdio_target(UDP);
+
+	initialize_state_machine(&state_handle, IDLE, NUM_STATES,
+							to_handlers, from_handlers);
 
 	return 0;
 }

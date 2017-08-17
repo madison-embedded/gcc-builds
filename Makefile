@@ -38,11 +38,11 @@ LFLAGS=--specs=nosys.specs -Wl,--gc-sections -Wl,-Map=$(PROJECT).map -T$(PROC_DI
 ###############################################################################
 # Global Objects
 OBJECTS += common/main.o
-OBJECTS += common/badgerloop.o
 OBJECTS += common/post.o
 OBJECTS += common/retarget.o
 OBJECTS += common/pcbuffer.o
 OBJECTS += common/handlers.o
+OBJECTS += common/state_machine.o
 OBJECTS += common/gpio_alias.o
 
 # Commands
@@ -82,6 +82,9 @@ OBJECTS += drivers/hal/stm32f7xx_hal_gpio.o
 OBJECTS += drivers/hal/stm32f7xx_hal_i2c.o
 OBJECTS += drivers/hal/stm32f7xx_hal_dma.o
 
+# Application Specific
+OBJECTS += common/badgerloop.o
+OBJECTS += common/badgerloop_state_handlers.o
 
 CPUDIR := include/proc
 
