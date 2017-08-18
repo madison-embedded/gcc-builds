@@ -7,6 +7,9 @@
 #include "cli.h"
 #include "gpio.h"
 #include "state_machine.h"
+#include "adc.h"
+#include "mpu9250.h"
+#include "HWPressure.h"
 
 /*****************************************************************************/
 /*                                 Data Buffer                               */
@@ -55,23 +58,26 @@ void badgerloop_update_data(void) {
 	SET_STATUS(state_handle.curr_state);
 
 	/* combination of strips and accelerometer */
-	SET_ACCEL(1);
+
+	SET_ACCEL(readAccelXData());
 	SET_VEL(-1);
 	SET_POS(-4);
 
 	/* I2C temp/pressure sensor */
-	SET_PAMP(1);
-	SET_TPOD(-2);
+	SET_PAMP(2);
+/*	SET_PAMP(HPGetPressure());*/
+	SET_TPOD(1);
+/*	SET_TPOD(HPGetTemp());*/
 
 	/* analog voltages */
-	SET_VBATT(-3);	/* C3:   Analog5 - Primary Battery Voltage */
-	SET_IBATT(2);	/* A3:   Analog1 - Primary Battery Current */
-	SET_TBATT(-5);	/* A4:  Analog14 - Thermistor 1 */
-	SET_PRP1(-1);	/* C0:   Analog3 - Pressure 1 (CN5) */
-	SET_PRP2(1);	/* C2:   Analog4 - Pressure 2 (CN5) */
-	SET_BRP1(-1);	/* F3:   Analog6 - Pressure 3 (CN5) */
-	SET_BRP2(1);	/* F4:   Analog7 - Pressure 4 (CN5) */
-	SET_BRP3(-1);	/* F5:   Analog8 - Pressure 1 (CN6) */
+	SET_VBATT(analogRead(ADC3, 13));	/* C3:   Analog5 - Primary Battery Voltage */
+	SET_IBATT(analogRead(ADC3, 3));	/* A3:   Analog1 - Primary Battery Current */
+	SET_TBATT(analogRead(ADC1, 4));	/* A4:  Analog14 - Thermistor 1 */
+	SET_PRP1(analogRead(ADC3, 10));	/* C0:   Analog3 - Pressure 1 (CN5) */
+	SET_PRP2(analogRead(ADC3, 12));	/* C2:   Analog4 - Pressure 2 (CN5) */
+	SET_BRP1(analogRead(ADC3, 9));	/* F3:   Analog6 - Pressure 3 (CN5) */
+	SET_BRP2(analogRead(ADC3, 14));	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP3(analogRead(ADC3, 15));	/* F5:   Analog8 - Pressure 1 (CN6) */
 
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */

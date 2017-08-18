@@ -12,8 +12,6 @@ uint8_t fifoCountBytes[2];
 uint16_t totalCount = 0, packetCount = 0;
 uint8_t readIndex = 0;
 
-MPU_STATE mpuState = IDLE;
-
 bool MPU_ready = false;
 
 uint8_t mpuBytes[14];
@@ -44,11 +42,17 @@ bool MPU_stopSampling(void) {
 
 void readAccelData(int16_t * destination)
 {
-  uint8_t rawData[6];  // x/y/z accel register data stored here
-  I2CRead(MPU_ADDRESS, ACCEL_XOUT_H, &rawData[0], 6);  // Read the six raw data registers into data array
-  destination[0] = ((int16_t)rawData[0] << 8) | rawData[1] ;  // Turn the MSB and LSB into a signed 16-bit value
-  destination[1] = ((int16_t)rawData[2] << 8) | rawData[3] ;  
-  destination[2] = ((int16_t)rawData[4] << 8) | rawData[5] ; 
+	uint8_t rawData[6];  // x/y/z accel register data stored here
+	I2CRead(MPU_ADDRESS, ACCEL_XOUT_H, &rawData[0], 6);  // Read the six raw data registers into data array
+	destination[0] = ((int16_t)rawData[0] << 8) | rawData[1] ;  // Turn the MSB and LSB into a signed 16-bit value
+	destination[1] = ((int16_t)rawData[2] << 8) | rawData[3] ;
+	destination[2] = ((int16_t)rawData[4] << 8) | rawData[5] ;
+}
+
+int readAccelXData(void){
+	uint8_t * rawData = NULL;  // x/y/z accel register data stored here
+	I2CRead(MPU_ADDRESS, ACCEL_XOUT_H, rawData, 2);  // Read the six raw data registers into data array
+	return (int) (rawData[0] | (rawData[1]) << 8);
 }
 
 void printOffsets(void) {

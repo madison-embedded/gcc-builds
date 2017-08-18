@@ -8,12 +8,7 @@
 
 #define MPU_ADDRESS     0x68
 
-typedef enum {
-    SAMPLING, WAIT, GET_FIFO_COUNT, GET_VALUES, IDLE
-} MPU_STATE;
-
 extern uint8_t mpuBytes[14];
-extern MPU_STATE mpuState;
 bool MPU_ready;
 
 // Functions
@@ -21,6 +16,7 @@ bool MPUinitialize(void);
 void MPUread(void);
 void printOffsets(void);
 void readAccelData(int16_t * destination);
+int readAccelXData(void);
 
 // From SparkFun
 #define SELF_TEST_X_GYRO 0x00

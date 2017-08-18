@@ -1,7 +1,7 @@
 #ifndef _HWPressure__H__
 #define _HWPressure__H__
 
-#include "../include/stm32_i2c.h"
+#include "i2c.h"
 #include <stdint.h>
 #include <float.h>
 
@@ -11,6 +11,7 @@
 #define OUTPUTMIN			1638
 #define PRESSUREMAX			87.0228
 #define PRESSUREMIN			0
+
 void HPread(void);
 double HPgetStatus(void);
 double HPgetPressure(void);

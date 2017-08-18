@@ -39,7 +39,7 @@ command_status do_i2c(int argc, char *argv[]) {
 	uint16_t MemAdd;
 	uint8_t numBytes;
 
-
+	/* one argument checks what devices are attached */
 	if (argc == 1) {
 		for (address = 0; address < 128; address++){
 			printf("%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000)));
@@ -47,16 +47,14 @@ command_status do_i2c(int argc, char *argv[]) {
 		return SUCCESS;
 	}
 	
-	if (argc == 2 || argc > 6)
+	/*  */
+	if (argc < 3 || argc > 6)
 		return USAGE;
 
 	address = strtoul(argv[2], NULL, 16);
 
 	MemAdd = atoi((const char *) argv[3]);
 	
-	
-	
-
 	if (strcmp(argv[1], "write") == 0) {
 	
 		if (argc != 5)
@@ -72,23 +70,24 @@ command_status do_i2c(int argc, char *argv[]) {
 	}
 	if (strcmp(argv[1], "read") == 0) {
 		if (argc < 5){
-		numBytes = atoi((const char *) argv[3]);
- 		printf("Reading\r\n");
-        	getStatus(HAL_I2C_Master_Receive(&hi2c, address<<1, pBuffer , numBytes, 500));
-		printf("%x\r\n", (pBuffer[0]));
-		printf("%x\r\n", (pBuffer[1]));
-		printf("%x\r\n", (pBuffer[2]));
-		printf("%x\r\n", (pBuffer[3]));
-	
-		pressureReading = (((pBuffer[0] & 0x3f) <<8) | pBuffer[1]);
-		printf ("pressureReading is %d\r\n", pressureReading);
- 		tempReading = ((pBuffer[2] <<8) | pBuffer[3]) >>5;
- 		temp = ((tempReading *200)/2047) -50;
- 		presstemp = (pressureReading-OUTPUTMIN)*(PRESSUREMAX-PRESSUREMIN);
-		pressure  = (presstemp/(OUTPUTMAX-OUTPUTMIN)) + PRESSUREMIN;
-	
-		printf("Temperature is: %f Degress Celsius\r\n", temp);
-		printf("Pressure is: %f psi\r\n", pressure); 
+			numBytes = atoi((const char *) argv[3]);
+			
+			printf("%s\r\n", getStatus(HAL_I2C_Master_Receive(&hi2c, address<<1, pBuffer , numBytes, 500)));
+			
+			printf("%x\r\n", (pBuffer[0]));
+			printf("%x\r\n", (pBuffer[1]));
+			printf("%x\r\n", (pBuffer[2]));
+			printf("%x\r\n", (pBuffer[3]));
+		
+			pressureReading = (((pBuffer[0] & 0x3f) <<8) | pBuffer[1]);
+			printf ("pressureReading is %d\r\n", pressureReading);
+			tempReading = ((pBuffer[2] <<8) | pBuffer[3]) >>5;
+			temp = ((tempReading *200)/2047) -50;
+			presstemp = (pressureReading-OUTPUTMIN)*(PRESSUREMAX-PRESSUREMIN);
+			pressure  = (presstemp/(OUTPUTMAX-OUTPUTMIN)) + PRESSUREMIN;
+		
+			printf("Temperature is: %f Degress Celsius\r\n", temp);
+			printf("Pressure is: %f psi\r\n", pressure);
 		return SUCCESS;	
 
 		}
