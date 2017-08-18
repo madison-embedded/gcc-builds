@@ -1,28 +1,16 @@
 #include "badgerloop.h"
 #include "state_machine.h"
+#include "config.h"
 #include <stdio.h>
 
 const unsigned int state_intervals[] = {
-	2500, /* FAULT */
-	2500, /* IDLE */
-	2500, /* FAULT */
-	2500, /* FAULT */
-	2500, /* FAULT */
-	2500  /* FAULT */
+	2500, /* FAULT		*/
+	2500, /* IDLE		*/
+	2500, /* READY		*/
+	2500, /* PUSHING	*/
+	2500, /* COAST		*/
+	2500  /* BRAKING	*/
 };
-
-extern unsigned int ticks;
-int check_interval(STATE_NAME state) {
-	if (!(ticks % GET_INTERVAL(state)) && ticks != GET_TIMESTAMP(state)) {
-		SET_TIMESTAMP(state);
-		return 1;
-	}
-	return 0;
-}
-
-void print_time(void) {
-	printf("(%4d.%03d) ", ticks / 1000, ticks % 1000);
-}
 
 /*****************************************************************************/
 /*                              Fault Handlers                               */

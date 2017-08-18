@@ -1,4 +1,5 @@
 #include "state_machine.h"
+#include "config.h"
 
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
@@ -50,6 +51,14 @@ void state_machine_handler(state_t *handle) {
 		handle->prev_state = handle->curr_state;
 		handle->curr_state = handle->next_state;
 	}
+}
+
+int check_interval(STATE_NAME state) {
+	if (!(ticks % GET_INTERVAL(state)) && ticks != GET_TIMESTAMP(state)) {
+		SET_TIMESTAMP(state);
+		return 1;
+	}
+	return 0;
 }
 
 const char *state_strings[] = {

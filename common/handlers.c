@@ -8,10 +8,14 @@ volatile unsigned int ticks = 0;
 void SysTick_Handler(void) { ticks++; }
 uint32_t HAL_GetTick(void) { return ticks; }
 
+void print_time(void) {
+	printf("(%4d.%03d) ", ticks / 1000, ticks % 1000);
+}
+
 void fault(void) {
 	
 	setLED(0, true);
-
+	print_time();
 	printf("Entered fault!\r\n");
 	printf("TODO: add arguments to this function to trace fault.\r\n");
 	

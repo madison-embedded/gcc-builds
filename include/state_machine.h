@@ -45,6 +45,7 @@ void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							unsigned int *timestamp_table,
 							const unsigned int *interval_table);
 void state_machine_handler(state_t *handle);
+int check_interval(STATE_NAME state);
 
 #endif
 
