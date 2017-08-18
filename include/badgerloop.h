@@ -20,8 +20,8 @@
 
 /* Constant fields */
 #define TEAM_ID	0xab
-#define DAQ_INT			250
-#define TELEM_INT		500
+#define DAQ_INT			2500
+#define TELEM_INT		5000
 
 /* State definitions */
 #define NUM_STATES 6

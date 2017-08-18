@@ -297,7 +297,7 @@ void application_handler(void) {
 	if (!(ticks % TELEM_INT) && last_telem_timestamp != ticks) {
 		last_telem_timestamp = ticks;
 		if (gnetif.flags & NETIF_FLAG_LINK_UP) {
-			if (!send_telemetry_to_SpaceX() || !send_telemetry_to_Dashboard()) {
+			if (send_telemetry_to_SpaceX() || send_telemetry_to_Dashboard()) {
 				state_handle.next_state = FAULT;
 				fault_message = "Sending telemetry failed!";
 				state_handle.change_state = true;
