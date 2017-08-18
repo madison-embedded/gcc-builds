@@ -33,7 +33,7 @@ typedef enum asdf {
 	COAST = 4,
 	BRAKING = 5
 } STATE_NAME;
-extern char *fault_message;
+extern const char *fault_message;
 
 extern uint8_t *status;
 #define SET_STATUS(val)	\

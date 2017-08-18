@@ -121,7 +121,7 @@ struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 /* Globals */
 uint32_t last_telem_timestamp, last_daq_timestamp;
 state_t state_handle;
-char *fault_message = "INITIAL_VAL";
+const char *fault_message = "INITIAL_VAL";
 static err_t lwip_error = ERR_OK;
 static uint8_t badgerloop_flags = 0;
 

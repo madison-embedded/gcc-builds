@@ -24,13 +24,14 @@ void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 
 	/* No flags, no state change assertion */
 	handle->change_state = false;
-	handle->flags = 0x0;
+	handle->flags = POWER_ON;
 }
 
 void state_machine_handler(state_t *handle) {
 
 	/* Enter state handler */
-	handle->in_state_table[handle->curr_state](handle->flags);
+	if(check_interval(handle->curr_state))
+		handle->in_state_table[handle->curr_state](handle->flags);
 
 	/* Check if we are transitioning */
 	if (handle->change_state) {

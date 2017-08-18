@@ -14,6 +14,7 @@ typedef struct state {
 	STATE_NAME next_state;
 	volatile bool change_state;
 	volatile uint32_t flags;
+#define POWER_ON	0x1
 	state_transition_t * const *to_state_table;
 	state_handler_t * const *in_state_table;
 	state_transition_t * const *from_state_table;
