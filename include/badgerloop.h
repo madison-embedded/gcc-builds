@@ -35,8 +35,6 @@ typedef enum asdf {
 } STATE_NAME;
 extern char *fault_message;
 
-//extern uint32_t last_telem_timestamp;
-
 extern uint8_t *status;
 #define SET_STATUS(val)	\
 	*status = (uint8_t) val
