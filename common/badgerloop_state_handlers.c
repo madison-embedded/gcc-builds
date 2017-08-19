@@ -28,12 +28,50 @@ void clear_flag(uint32_t flags) {
 	state_handle.flags &= flags;
 }
 
-static int primary_intensity = -1, secondary_intensity = -1;
+void verify_DAQ(void) {
+	/* Check battery voltage */
+	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER))
+		assert_fault("Low primary battery voltage\r\n");
+
+	/* Check battery current */
+	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER))
+		assert_fault("High primary battery current\r\n");
+
+	/* Check battery temperature */
+	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER))
+		assert_fault("High primary battery temperature\r\n");
+
+	/* Check braking pressure 1, upstream? */
+	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
+		assert_fault("Low braking pressure 1\r\n");
+
+	/* Check braking pressure 2, upstream? */
+	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
+		assert_fault("Low braking pressure 2\r\n");
+
+	/* Check braking pressure 3, downstream? */
+	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER))
+		assert_fault("High braking pressure 3\r\n");
+
+	/* Check accelerometer */
+	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE))
+		assert_fault("Accelerating\r\n");
+
+	/* Check velocity */
+	if (CHECK_THRESHOLD(GET_VEL, 0, 0))
+		assert_fault("Velocity not zero\r\n");
+
+	/* Check position */
+	if (CHECK_THRESHOLD(GET_POS, 0, 0))
+		assert_fault("Position not zero\r\n");
+}
+
 
 /*****************************************************************************/
 /*                            Actuation Functions                            */
 /*****************************************************************************/
 #define BRAKING_COUNT_THRS	5
+static int primary_intensity = -1, secondary_intensity = -1;
 
 void primary_brakes(int intensity) {
 	if (intensity != primary_intensity) {
@@ -135,41 +173,7 @@ void in_idle(uint32_t flags) {
 		return;
 	}
 
-	/* Check battery voltage */
-	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER))
-		assert_fault("Low primary battery voltage\r\n");
-
-	/* Check battery current */
-	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER))
-		assert_fault("High primary battery current\r\n");
-
-	/* Check battery temperature */
-	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER))
-		assert_fault("High primary battery temperature\r\n");
-
-	/* Check braking pressure 1, upstream? */
-	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
-		assert_fault("Low braking pressure 1\r\n");
-
-	/* Check braking pressure 2, upstream? */
-	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
-		assert_fault("Low braking pressure 2\r\n");
-
-	/* Check braking pressure 3, downstream? */
-	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER))
-		assert_fault("High braking pressure 3\r\n");
-
-	/* Check accelerometer */
-	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE))
-		assert_fault("Accelerating\r\n");
-
-	/* Check velocity */
-	if (CHECK_THRESHOLD(GET_VEL, 0, 0))
-		assert_fault("Velocity not zero\r\n");
-
-	/* Check position */
-	if (CHECK_THRESHOLD(GET_POS, 0, 0))
-		assert_fault("Position not zero\r\n");
+	verify_DAQ();
 
 }
 
@@ -192,6 +196,11 @@ void in_ready(uint32_t flags) {
 	print_time();
 	printf("%s\r\n", __func__);
 #endif
+
+	/* Push phase condition */
+	if (0)
+		change_state(PUSHING);
+
 }
 
 void from_ready(STATE_NAME to, uint32_t flags) {
@@ -213,6 +222,10 @@ void in_pushing(uint32_t flags) {
 	print_time();
 	printf("%s\r\n", __func__);
 #endif
+
+	/* Coast phase condition */
+	if (0)
+		change_state(PUSHING);
 }
 
 void from_pushing(STATE_NAME to, uint32_t flags) {
@@ -235,6 +248,10 @@ void in_coast(uint32_t flags) {
 	print_time();
 	printf("%s\r\n", __func__);
 #endif
+
+	/* Braking phase condition */
+	if (0)
+		change_state(BRAKING);
 }
 
 void from_coast(STATE_NAME to, uint32_t flags) {
