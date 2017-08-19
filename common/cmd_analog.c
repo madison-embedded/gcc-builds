@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "cli.h"
 #include "adc.h"
 #include "gpio.h"
 #include "gpio_alias.h"
+#include "config.h"
+
+uint16_t get_performanceITI(uint16_t(*func)(ADC_TypeDef *, uint8_t), ADC_TypeDef * adc, uint8_t pin);
 
 command_status do_ar(int argc, char *argv[]) {
 	char portTemp;
@@ -27,7 +31,12 @@ command_status do_ar(int argc, char *argv[]) {
 	if (hasGpioAlias(&port, &pin, argv[1])){
 		for (i = 0; i < NUM_ADC; i++){
 			if (ADC_LUT[i].port == port && ADC_LUT[i].pin == pin){
+				if (argc>2) {
+				if (strcmp(argv[2], "perf") == 0)
+					get_performanceITI(analogRead, ADC_LUT[i].adc, ADC_LUT[i].channel);
+				}
 				printf("Result: %d\r\n", analogRead(ADC_LUT[i].adc, ADC_LUT[i].channel));
+				
 				return SUCCESS;
 			}
 		}
@@ -38,6 +47,8 @@ command_status do_ar(int argc, char *argv[]) {
 
 	for (i = 0; i < NUM_ADC; i++){
 		if (ADC_LUT[i].port == port && ADC_LUT[i].pin == pin){
+			if (strcmp(argv[1], "perf") == 0)
+				get_performanceITI(analogRead, ADC_LUT[i].adc, ADC_LUT[i].channel);
 			printf("Result: %d\r\n", analogRead(ADC_LUT[i].adc, ADC_LUT[i].channel));
 			return SUCCESS;
 		}

@@ -44,5 +44,3 @@ LOCAL int badRetro(void){
 
 	return 1;
 }
-
-

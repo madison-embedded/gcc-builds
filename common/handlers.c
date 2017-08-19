@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "timer.h"
 #include "config.h"
+#include "proc/defs.h"
 
 /* can be used to roughly keep track of time, implement timeouts and blocking delays */
 /* this 32-bit count overflows after 49.7 days */
@@ -128,6 +129,24 @@ int get_performanceIV(int (*func)(void)) {
 	before = SysTick->VAL;
 	__disable_irq();
 	retval = func();
+	__enable_irq();
+	after = SysTick->VAL;
+	after_tick = ticks;
+
+	print_elapsed_time(before, after, before_tick, after_tick);
+
+	return retval;
+}
+
+uint16_t get_performanceITI(uint16_t(*func)(ADC_TypeDef *, uint8_t), ADC_TypeDef * adc, uint8_t pin) {
+
+	uint64_t before, after, before_tick, after_tick;
+	uint16_t retval;
+
+	before_tick = ticks;
+	before = SysTick->VAL;
+	__disable_irq();
+	retval = func(adc, pin);
 	__enable_irq();
 	after = SysTick->VAL;
 	after_tick = ticks;
