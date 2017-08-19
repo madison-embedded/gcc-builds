@@ -1,26 +1,26 @@
 #include "exti.h"
+#include "retro.h"
 
-#define FRONT 	interline[9];
-#define MIDDLE 	interline[11];
-#define REAR	interline[13];
 
 extern timeStamp * interLine;
 
 timeStamp mainRetro;
 volatile unsigned int *main_count = NULL;
 
-void retroInit(){
+void retroInit(void) {
 	mainRetro = FRONT;
 }
 
 int getVelcity(void) {
 	int vel, time;
-	time = interLine[0].curr - interLine[0].prev;
+	time = mainRetro.curr - mainRetro.prev;
 
 	/* feet per milisecond */
-	vel= 100/time; 
+	vel= 100/time;
 
-	
+	vel = vel * 
+
+		
 	return vel;
 
 }
