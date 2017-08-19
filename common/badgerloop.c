@@ -47,8 +47,22 @@ uint16_t *p_amb = (uint16_t *) &telemetry_buffer[34],
 
 /* Limit Swtich States */
 uint8_t *lim_states = &telemetry_buffer[46];
+
+/* Stopping distance */
+int *stopping_distance = (int *) &telemetry_buffer[47];
 /*****************************************************************************/
 /*****************************************************************************/
+
+int calculate_stopping_distance(int velocity, int target_decel) {
+
+	/* must be moving forward, want to move backward */
+	if (velocity <= 0 || target_decel >= 0)
+		return -1;
+
+	velocity *= velocity;
+	return velocity / target_decel;
+
+}
 
 void badgerloop_update_data(void) {
 
@@ -111,6 +125,8 @@ void badgerloop_update_data(void) {
 	else CLR_DLIM;
 	/*************************************************************************/
 	/*************************************************************************/
+
+	SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
 }
 
 /* Networking */

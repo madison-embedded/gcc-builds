@@ -7,7 +7,7 @@
 
 const unsigned int state_intervals[] = {
 	2500,	/* FAULT		*/
-	2500,	/* IDLE			*/
+	100,	/* IDLE			*/
 	2500,	/* READY		*/
 	2500,	/* PUSHING		*/
 	2500,	/* COAST		*/
@@ -24,25 +24,25 @@ void assert_fault(const char *message) {
 	fault_message = message;
 }
 
+static int primary_intensity = -1, secondary_intensity = -1;
+
 /*****************************************************************************/
 /*                            Actuation Functions                            */
 /*****************************************************************************/
 #define BRAKING_COUNT_THRS	5
 
 void primary_brakes(int intensity) {
-	static int curr_intensity = -1;
-	if (intensity != curr_intensity) {
+	if (intensity != primary_intensity) {
 		// Do actuation
 	}
-	curr_intensity = intensity;
+	primary_intensity = intensity;
 }
 
 void secondary_brakes(int intensity) {
-	static int curr_intensity = -1;
-	if (intensity != curr_intensity) {
+	if (intensity != secondary_intensity) {
 		// Do actuation
 	}
-	curr_intensity = intensity;
+	secondary_intensity = intensity;
 }
 
 void vent_primary_brakes(bool open) {
@@ -112,25 +112,47 @@ void in_idle(uint32_t flags) {
 		flags &= POWER_ON;
 	}
 
+	if (flags & RUN_OVER) {
+		// TODO: check a different set of conditions?
+		return;
+	}
+
 	/* Check battery voltage */
-	if (0)
+	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER))
 		assert_fault("Low primary battery voltage\r\n");
 
 	/* Check battery current */
-	if (0)
+	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER))
 		assert_fault("High primary battery current\r\n");
 
 	/* Check battery temperature */
-	if (0)
+	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER))
 		assert_fault("High primary battery temperature\r\n");
 
-	/* Check braking pressure 1 */
-	if (0)
+	/* Check braking pressure 1, upstream? */
+	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
 		assert_fault("Low braking pressure 1\r\n");
 
-	/* Check braking pressure 2 */
-	if (0)
+	/* Check braking pressure 2, upstream? */
+	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
 		assert_fault("Low braking pressure 2\r\n");
+
+	/* Check braking pressure 3, downstream? */
+	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER))
+		assert_fault("High braking pressure 3\r\n");
+
+	/* Check accelerometer */
+	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE))
+		assert_fault("Accelerating\r\n");
+
+	/* Check current velocity */
+	if (CHECK_THRESHOLD(GET_VEL, 0, 0))
+		assert_fault("Velocity not zero\r\n");
+
+	/* Check current position */
+	if (CHECK_THRESHOLD(GET_POS, 0, 0))
+		assert_fault("Position not zero\r\n");
+
 }
 
 void from_idle(STATE_NAME to, uint32_t flags) {
@@ -215,31 +237,31 @@ void to_braking(STATE_NAME from, uint32_t flags) {
 
 void in_braking(uint32_t flags) {
 
-	static int primary_low_count = 0, secondary_low_count = 0;
+	static int primary_low_count = 0;
 
 #if DEBUG
 	print_time();
 	printf("%s\r\n", __func__);
 #endif
 
-	/* Check downstream primary is low, limit switches */
-	if (0 && ++primary_low_count > BRAKING_COUNT_THRS)
+	/* Check downstream primary is low, limit switches, target accel */
+	if (((CHECK_THRESHOLD(GET_BRP3, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)
+		&& (!GET_BLIM1 || !GET_BLIM2)) ||
+		CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_BRAKING, ACCEL_LOWER_BRAKING))
+		&& ++primary_low_count > BRAKING_COUNT_THRS)
 		secondary_brakes(100);
 
-
-	/* Check braking pressure 2 */
-	if (0 && ++secondary_low_count > BRAKING_COUNT_THRS)
-		assert_fault("CAN'T BRAKE");
-
 	/* vary braking intensity? */
+
+	/* if secondary on & braking fast, turn off? */
 
 }
 
 void from_braking(STATE_NAME to, uint32_t flags) {
 	printf("executing %s to %s\r\n", __func__, state_strings[to]);
 	if (to != FAULT) {
-		disengage_primary_brakes();
-		disengage_secondary_brakes();
+		primary_brakes(0);
+		secondary_brakes(0);
 	}
 }
 /*****************************************************************************/
