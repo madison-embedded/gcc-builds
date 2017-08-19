@@ -127,6 +127,9 @@ void badgerloop_update_data(void) {
 	/*************************************************************************/
 
 	SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
+
+	if (CHECK_THRESHOLD(GET_POS, TARGET_END_POS, -1))
+		state_handle.flags |= RUN_OVER;
 }
 
 /* Networking */
@@ -323,6 +326,8 @@ void application_handler(void) {
 			state_handle.next_state = FAULT;
 			fault_message = "No network link!";
 			state_handle.change_state = true;
+			if (state_handle.flags & POWER_ON)
+				state_handle.flags |= RETRY_INIT;
 		}
 	}
 

@@ -24,6 +24,10 @@ void assert_fault(const char *message) {
 	fault_message = message;
 }
 
+void clear_flag(uint32_t flags) {
+	state_handle.flags &= flags;
+}
+
 static int primary_intensity = -1, secondary_intensity = -1;
 
 /*****************************************************************************/
@@ -61,7 +65,7 @@ void disengage_thrusters(void) {
 
 }
 
-void vent_thrusters(void) {
+void vent_thrusters(bool open) {
 
 }
 /*****************************************************************************/
@@ -80,6 +84,14 @@ void in_fault(uint32_t flags) {
 	print_time();
 	printf("curr fault: %s\r\n", fault_message);
 #endif
+	// TODO: determine if fault == run_over
+	//       if so, set RUN_OVER flag and go to
+	//       idle so we can vent everything
+
+	if (flags & RETRY_INIT) {
+		change_state(IDLE);
+		clear_flag(RETRY_INIT);
+	}
 }
 void from_fault(STATE_NAME to, uint32_t flags) {
 	printf("executing %s to %s\r\n", __func__, state_strings[to]);
@@ -109,11 +121,17 @@ void in_idle(uint32_t flags) {
 		disengage_thrusters();
 		vent_primary_brakes(false);
 		vent_secondary_brakes(false);
-		flags &= POWER_ON;
+		vent_thrusters(false);
+		clear_flag(POWER_ON);
 	}
 
+	/* Run over */
 	if (flags & RUN_OVER) {
 		// TODO: check a different set of conditions?
+		vent_thrusters(true);
+		vent_primary_brakes(true);
+		vent_secondary_brakes(true);
+		printf("Run over!\r\n");
 		return;
 	}
 
@@ -145,11 +163,11 @@ void in_idle(uint32_t flags) {
 	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE))
 		assert_fault("Accelerating\r\n");
 
-	/* Check current velocity */
+	/* Check velocity */
 	if (CHECK_THRESHOLD(GET_VEL, 0, 0))
 		assert_fault("Velocity not zero\r\n");
 
-	/* Check current position */
+	/* Check position */
 	if (CHECK_THRESHOLD(GET_POS, 0, 0))
 		assert_fault("Position not zero\r\n");
 

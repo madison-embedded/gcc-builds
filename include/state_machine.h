@@ -16,6 +16,7 @@ typedef struct state {
 	volatile uint32_t flags;
 #define POWER_ON	0x00000001
 #define RUN_OVER	0x80000000
+#define RETRY_INIT	0x00000002
 	state_transition_t * const *to_state_table;
 	state_handler_t * const *in_state_table;
 	state_transition_t * const *from_state_table;
