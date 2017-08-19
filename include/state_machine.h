@@ -14,6 +14,9 @@ typedef struct state {
 	STATE_NAME next_state;
 	volatile bool change_state;
 	volatile uint32_t flags;
+#define POWER_ON	0x00000001
+#define RUN_OVER	0x80000000
+#define RETRY_INIT	0x00000002
 	state_transition_t * const *to_state_table;
 	state_handler_t * const *in_state_table;
 	state_transition_t * const *from_state_table;
@@ -45,6 +48,7 @@ void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							unsigned int *timestamp_table,
 							const unsigned int *interval_table);
 void state_machine_handler(state_t *handle);
+int check_interval(STATE_NAME state);
 
 #endif
 

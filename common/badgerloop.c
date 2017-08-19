@@ -50,44 +50,46 @@ uint16_t *p_amb = (uint16_t *) &telemetry_buffer[34],
 
 /* Limit Swtich States */
 uint8_t *lim_states = &telemetry_buffer[46];
+
+/* Stopping distance */
+int *stopping_distance = (int *) &telemetry_buffer[47];
 /*****************************************************************************/
 /*****************************************************************************/
+
+int calculate_stopping_distance(int velocity, int target_decel) {
+
+	/* must be moving forward, want to move backward */
+	if (velocity <= 0 || target_decel >= 0)
+		return -1;
+
+	velocity *= velocity;
+	return velocity / target_decel;
+
+}
 
 void badgerloop_update_data(void) {
 
 	SET_STATUS(state_handle.curr_state);
 
 	/* combination of strips and accelerometer */
-
-/*	SET_ACCEL(readAccelXData());*/
-	SET_ACCEL(1);
-	SET_VEL(-1);
-	SET_POS(-4);
+	SET_ACCEL(0);
+	SET_VEL(0);
+	SET_POS(0);
 
 	/* I2C temp/pressure sensor */
-	SET_PAMP(2);
-/*	SET_PAMP(HPGetPressure());*/
-	SET_TPOD(1);
-/*	SET_TPOD(HPGetTemp());*/
+	SET_PAMP(15);
+	SET_TPOD(250);
 
 	/* analog voltages */
-	SET_VBATT(1);	/* C3:   Analog5 - Primary Battery Voltage */
-	SET_IBATT(1);	/* A3:   Analog1 - Primary Battery Current */
-	SET_TBATT(1);	/* A4:  Analog14 - Thermistor 1 */
-	SET_PRP1(1);	/* C0:   Analog3 - Pressure 1 (CN5) */
-	SET_PRP2(1);	/* C2:   Analog4 - Pressure 2 (CN5) */
-	SET_BRP1(1);	/* F3:   Analog6 - Pressure 3 (CN5) */
-	SET_BRP2(1);	/* F4:   Analog7 - Pressure 4 (CN5) */
-	SET_BRP3(1);	/* F5:   Analog8 - Pressure 1 (CN6) */
+	SET_VBATT(13000);	/* C3:   Analog5 - Primary Battery Voltage */
+	SET_IBATT(10000);	/* A3:   Analog1 - Primary Battery Current */
+	SET_TBATT(250);	/* A4:  Analog14 - Thermistor 1 */
+	SET_PRP1(3300);	/* C0:   Analog3 - Pressure 1 (CN5) */
+	SET_PRP2(3300);	/* C2:   Analog4 - Pressure 2 (CN5) */
+	SET_BRP1(275);	/* F3:   Analog6 - Pressure 3 (CN5) */
+	SET_BRP2(275);	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP3(15);	/* F5:   Analog8 - Pressure 1 (CN6) */
 
-/*	SET_VBATT(analogRead(ADC3, 13));*/
-/*	SET_IBATT(analogRead(ADC3, 3));*/
-/*	SET_TBATT(analogRead(ADC1, 4));*/
-/*	SET_PRP1(analogRead(ADC3, 10));*/
-/*	SET_PRP2(analogRead(ADC3, 12));*/
-/*	SET_BRP1(analogRead(ADC3, 9));*/
-/*	SET_BRP2(analogRead(ADC3, 14));*/
-/*	SET_BRP3(analogRead(ADC3, 15));*/
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */
 
@@ -100,7 +102,7 @@ void badgerloop_update_data(void) {
 	/* F8:  Analog12 - Thermistor 4 */
 
 	/* strip count */
-	SET_SCOUNT(4);
+	SET_SCOUNT(0);
 
 	/*************************************************************************/
 	/*                            digital I/O                                */
@@ -126,6 +128,15 @@ void badgerloop_update_data(void) {
 	else CLR_DLIM;
 	/*************************************************************************/
 	/*************************************************************************/
+
+	/* When not braking, accel is a "guess", when braking accel is literal */
+	if (state_handle.curr_state == BRAKING)
+		SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
+	else /* todo, can we trust the accelerometer 100% of the time? */
+		SET_STOPD(calculate_stopping_distance(GET_VEL, GET_ACCEL));
+
+	if (CHECK_THRESHOLD(GET_POS, TARGET_END_POS, -1))
+		state_handle.flags |= RUN_OVER;
 }
 
 /* Networking */
@@ -136,7 +147,7 @@ struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 /* Globals */
 uint32_t last_telem_timestamp, last_daq_timestamp;
 state_t state_handle;
-char *fault_message = "INITIAL_VAL";
+const char *fault_message = "INITIAL_VAL";
 static err_t lwip_error = ERR_OK;
 static uint8_t badgerloop_flags = 0;
 
@@ -312,7 +323,7 @@ void application_handler(void) {
 	if (!(ticks % TELEM_INT) && last_telem_timestamp != ticks) {
 		last_telem_timestamp = ticks;
 		if (gnetif.flags & NETIF_FLAG_LINK_UP) {
-			if (!send_telemetry_to_SpaceX() || !send_telemetry_to_Dashboard()) {
+			if (send_telemetry_to_SpaceX() || send_telemetry_to_Dashboard()) {
 				state_handle.next_state = FAULT;
 				fault_message = "Sending telemetry failed!";
 				state_handle.change_state = true;
@@ -322,6 +333,8 @@ void application_handler(void) {
 			state_handle.next_state = FAULT;
 			fault_message = "No network link!";
 			state_handle.change_state = true;
+			if (state_handle.flags & POWER_ON)
+				state_handle.flags |= RETRY_INIT;
 		}
 	}
 

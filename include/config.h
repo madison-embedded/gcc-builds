@@ -42,6 +42,7 @@ extern const uint8_t AHBPrescTable[16];
 extern const uint8_t APBPrescTable[8];
 #define BOARD "STM32 Nucleo144 F767ZI"
 #define PROCESSOR "STM32F767ZI"
+void print_time(void);
 void get_performanceVV(void (*func)(void));
 int get_performanceIV(int (*func)(void));
 int eth_check_link(void);
