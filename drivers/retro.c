@@ -1,26 +1,10 @@
 #include "retro.h"
 
-
-extern timeStamp * interLine;
-
-timeStamp mainRetro;
-volatile unsigned int *main_count = NULL;
-
 void retroInit(void) {
 	mainRetro = FRONT;
 }
 
-int getVelcity(void) {
-	int vel, time;
-	time = mainRetro.curr - mainRetro.prev;
-
-	/* feet per milisecond */
-	vel= 100/time;
-
-	return vel;
-}
-
-int badRetro(void){
+void badRetro(void){
 
 	if (&mainRetro.count == &FRONT.count) {
 		if (FRONT.count != MIDDLE.count && MIDDLE.count == REAR.count && MIDDLE.count > FRONT.count)
@@ -37,5 +21,17 @@ int badRetro(void){
 			mainRetro = MIDDLE;
 	}
 
-	return 1;
 }
+
+int getVelocity(void) {
+	int velocity;
+
+	badRetro();
+	
+	velocity = 100.0/MAIN_INTERVAL; /*feet/ms*/
+	velocity = velocity * 30 + velocity / 2.0; /*cm/ms*/
+	velocity = velocity/1000.0; /*cm/s*/
+
+	return velocity;
+}
+

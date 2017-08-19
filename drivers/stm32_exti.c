@@ -55,7 +55,7 @@ void exti_disable(GPIO_TypeDef * port, uint32_t pin) {
 	}
 /*gets number of interrupts from given pin*/
 void getTimeStamps(int pin){
-		printf("pin %d has prev %x curr %x \r\n", pin, interLine[pin].prev, interLine[pin].curr);
+		printf("pin %d has prev 0x%x curr 0x%x \r\n", pin, interLine[pin].prev, interLine[pin].curr);
 }
 
 /*need to get time stamps*/

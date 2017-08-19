@@ -36,7 +36,7 @@ command_status do_i2c(int argc, char *argv[]) {
 	/* one argument checks what devices are attached */
 	if (argc == 1) {
 		for (address = 0; address < 128; address++){
-			printf("%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000)));
+			printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000)));
 		}
 		return SUCCESS;
 	}
@@ -56,7 +56,7 @@ command_status do_i2c(int argc, char *argv[]) {
 	 	pData= strtoul(argv[4], NULL, 16);
 	 	
 	 	if (HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000) != HAL_OK){
-	 		printf("%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
+	 		printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
 	 		return USAGE;
 	 	}
 	 	printf("%s\r\n",getStatus(HAL_I2C_Mem_Write(&hi2c, address<<1, MemAdd, 1, &pData, 1, 500)));
@@ -69,7 +69,7 @@ command_status do_i2c(int argc, char *argv[]) {
 			printf("%s\r\n", getStatus(HAL_I2C_Master_Receive(&hi2c, address<<1, pBuffer , numBytes, 500)));
 			
 			for (i = 0; i < numBytes; i ++)
-				printf("%x\r\n", (pBuffer[i]));
+				printf("0x%x\r\n", (pBuffer[i]));
 		
 		
 		return SUCCESS;	
@@ -78,7 +78,7 @@ command_status do_i2c(int argc, char *argv[]) {
 		else{
 	
 		if (HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000) != HAL_OK){
-			printf("%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
+			printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
 			return USAGE;
 		}
 
