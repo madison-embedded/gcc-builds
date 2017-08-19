@@ -4,8 +4,6 @@
 #include "config.h"
 #include <stdio.h>
 
-#define DEBUG	0
-
 const unsigned int state_intervals[] = {
 	2500,	/* FAULT		*/
 	100,	/* IDLE			*/
@@ -115,7 +113,6 @@ void vent_thrusters(bool open) {
 /*                              Fault Handlers                               */
 /*****************************************************************************/
 void to_fault(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
 
 	/* Lord have mercy */
 	if (from == BRAKING)
@@ -123,21 +120,22 @@ void to_fault(STATE_NAME from, uint32_t flags) {
 }
 
 void in_fault(uint32_t flags) {
-#if DEBUG
-	print_time();
-	printf("curr fault: %s\r\n", fault_message);
-#endif
-	// TODO: determine if fault == run_over
-	//       if so, set RUN_OVER flag and go to
-	//       idle so we can vent everything
+
+	// TODO: determine if fault means the run is
+	//       over if so, set RUN_OVER flag and
+	//       go to idle so we can vent everything
 
 	if ((flags & RETRY_INIT) && gnetif.flags & NETIF_FLAG_LINK_UP) {
 		change_state(IDLE);
 		clear_flag(RETRY_INIT);
 	}
+
+	if (flags & RUN_OVER)
+		change_state(IDLE);
 }
+
 void from_fault(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -147,15 +145,10 @@ void from_fault(STATE_NAME to, uint32_t flags) {
 /*                                 Idle Handlers                             */
 /*****************************************************************************/
 void to_idle(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
 }
 
 void in_idle(uint32_t flags) {
-
-#if DEBUG
-	print_time();
-	printf("%s\r\n", __func__);
-#endif
 
 	/* Initial state */
 	if (flags & POWER_ON) {
@@ -183,7 +176,7 @@ void in_idle(uint32_t flags) {
 }
 
 void from_idle(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -193,14 +186,10 @@ void from_idle(STATE_NAME to, uint32_t flags) {
 /*                             Ready Handlers                                */
 /*****************************************************************************/
 void to_ready(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
 }
 
 void in_ready(uint32_t flags) {
-#if DEBUG
-	print_time();
-	printf("%s\r\n", __func__);
-#endif
 
 	/* Push phase condition */
 	if (0)
@@ -209,7 +198,7 @@ void in_ready(uint32_t flags) {
 }
 
 void from_ready(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -219,14 +208,10 @@ void from_ready(STATE_NAME to, uint32_t flags) {
 /*                               Pushing Handlers                            */
 /*****************************************************************************/
 void to_pushing(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
 }
 
 void in_pushing(uint32_t flags) {
-#if DEBUG
-	print_time();
-	printf("%s\r\n", __func__);
-#endif
 
 	/* Coast phase condition */
 	if (0)
@@ -234,7 +219,7 @@ void in_pushing(uint32_t flags) {
 }
 
 void from_pushing(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -244,15 +229,12 @@ void from_pushing(STATE_NAME to, uint32_t flags) {
 /*                                 Coast Handlers                            */
 /*****************************************************************************/
 void to_coast(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
 	engage_thrusters();
+
 }
 
 void in_coast(uint32_t flags) {
-#if DEBUG
-	print_time();
-	printf("%s\r\n", __func__);
-#endif
 
 	/* Braking phase condition */
 	if (0)
@@ -260,8 +242,9 @@ void in_coast(uint32_t flags) {
 }
 
 void from_coast(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 	disengage_thrusters();
+
 }
 /*****************************************************************************/
 /*****************************************************************************/
@@ -271,18 +254,14 @@ void from_coast(STATE_NAME to, uint32_t flags) {
 /*                               Braking Handlers                            */
 /*****************************************************************************/
 void to_braking(STATE_NAME from, uint32_t flags) {
-	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
 	primary_brakes(100);
+
 }
 
 void in_braking(uint32_t flags) {
 
 	static int primary_low_count = 0;
-
-#if DEBUG
-	print_time();
-	printf("%s\r\n", __func__);
-#endif
 
 	/* Check downstream primary is low, limit switches, target accel */
 	if (((CHECK_THRESHOLD(GET_BRP3, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)
@@ -298,11 +277,12 @@ void in_braking(uint32_t flags) {
 }
 
 void from_braking(STATE_NAME to, uint32_t flags) {
-	printf("executing %s to %s\r\n", __func__, state_strings[to]);
+
 	if (to != FAULT) {
 		primary_brakes(0);
 		secondary_brakes(0);
 	}
+
 }
 /*****************************************************************************/
 /*****************************************************************************/

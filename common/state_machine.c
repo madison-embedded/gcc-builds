@@ -1,6 +1,8 @@
 #include "state_machine.h"
 #include "config.h"
 
+#define DEBUG	0
+
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
 							state_handler_t * const *in_states,
@@ -30,8 +32,13 @@ void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 void state_machine_handler(state_t *handle) {
 
 	/* Enter state handler */
-	if(check_interval(handle->curr_state))
+	if(check_interval(handle->curr_state)) {
+#if DEBUG
+		print_time();
+		printf("%s\r\n", state_strings[handle->curr_state]);
+#endif
 		handle->in_state_table[handle->curr_state](handle->flags);
+	}
 
 	/* Check if we are transitioning */
 	if (handle->change_state) {
@@ -41,6 +48,12 @@ void state_machine_handler(state_t *handle) {
 		/* see if any action is necessary */
 		if (handle->curr_state == handle->next_state)
 			return;
+
+#if DEBUG
+		printf("%s -> %s\r\n",
+			state_strings[handle->next_state],
+			state_strings[handle->curr_state]);
+#endif
 
 		/* call state exit function */
 		handle->from_state_table[handle->curr_state](handle->next_state, handle->flags);
