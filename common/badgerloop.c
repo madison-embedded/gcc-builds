@@ -69,23 +69,23 @@ void badgerloop_update_data(void) {
 	SET_STATUS(state_handle.curr_state);
 
 	/* combination of strips and accelerometer */
-	SET_ACCEL(1);
-	SET_VEL(-1);
-	SET_POS(-4);
+	SET_ACCEL(0);
+	SET_VEL(0);
+	SET_POS(0);
 
 	/* I2C temp/pressure sensor */
-	SET_PAMP(1);
-	SET_TPOD(-2);
+	SET_PAMP(15);
+	SET_TPOD(250);
 
 	/* analog voltages */
-	SET_VBATT(-3);	/* C3:   Analog5 - Primary Battery Voltage */
-	SET_IBATT(2);	/* A3:   Analog1 - Primary Battery Current */
-	SET_TBATT(-5);	/* A4:  Analog14 - Thermistor 1 */
-	SET_PRP1(-1);	/* C0:   Analog3 - Pressure 1 (CN5) */
-	SET_PRP2(1);	/* C2:   Analog4 - Pressure 2 (CN5) */
-	SET_BRP1(-1);	/* F3:   Analog6 - Pressure 3 (CN5) */
-	SET_BRP2(1);	/* F4:   Analog7 - Pressure 4 (CN5) */
-	SET_BRP3(-1);	/* F5:   Analog8 - Pressure 1 (CN6) */
+	SET_VBATT(13000);	/* C3:   Analog5 - Primary Battery Voltage */
+	SET_IBATT(10000);	/* A3:   Analog1 - Primary Battery Current */
+	SET_TBATT(250);	/* A4:  Analog14 - Thermistor 1 */
+	SET_PRP1(3300);	/* C0:   Analog3 - Pressure 1 (CN5) */
+	SET_PRP2(3300);	/* C2:   Analog4 - Pressure 2 (CN5) */
+	SET_BRP1(275);	/* F3:   Analog6 - Pressure 3 (CN5) */
+	SET_BRP2(275);	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP3(15);	/* F5:   Analog8 - Pressure 1 (CN6) */
 
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */
@@ -99,7 +99,7 @@ void badgerloop_update_data(void) {
 	/* F8:  Analog12 - Thermistor 4 */
 
 	/* strip count */
-	SET_SCOUNT(4);
+	SET_SCOUNT(0);
 
 	/*************************************************************************/
 	/*                            digital I/O                                */

@@ -37,8 +37,8 @@
 #define TBATT_UPPER			400		/* 1/10 deg C	*/
 #define TBATT_LOWER			150		/* 1/10 deg C	*/
 
-#define BRAKING_ON_P_UPPER	250		/* PSI			*/
-#define BRAKING_ON_P_LOWER	300		/* PSI			*/
+#define BRAKING_ON_P_UPPER	300		/* PSI			*/
+#define BRAKING_ON_P_LOWER	250		/* PSI			*/
 #define BRAKING_OFF_P_UPPER	16		/* PSI			*/
 #define BRAKING_OFF_P_LOWER	0		/* PSI			*/
 #define PROP_P_UPPER		4000	/* PSI			*/
@@ -72,21 +72,21 @@ extern uint8_t *status;
 
 extern int *acceleration, *velocity, *position;
 #define SET_ACCEL(val)	*acceleration = htonl(val)
-#define GET_ACCEL		ntohl(*acceleration)
+#define GET_ACCEL		((int) ntohl(*acceleration))
 #define SET_VEL(val)	*velocity = htonl(val)
-#define GET_VEL			ntohl(*velocity)
+#define GET_VEL			((int) ntohl(*velocity))
 #define SET_POS(val)	*position = htonl(val)
-#define GET_POS			ntohl(*position)
+#define GET_POS			((int) ntohl(*position))
 extern int *v_batt, *i_batt;
 #define SET_VBATT(val)	*v_batt = htonl(val)
-#define GET_VBATT		ntohl(*v_batt)
+#define GET_VBATT		((int) ntohl(*v_batt))
 #define SET_IBATT(val)	*i_batt = htonl(val)
-#define GET_IBATT		ntohl(*i_batt)
+#define GET_IBATT		((int) ntohl(*i_batt))
 extern int *t_batt, *t_pod;
 #define SET_TBATT(val)	*t_batt = htonl(val)
-#define GET_TBATT		ntohl(*t_batt)
+#define GET_TBATT		((int) ntohl(*t_batt))
 #define SET_TPOD(val)	*t_pod = htonl(val)
-#define GET_TPOD		ntohl(*t_pod)
+#define GET_TPOD		((int) ntohl(*t_pod))
 extern uint32_t *s_count;
 #define SET_SCOUNT(val)	*s_count = htonl(val)
 #define GET_SCOUNT		ntohl(*s_count)
@@ -130,7 +130,7 @@ extern uint8_t *lim_states;
 
 extern int *stopping_distance;
 #define SET_STOPD(val)	*stopping_distance = htonl(val)
-#define GET_STOPD		ntohl(*stopping_distance)
+#define GET_STOPD		((int) ntohl(*stopping_distance))
 
 /* Exposed functions */
 int badgerloop_init(void);

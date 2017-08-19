@@ -1,9 +1,10 @@
 #include "badgerloop.h"
 #include "state_machine.h"
+#include "ethernetif.h"
 #include "config.h"
 #include <stdio.h>
 
-#define DEBUG	1
+#define DEBUG	0
 
 const unsigned int state_intervals[] = {
 	2500,	/* FAULT		*/
@@ -46,7 +47,7 @@ void verify_DAQ(void) {
 		assert_fault("Low braking pressure 1\r\n");
 
 	/* Check braking pressure 2, upstream? */
-	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
+	if (CHECK_THRESHOLD(GET_BRP2, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
 		assert_fault("Low braking pressure 2\r\n");
 
 	/* Check braking pressure 3, downstream? */
@@ -130,7 +131,7 @@ void in_fault(uint32_t flags) {
 	//       if so, set RUN_OVER flag and go to
 	//       idle so we can vent everything
 
-	if (flags & RETRY_INIT) {
+	if ((flags & RETRY_INIT) && gnetif.flags & NETIF_FLAG_LINK_UP) {
 		change_state(IDLE);
 		clear_flag(RETRY_INIT);
 	}
