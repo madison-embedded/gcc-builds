@@ -30,27 +30,27 @@
 /*****************************************************************************/
 /*                          Error checking parameters                        */
 /*****************************************************************************/
-#define VBATT_UPPER		14500	/* mV			*/
-#define VBATT_LOWER		12500	/* mV			*/
-#define IBATT_UPPER		12000	/* mA			*/
-#define IBATT_LOWER		4000	/* mA			*/
-#define TBATT_UPPER		400		/* 1/10 deg C	*/
-#define TBATT_LOWER		150		/* 1/10 deg C	*/
+#define VBATT_UPPER			14500	/* mV			*/
+#define VBATT_LOWER			12500	/* mV			*/
+#define IBATT_UPPER			12000	/* mA			*/
+#define IBATT_LOWER			4000	/* mA			*/
+#define TBATT_UPPER			400		/* 1/10 deg C	*/
+#define TBATT_LOWER			150		/* 1/10 deg C	*/
 
 #define BRAKING_ON_P_UPPER	250		/* PSI			*/
 #define BRAKING_ON_P_LOWER	300		/* PSI			*/
 #define BRAKING_OFF_P_UPPER	16		/* PSI			*/
 #define BRAKING_OFF_P_LOWER	0		/* PSI			*/
-#define PROP_P_UPPER	4000	/* PSI			*/
-#define PROP_P_LOWER	2000	/* PSI			*/
+#define PROP_P_UPPER		4000	/* PSI			*/
+#define PROP_P_LOWER		2000	/* PSI			*/
 
 #define ACCEL_UPPER_IDLE	50		/* cm/s^2	*/
 #define ACCEL_LOWER_IDLE	-50		/* cm/s^2	*/
 #define ACCEL_LOWER_BRAKING	-1962	/* cm/s^2	*/
 #define ACCEL_UPPER_BRAKING	-491	/* cm/s^2	*/
 
-#define TARGET_DECEL	-981
-#define TARGET_END_POS 125000
+#define TARGET_DECEL		-981
+#define TARGET_END_POS		125000
 /*****************************************************************************/
 /*****************************************************************************/
 

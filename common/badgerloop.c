@@ -126,7 +126,11 @@ void badgerloop_update_data(void) {
 	/*************************************************************************/
 	/*************************************************************************/
 
-	SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
+	/* When not braking, accel is a "guess", when braking accel is literal */
+	if (state_handle.curr_state == BRAKING)
+		SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
+	else /* todo, can we trust the accelerometer 100% of the time? */
+		SET_STOPD(calculate_stopping_distance(GET_VEL, GET_ACCEL));
 
 	if (CHECK_THRESHOLD(GET_POS, TARGET_END_POS, -1))
 		state_handle.flags |= RUN_OVER;

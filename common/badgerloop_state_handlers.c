@@ -58,7 +58,7 @@ void verify_DAQ(void) {
 		assert_fault("Accelerating\r\n");
 
 	/* Check velocity */
-	if (CHECK_THRESHOLD(GET_VEL, 0, 0))
+	if (CHECK_THRESHOLD(GET_VEL, 5, -5))
 		assert_fault("Velocity not zero\r\n");
 
 	/* Check position */
@@ -115,6 +115,10 @@ void vent_thrusters(bool open) {
 /*****************************************************************************/
 void to_fault(STATE_NAME from, uint32_t flags) {
 	printf("executing %s from %s\r\n", __func__, state_strings[from]);
+
+	/* Lord have mercy */
+	if (from == BRAKING)
+		secondary_brakes(100);
 }
 
 void in_fault(uint32_t flags) {
