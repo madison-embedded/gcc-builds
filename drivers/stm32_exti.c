@@ -1,8 +1,6 @@
 #include "exti.h"
 
-#define NUMBER_INTERUPT_PINS 16
-#define AVERAGE_SIZE		 3
-timeStamp * interLine;
+timeStamp interLine[NUMBER_INTERUPT_PINS];
 
 /* gets interupt vecotor number for pin */
 static IRQn_Type exti_get_irq_num(uint32_t pin) {
@@ -21,12 +19,9 @@ static IRQn_Type exti_get_irq_num(uint32_t pin) {
 /*sets up an interrupt from a passed in port and pin */
 void exti_config(GPIO_TypeDef * port, uint32_t pin, bool rtsr, bool ftsr, bool ie) {
 	
-	interLine = malloc(sizeof(timeStamp)*NUMBER_INTERUPT_PINS); 
-	
 	interLine[pin].prev = 0;
 	interLine[pin].curr = 0;
 	interLine[pin].count = 0;
-	interLine[pin].filter = malloc(sizeof(int)*3);
 
 	gpio_setMode(port, pin, INPUT);
 	GPIOC->OSPEEDR |= (0x03<< (2 * pin));    // high speed

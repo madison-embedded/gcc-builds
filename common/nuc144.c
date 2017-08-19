@@ -80,12 +80,12 @@ void early_init(void) {
 	hi2c.Init.Timing = I2C_TIMING;
 	hi2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
 
-/*	__HAL_RCC_I2C2_CLK_ENABLE();*/
-/*	HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 1);*/
-/* 	HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);*/
-/*  HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 2);*/
-/*  HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);*/
-/*  HAL_I2C_Init(&hi2c);*/
+	__HAL_RCC_I2C2_CLK_ENABLE();
+	HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 1);
+	HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
+	HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 2);
+	HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
+	HAL_I2C_Init(&hi2c);
 
 	/* Networking */
 	lwip_init();
