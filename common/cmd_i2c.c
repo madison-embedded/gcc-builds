@@ -4,13 +4,6 @@
 #include "hal/hal_conf.h"
 #include "hal/stm32f7xx_hal_i2c.h"
 #include "cli.h"
-#define OUTPUTMAX			14746
-#define OUTPUTMIN			1638
-#define PRESSUREMAX			23.206
-#define PRESSUREMIN			0
-double temp = 0.0;
-double pressure, presstemp = 0.0;
-uint16_t tempReading, pressureReading;
 
 extern I2C_HandleTypeDef hi2c;
 
@@ -38,6 +31,7 @@ command_status do_i2c(int argc, char *argv[]) {
 	uint8_t* pBuffer = NULL;
 	uint16_t MemAdd;
 	uint8_t numBytes;
+	int i;
 
 	/* one argument checks what devices are attached */
 	if (argc == 1) {
@@ -74,20 +68,10 @@ command_status do_i2c(int argc, char *argv[]) {
 			
 			printf("%s\r\n", getStatus(HAL_I2C_Master_Receive(&hi2c, address<<1, pBuffer , numBytes, 500)));
 			
-			printf("%x\r\n", (pBuffer[0]));
-			printf("%x\r\n", (pBuffer[1]));
-			printf("%x\r\n", (pBuffer[2]));
-			printf("%x\r\n", (pBuffer[3]));
+			for (i = 0; i < numBytes; i ++)
+				printf("%x\r\n", (pBuffer[i]));
 		
-			pressureReading = (((pBuffer[0] & 0x3f) <<8) | pBuffer[1]);
-			printf ("pressureReading is %d\r\n", pressureReading);
-			tempReading = ((pBuffer[2] <<8) | pBuffer[3]) >>5;
-			temp = ((tempReading *200)/2047) -50;
-			presstemp = (pressureReading-OUTPUTMIN)*(PRESSUREMAX-PRESSUREMIN);
-			pressure  = (presstemp/(OUTPUTMAX-OUTPUTMIN)) + PRESSUREMIN;
 		
-			printf("Temperature is: %f Degress Celsius\r\n", temp);
-			printf("Pressure is: %f psi\r\n", pressure);
 		return SUCCESS;	
 
 		}

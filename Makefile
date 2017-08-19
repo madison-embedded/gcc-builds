@@ -71,6 +71,8 @@ OBJECTS += drivers/$(PROC_PREFIX)adc.o
 OBJECTS += drivers/$(PROC_PREFIX)exti.o
 OBJECTS += drivers/$(PROC_PREFIX)tim.o
 OBJECTS += drivers/mpu9250.c
+OBJECTS += drivers/retro.c
+OBJECTS += drivers/HWPressure.c
 
 # HAL Drivers
 OBJECTS += drivers/hal/stm32f7xx_hal.o

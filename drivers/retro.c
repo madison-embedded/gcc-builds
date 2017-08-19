@@ -1,4 +1,3 @@
-#include "exti.h"
 #include "retro.h"
 
 
@@ -18,20 +17,16 @@ int getVelcity(void) {
 	/* feet per milisecond */
 	vel= 100/time;
 
-	vel = vel * 
-
-		
 	return vel;
-
 }
 
-LOCAL int badRetro(void){
+int badRetro(void){
 
-	if (mainRetro.count == &FRONT.count) {
+	if (&mainRetro.count == &FRONT.count) {
 		if (FRONT.count != MIDDLE.count && MIDDLE.count == REAR.count && MIDDLE.count > FRONT.count)
 			mainRetro = MIDDLE;
 	}
-	else if (main.count == &MIDDLE.count) {
+	else if (&mainRetro.count == &MIDDLE.count) {
 		if (MIDDLE.count < REAR.count)
 			mainRetro = REAR;
 	}
