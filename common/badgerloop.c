@@ -67,6 +67,19 @@ int calculate_stopping_distance(int velocity, int target_decel) {
 
 }
 
+void battery_voltage(void) {
+	uint16_t temp_adc1, temp_adc2;
+
+	/* READING * 3.2 * 4.3 */
+	temp_adc1 = analogRead(ADC3, 13);
+	temp_adc2 = temp_adc1 * 3;
+	temp_adc2 += temp_adc1 / 5;
+	temp_adc1 = 4 * temp_adc2;
+	temp_adc2 = temp_adc1 + ((3 * temp_adc2) / 10);
+
+	SET_VBATT(temp_adc2);	/* C3:   Analog5 - Primary Battery Voltage */
+}
+
 void badgerloop_update_data(void) {
 
 	SET_STATUS(state_handle.curr_state);
@@ -80,8 +93,7 @@ void badgerloop_update_data(void) {
 	SET_PAMP(15);
 	SET_TPOD(250);
 
-	/* analog voltages */
-	SET_VBATT(analogRead(ADC3, 13));	/* C3:   Analog5 - Primary Battery Voltage */
+	battery_voltage();
 	SET_IBATT(analogRead(ADC3, 3));	/* A3:   Analog1 - Primary Battery Current */
 	SET_TBATT(analogRead(ADC1, 4));	/* A4:  Analog14 - Thermistor 1 */
 	SET_PRP1(analogRead(ADC3, 13));	/* C0:   Analog3 - Pressure 1 (CN5) */
@@ -130,7 +142,7 @@ void badgerloop_update_data(void) {
 	/*************************************************************************/
 
 	/* When not braking, accel is a "guess", when braking accel is literal */
-	if (state_handle.curr_state == BRAKING)
+	if (state_handle.curr_state != BRAKING)
 		SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
 	else /* todo, can we trust the accelerometer 100% of the time? */
 		SET_STOPD(calculate_stopping_distance(GET_VEL, GET_ACCEL));
@@ -214,7 +226,7 @@ int badgerloop_init(void) {
 		state_event_timestamps, state_intervals);
 
 	/* initial capture */
-/*	badgerloop_update_data();*/
+	badgerloop_update_data();
 
 	return 0;
 }

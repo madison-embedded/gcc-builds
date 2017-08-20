@@ -31,7 +31,7 @@ int main(void) {
 		lwip_loop_handler();
 
 		/* Badgerloop: DAQ, telemetry, state machine */
-/*		application_handler();*/
+		application_handler();
 
 		/* Blink Red LED */
 		blink_handler(curr, prev);

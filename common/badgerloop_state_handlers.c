@@ -29,40 +29,58 @@ void clear_flag(uint32_t flags) {
 
 void verify_DAQ(void) {
 	/* Check battery voltage */
-	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER))
-		assert_fault("Low primary battery voltage\r\n");
+	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER)) {
+		assert_fault("primary battery voltage OOR\r\n");
+		return;
+	}
 
 	/* Check battery current */
-	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER))
-		assert_fault("High primary battery current\r\n");
+	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER)) {
+		assert_fault("primary battery current OOR\r\n");
+		return;
+	}
 
 	/* Check battery temperature */
-	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER))
-		assert_fault("High primary battery temperature\r\n");
+	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER)) {
+		assert_fault("primary battery temperature OOR\r\n");
+		return;
+	}
 
 	/* Check braking pressure 1, upstream? */
-	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
+	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
 		assert_fault("Low braking pressure 1\r\n");
+		return;
+	}
 
 	/* Check braking pressure 2, upstream? */
-	if (CHECK_THRESHOLD(GET_BRP2, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER))
+	if (CHECK_THRESHOLD(GET_BRP2, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
 		assert_fault("Low braking pressure 2\r\n");
+		return;
+	}
 
 	/* Check braking pressure 3, downstream? */
-	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER))
+	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER)) {
 		assert_fault("High braking pressure 3\r\n");
+		return;
+	}
 
 	/* Check accelerometer */
-	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE))
+	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE)) {
 		assert_fault("Accelerating\r\n");
+		return;
+	}
 
 	/* Check velocity */
-	if (CHECK_THRESHOLD(GET_VEL, 5, -5))
+	if (CHECK_THRESHOLD(GET_VEL, 5, -5)) {
 		assert_fault("Velocity not zero\r\n");
+		return;
+	}
 
 	/* Check position */
-	if (CHECK_THRESHOLD(GET_POS, 0, 0))
+	if (CHECK_THRESHOLD(GET_POS, 0, 0)) {
 		assert_fault("Position not zero\r\n");
+		return;
+	}
 }
 
 
@@ -191,8 +209,8 @@ void to_ready(STATE_NAME from, uint32_t flags) {
 
 void in_ready(uint32_t flags) {
 
-	/* Push phase condition */
-	if (0)
+	/* Push phase condition: either pusher limit switch */
+	if (GET_PLIM1 || GET_PLIM2)
 		change_state(PUSHING);
 
 }
@@ -213,9 +231,9 @@ void to_pushing(STATE_NAME from, uint32_t flags) {
 
 void in_pushing(uint32_t flags) {
 
-	/* Coast phase condition */
+	/* Coast phase condition: limit switches + delay */
 	if (0)
-		change_state(PUSHING);
+		change_state(COAST);
 }
 
 void from_pushing(STATE_NAME to, uint32_t flags) {
@@ -236,9 +254,12 @@ void to_coast(STATE_NAME from, uint32_t flags) {
 
 void in_coast(uint32_t flags) {
 
-	/* Braking phase condition */
-	if (0)
+	/* Braking phase condition: curr_pos + stopd = target end_pos */
+	if ((GET_STOPD != -1 && ((GET_STOPD + GET_POS) > TARGET_END_POS)))
 		change_state(BRAKING);
+	else if (GET_STOPD == -1)
+		assert_fault("Unknown stopping distance");
+
 }
 
 void from_coast(STATE_NAME to, uint32_t flags) {
@@ -263,14 +284,15 @@ void in_braking(uint32_t flags) {
 
 	static int primary_low_count = 0;
 
-	/* Check downstream primary is low, limit switches, target accel */
+	/* Check downstream primary is too low and one of limit switches is open
+	   OR curr_pos + stopd > target_pos */
 	if (((CHECK_THRESHOLD(GET_BRP3, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)
-		&& (!GET_BLIM1 || !GET_BLIM2)) ||
-		CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_BRAKING, ACCEL_LOWER_BRAKING))
+		&& (!GET_BLIM1 && !GET_BLIM2)) ||
+		(GET_STOPD != -1 && ((GET_STOPD + GET_POS) > TARGET_END_POS)))
 		&& ++primary_low_count > BRAKING_COUNT_THRS)
 		secondary_brakes(100);
 
-	/* vary braking intensity? */
+	/* check stopping distance threshold for secondary */
 
 	/* if secondary on & braking fast, turn off? */
 

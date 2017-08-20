@@ -7,7 +7,7 @@
 /* IP addresses */
 #define SPACEX_IP		1
 #define DASHBOARD_IP	10
-#define DEV_IP			104
+#define DEV_IP			112
 
 /* Packet sizes */
 #define SPACEXP_SIZ		34
@@ -46,8 +46,6 @@
 
 #define ACCEL_UPPER_IDLE	50		/* cm/s^2	*/
 #define ACCEL_LOWER_IDLE	-50		/* cm/s^2	*/
-#define ACCEL_LOWER_BRAKING	-1962	/* cm/s^2	*/
-#define ACCEL_UPPER_BRAKING	-491	/* cm/s^2	*/
 
 #define TARGET_DECEL		-981
 #define TARGET_END_POS		125000

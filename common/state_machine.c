@@ -1,7 +1,7 @@
 #include "state_machine.h"
 #include "config.h"
 
-#define DEBUG	0
+#define DEBUG	1
 
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
@@ -35,7 +35,7 @@ void state_machine_handler(state_t *handle) {
 	if(check_interval(handle->curr_state)) {
 #if DEBUG
 		print_time();
-		printf("%s\r\n", state_strings[handle->curr_state]);
+		printf("%s (message: %s)\r\n", state_strings[handle->curr_state], fault_message);
 #endif
 		handle->in_state_table[handle->curr_state](handle->flags);
 	}
