@@ -85,49 +85,6 @@ void verify_DAQ(void) {
 
 
 /*****************************************************************************/
-/*                            Actuation Functions                            */
-/*****************************************************************************/
-#define BRAKING_COUNT_THRS	5
-static int primary_intensity = -1, secondary_intensity = -1;
-
-void primary_brakes(int intensity) {
-	if (intensity != primary_intensity) {
-		// Do actuation
-	}
-	primary_intensity = intensity;
-}
-
-void secondary_brakes(int intensity) {
-	if (intensity != secondary_intensity) {
-		// Do actuation
-	}
-	secondary_intensity = intensity;
-}
-
-void vent_primary_brakes(bool open) {
-
-}
-
-void vent_secondary_brakes(bool open) {
-
-}
-
-void engage_thrusters(void) {
-
-}
-
-void disengage_thrusters(void) {
-
-}
-
-void vent_thrusters(bool open) {
-
-}
-/*****************************************************************************/
-/*****************************************************************************/
-
-
-/*****************************************************************************/
 /*                              Fault Handlers                               */
 /*****************************************************************************/
 void to_fault(STATE_NAME from, uint32_t flags) {
@@ -172,7 +129,7 @@ void in_idle(uint32_t flags) {
 	if (flags & POWER_ON) {
 		primary_brakes(0);
 		secondary_brakes(0);
-		disengage_thrusters();
+		thrusters(0);
 		vent_primary_brakes(false);
 		vent_secondary_brakes(false);
 		vent_thrusters(false);
@@ -232,8 +189,10 @@ void to_pushing(STATE_NAME from, uint32_t flags) {
 void in_pushing(uint32_t flags) {
 
 	/* Coast phase condition: limit switches + delay */
-	if (0)
-		change_state(COAST);
+	if (!GET_PLIM1 && !GET_PLIM2)
+		if (ticks - ((plim1_ts > plim2_ts) ? plim1_ts : plim2_ts) > 1000)
+			change_state(COAST);
+
 }
 
 void from_pushing(STATE_NAME to, uint32_t flags) {
@@ -248,7 +207,7 @@ void from_pushing(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 void to_coast(STATE_NAME from, uint32_t flags) {
 
-	engage_thrusters();
+	thrusters(100);
 
 }
 
@@ -264,7 +223,7 @@ void in_coast(uint32_t flags) {
 
 void from_coast(STATE_NAME to, uint32_t flags) {
 
-	disengage_thrusters();
+	thrusters(0);
 
 }
 /*****************************************************************************/

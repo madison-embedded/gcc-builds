@@ -11,6 +11,10 @@
 #include "mpu9250.h"
 #include "HWPressure.h"
 
+#ifndef DEBUG
+#define DEBUG	1
+#endif
+
 /*****************************************************************************/
 /*                                 Data Buffer                               */
 /*****************************************************************************/
@@ -50,6 +54,7 @@ uint16_t *p_amb = (uint16_t *) &telemetry_buffer[34],
 
 /* Limit Swtich States */
 uint8_t *lim_states = &telemetry_buffer[46];
+uint32_t plim1_ts, plim2_ts, blim1_ts, blim2_ts, dlim_ts;
 
 /* Stopping distance */
 int *stopping_distance = (int *) &telemetry_buffer[47];
@@ -88,12 +93,17 @@ void battery_current(void) {
 
 void badgerloop_update_data(void) {
 
+	int temp;
+
 	SET_STATUS(state_handle.curr_state);
+
+	/* strip count */
+	SET_SCOUNT(0);
 
 	/* combination of strips and accelerometer */
 	SET_ACCEL(0);
 	SET_VEL(0);
-	SET_POS(0);
+	SET_POS(CM_PER_STRIP * GET_SCOUNT);
 
 	/* I2C temp/pressure sensor */
 	SET_PAMP(15);
@@ -119,30 +129,63 @@ void badgerloop_update_data(void) {
 	/* F7:  Analog11 - Thermistor 3 */
 	/* F8:  Analog12 - Thermistor 4 */
 
-	/* strip count */
-	SET_SCOUNT(0);
 
 	/*************************************************************************/
 	/*                            digital I/O                                */
 	/*************************************************************************/
 	/* LIM1, braking limit switch 1 */
-	if (gpio_readPin(GPIOG, 2)) SET_BLIM1;
+	temp = gpio_readPin(GPIOG, 2);
+	if ((temp && !GET_BLIM1) || (!temp && GET_BLIM1)) {
+		blim1_ts = ticks;
+#if DEBUG
+		printf("braking limit 1 changed (%d)\r\n", temp);
+#endif
+	}
+	if (temp) SET_BLIM1;
 	else CLR_BLIM1;
 
 	/* LIM2, braking limit switch 2 */
-	if (gpio_readPin(GPIOG, 3)) SET_BLIM2;
+	temp = gpio_readPin(GPIOG, 3);
+	if ((temp && !GET_BLIM2) || (!temp && GET_BLIM2)) {
+		blim2_ts = ticks;
+#if DEBUG
+		printf("braking limit 2 changed (%d)\r\n", temp);
+#endif
+	}
+	if (temp) SET_BLIM2;
 	else CLR_BLIM2;
 
 	/* GPIO1, pusher limit switch 1 */
-	if (gpio_readPin(GPIOD, 0)) SET_PLIM1;
+	temp = gpio_readPin(GPIOD, 0);
+	if ((temp && !GET_PLIM1) || (!temp && GET_PLIM1)) {
+		plim1_ts = ticks;
+#if DEBUG
+		printf("pusher limit 1 changed (%d)\r\n", temp);
+#endif
+	}
+	if (temp) SET_PLIM1;
 	else CLR_PLIM1;
 
 	/* GPIO2, pusher limit switch 2 */
-	if (gpio_readPin(GPIOD, 1)) SET_PLIM2;
+	temp = gpio_readPin(GPIOD, 1);
+	if ((temp && !GET_PLIM2) || (!temp && GET_PLIM2)) {
+		plim2_ts = ticks;
+#if DEBUG
+		printf("pusher limit 2 changed (%d)\r\n", temp);
+#endif
+	}
+	if (temp) SET_PLIM2;
 	else CLR_PLIM2;
 
 	/* GPIO3, door limit switch? */
-	if (gpio_readPin(GPIOD, 3)) SET_DLIM;
+	temp = gpio_readPin(GPIOD, 3);
+	if ((temp && !GET_DLIM) || (!temp && GET_DLIM)) {
+		dlim_ts = ticks;
+#if DEBUG
+		printf("door limit changed (%d)\r\n", temp);
+#endif
+	}
+	if (temp) SET_DLIM;
 	else CLR_DLIM;
 	/*************************************************************************/
 	/*************************************************************************/
@@ -359,3 +402,55 @@ void application_handler(void) {
 	state_machine_handler(&state_handle);
 
 }
+
+/*****************************************************************************/
+/*                            Actuation Functions                            */
+/*****************************************************************************/
+static int primary_intensity = -1, secondary_intensity = -1;
+
+void primary_brakes(int intensity) {
+#if DEBUG
+	printf("primary brakes %d\r\n", intensity);
+#endif
+	if (intensity != primary_intensity) {
+		// Do actuation
+	}
+	primary_intensity = intensity;
+}
+
+void secondary_brakes(int intensity) {
+#if DEBUG
+	printf("secondary brakes %d\r\n", intensity);
+#endif
+	if (intensity != secondary_intensity) {
+		// Do actuation
+	}
+	secondary_intensity = intensity;
+}
+
+void vent_primary_brakes(bool open) {
+#if DEBUG
+	printf("vent primary brakes %s\r\n", open ? "on" : "off");
+#endif
+}
+
+void vent_secondary_brakes(bool open) {
+#if DEBUG
+	printf("vent secondary brakes %s\r\n", open ? "on" : "off");
+#endif
+}
+
+void thrusters(bool on) {
+#if DEBUG
+	printf("thrust %s\r\n", on ? "on" : "off");
+#endif
+}
+
+void vent_thrusters(bool open) {
+#if DEBUG
+	printf("vent thrust %s\r\n", open ? "on" : "off");
+#endif
+}
+/*****************************************************************************/
+/*****************************************************************************/
+

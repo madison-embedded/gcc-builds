@@ -11,6 +11,33 @@ command_status do_badgerloop(int argc, char *argv[]) {
 
 	if (argc == 1) return USAGE;
 
+	/* actuation functions */
+	if (argc == 3) {
+		if (!strcmp(argv[1], "pbrake"))
+			primary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
+		else if (!strcmp(argv[1], "sbrake"))
+			secondary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
+		else if (!strcmp(argv[1], "vbrake"))
+			vent_primary_brakes(!strcmp(argv[2], "on"));
+		else if (!strcmp(argv[1], "thrust"))
+			thrusters(!strcmp(argv[2], "on"));
+		else if (!strcmp(argv[1], "vthrust"))
+			vent_thrusters(!strcmp(argv[2], "on"));
+		else if (!strcmp(argv[1], "state")) {
+			switch (argv[2][0]) {
+			case 'i': state_handle.next_state = IDLE; break;
+			case 'f': state_handle.next_state = FAULT; break;
+			case 'r': state_handle.next_state = READY; break;
+			case 'p': state_handle.next_state = PUSHING; break;
+			case 'c': state_handle.next_state = COAST; break;
+			case 'b': state_handle.next_state = BRAKING; break;
+			default: return USAGE;
+			}
+			state_handle.change_state = true;
+		} else return USAGE;
+		return SUCCESS;
+	}
+
 	switch (argv[1][0]) {
 	/* test dashboard functionality */
 	case 'd':
@@ -18,18 +45,7 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		break;
 	/* test SpaceX telemetry */
 	case 's':
-		//ret = get_performanceIV(send_telemetry_to_SpaceX);
-		if (argc != 3) return USAGE;
-		switch (argv[2][0]) {
-		case 'i': state_handle.next_state = IDLE; break;
-		case 'f': state_handle.next_state = FAULT; break;
-		case 'r': state_handle.next_state = READY; break;
-		case 'p': state_handle.next_state = PUSHING; break;
-		case 'c': state_handle.next_state = COAST; break;
-		case 'b': state_handle.next_state = BRAKING; break;
-		default: return USAGE;
-		}
-		state_handle.change_state = true;
+		ret = get_performanceIV(send_telemetry_to_SpaceX);
 		break;
 	/* perform DAQ / update values */
 	case 'r':

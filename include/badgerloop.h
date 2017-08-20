@@ -25,7 +25,8 @@
 #define TELEM_INT		5000
 #define CHECK_THRESHOLD(get_macro, upper, lower)	\
 	(get_macro > upper || get_macro < lower)
-#define SHOULD_STOP		(GET_STOPD + GET_POS >= TARGET_END_POS)
+
+#define CM_PER_STRIP	3048
 
 /*****************************************************************************/
 /*                          Error checking parameters                        */
@@ -49,6 +50,8 @@
 
 #define TARGET_DECEL		-981
 #define TARGET_END_POS		125000
+
+#define BRAKING_COUNT_THRS	5
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -125,6 +128,7 @@ extern uint8_t *lim_states;
 #define SET_DLIM	*lim_states |= DLIM
 #define CLR_DLIM	*lim_states &= DLIM
 #define GET_DLIM	(*lim_states & DLIM)
+extern uint32_t plim1_ts, plim2_ts, blim1_ts, blim2_ts, dlim_ts;
 
 extern int *stopping_distance;
 #define SET_STOPD(val)	*stopping_distance = htonl(val)
@@ -137,6 +141,14 @@ int send_telemetry_to_Dashboard(void);
 int send_message_to_Dashboard(char *buf, int length);
 void badgerloop_update_data(void);
 int query_Dashboard(void);
+
+/* Actuation functions */
+void primary_brakes(int intensity);
+void secondary_brakes(int intensity);
+void vent_primary_brakes(bool open);
+void vent_secondary_brakes(bool open);
+void thrusters(bool on);
+void vent_thrusters(bool open);
 
 #endif
 
