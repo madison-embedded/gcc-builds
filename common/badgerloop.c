@@ -80,6 +80,12 @@ void battery_voltage(void) {
 	SET_VBATT(temp_adc2);	/* C3:   Analog5 - Primary Battery Voltage */
 }
 
+void battery_current(void) {
+
+	SET_IBATT(analogRead(ADC3, 3));	/* A3:   Analog1 - Primary Battery Current */
+
+}
+
 void badgerloop_update_data(void) {
 
 	SET_STATUS(state_handle.curr_state);
@@ -94,7 +100,7 @@ void badgerloop_update_data(void) {
 	SET_TPOD(250);
 
 	battery_voltage();
-	SET_IBATT(analogRead(ADC3, 3));	/* A3:   Analog1 - Primary Battery Current */
+	battery_current();
 	SET_TBATT(analogRead(ADC1, 4));	/* A4:  Analog14 - Thermistor 1 */
 	SET_PRP1(analogRead(ADC3, 13));	/* C0:   Analog3 - Pressure 1 (CN5) */
 	SET_PRP2(analogRead(ADC3, 12));	/* C2:   Analog4 - Pressure 2 (CN5) */
