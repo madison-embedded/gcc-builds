@@ -1,13 +1,10 @@
 #include "mpu9250.h"
 #include "hal/hal_conf.h"
+
 extern I2C_HandleTypeDef hi2c;
 
-uint8_t Gscale = GFS_250DPS;
-uint8_t Ascale = AFS_2G;
-float accelBias[3];
-
-static void readBytes(uint8_t addr, uint8_t subAddr, uint8_t numBytes, uint8_t * buffer) {
-	HAL_I2C_Mem_Read(&hi2c, addr << 1, subAddr, 1, buffer, numBytes, 500);
+static bool readBytes(uint8_t addr, uint8_t subAddr, uint8_t numBytes, uint8_t * buffer) {
+	return HAL_I2C_Mem_Read(&hi2c, addr << 1, subAddr, 1, buffer, numBytes, 500) == HAL_OK ? true : false;
 }
 
 static uint8_t readByte(uint8_t addr, uint8_t subAddr) {
@@ -18,6 +15,10 @@ static uint8_t readByte(uint8_t addr, uint8_t subAddr) {
 
 static void writeByte(uint8_t addr, uint8_t subAddr, uint8_t data) {
 	HAL_I2C_Mem_Write(&hi2c, addr << 1, subAddr, 1, &data, 1, 500);
+}
+
+bool mpuAlive(void) {
+	return (HAL_I2C_IsDeviceReady(&hi2c, MPU9250_ADDRESS << 1, 1, 500) == HAL_OK) ? true : false;
 }
 
 static void delay(int ms) { HAL_Delay(ms); }
@@ -45,12 +46,13 @@ void printMPU9250(void) {
 		| readByte(MPU9250_ADDRESS, ZA_OFFSET_L)));
 }
 
-void readAccelData(int16_t * destination) {
-	uint8_t rawData[6];  // x/y/z accel register data stored here
-	readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]);  // Read the six raw data registers into data array
-	destination[0] = ((int16_t)rawData[0] << 8) | rawData[1] ;  // Turn the MSB and LSB into a signed 16-bit value
-	destination[1] = ((int16_t)rawData[2] << 8) | rawData[3] ;  
-	destination[2] = ((int16_t)rawData[4] << 8) | rawData[5] ; 
+bool readAccelData(int16_t * destination) {
+	uint8_t rawData[6];
+	bool retval = readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, &rawData[0]);
+	destination[0] = ((int16_t)rawData[0] << 8) | rawData[1];
+	destination[1] = ((int16_t)rawData[2] << 8) | rawData[3];
+	destination[2] = ((int16_t)rawData[4] << 8) | rawData[5];
+	return retval;
 }
 
 bool initMPU9250(void) {
@@ -72,7 +74,7 @@ bool initMPU9250(void) {
 
 	// set accel configs
 	writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 0x0);
-	writeByte(MPU9250_ADDRESS, ACCEL_CONFIG2, 4 | (Ascale << 3));
+	writeByte(MPU9250_ADDRESS, ACCEL_CONFIG2, 4 | (AFS_2G << 3));
 	/*************************************************************************/
 	/*************************************************************************/
 
@@ -90,13 +92,12 @@ bool initMPU9250(void) {
 	// Configure FIFO to capture accelerometer and gyro data for bias calculation
 	writeByte(MPU9250_ADDRESS, USER_CTRL, 0x40);   // Enable FIFO  
 	writeByte(MPU9250_ADDRESS, FIFO_EN, 0x08);     // Enable gyro and accelerometer sensors for FIFO  (max size 512 bytes in MPU-9150)
-	delay(2010); // accumulate 40 samples in 40 milliseconds = 480 bytes
+	delay(1000); // accumulate samples
 
 	// At end of sample accumulation, turn off FIFO sensor read
 	writeByte(MPU9250_ADDRESS, FIFO_EN, 0x00);        // Disable gyro and accelerometer sensors for FIFO
 	readBytes(MPU9250_ADDRESS, FIFO_COUNTH, 2, &data[0]); // read FIFO sample count
 	fifo_count = ((uint16_t)data[0] << 8) | data[1];
-	printf("fifo sample count: %d, packet count: %d\r\n", fifo_count, fifo_count / 6);
 	packet_count = fifo_count / 6;// How many sets of full gyro and accelerometer data for averaging
 
 	for (ii = 0; ii < packet_count; ii++) {
@@ -133,11 +134,11 @@ bool initMPU9250(void) {
 
 	int32_t accel_bias_reg[3] = {0, 0, 0}; // A place to hold the factory accelerometer trim biases
 	readBytes(MPU9250_ADDRESS, XA_OFFSET_H, 2, &data[0]); // Read factory accelerometer trim values
-	accel_bias_reg[0] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
+	accel_bias_reg[0] = (int32_t) (((int16_t) data[0] << 8) | data[1]);
 	readBytes(MPU9250_ADDRESS, YA_OFFSET_H, 2, &data[0]);
-	accel_bias_reg[1] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
+	accel_bias_reg[1] = (int32_t) (((int16_t) data[0] << 8) | data[1]);
 	readBytes(MPU9250_ADDRESS, ZA_OFFSET_H, 2, &data[0]);
-	accel_bias_reg[2] = (int32_t) (((int16_t)data[0] << 8) | data[1]);
+	accel_bias_reg[2] = (int32_t) (((int16_t) data[0] << 8) | data[1]);
 
 	// Construct total accelerometer bias, including calculated average accelerometer bias from above
 	accel_bias_reg[0] -= (accel_bias[0]/8); // Subtract calculated averaged accelerometer bias scaled to 2048 LSB/g (16 g full scale)
@@ -151,8 +152,6 @@ bool initMPU9250(void) {
 	data[4] = (accel_bias_reg[2] >> 8) & 0xFF;
 	data[5] = (accel_bias_reg[2])      & 0xFF;
 
-	// Apparently this is not working for the acceleration biases in the MPU-9250
-	// Are we handling the temperature correction bit properly?
 	// Push accelerometer biases to hardware registers
 	writeByte(MPU9250_ADDRESS, XA_OFFSET_H, data[0]);
 	writeByte(MPU9250_ADDRESS, XA_OFFSET_L, data[1]);
@@ -162,9 +161,9 @@ bool initMPU9250(void) {
 	writeByte(MPU9250_ADDRESS, ZA_OFFSET_L, data[5]);
 
 	// Output scaled accelerometer biases for display in the main program
-	accelBias[0] = (float)accel_bias[0]/(float)accelsensitivity; 
-	accelBias[1] = (float)accel_bias[1]/(float)accelsensitivity;
-	accelBias[2] = (float)accel_bias[2]/(float)accelsensitivity;
+	//accelBias[0] = (float) accel_bias[0] / (float) accelsensitivity;
+	//accelBias[1] = (float) accel_bias[1] / (float) accelsensitivity;
+	//accelBias[2] = (float) accel_bias[2] / (float) accelsensitivity;
 
 	return true;
 }

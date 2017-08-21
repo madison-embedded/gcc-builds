@@ -10,6 +10,7 @@
 #include "ethernetif.h"
 #include "badgerloop.h"
 #include "cli.h"
+#include "mpu9250.h"
 
 #define I2C_TIMING        0x00400E40 
 I2C_HandleTypeDef hi2c;
@@ -82,12 +83,7 @@ void early_init(void) {
 	hi2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
 
 	__HAL_RCC_I2C2_CLK_ENABLE();
-	//HAL_NVIC_SetPriority(I2C2_ER_IRQn, 7, 7);
-	//HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
-	//HAL_NVIC_SetPriority(I2C2_EV_IRQn, 7, 7);
-	//HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
 	HAL_I2C_Init(&hi2c);
-	process_input("i2c");
 
 	/* Networking */
 	lwip_init();
@@ -98,6 +94,10 @@ void early_init(void) {
 	badgerloop_init();
 
 	print_post_info();
+
+	process_input("i2c");
+	if (mpuAlive())
+		initMPU9250();
 
 }
 

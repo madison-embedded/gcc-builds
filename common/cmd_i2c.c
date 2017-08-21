@@ -49,7 +49,6 @@ command_status do_i2c(int argc, char *argv[]) {
 		switch (argv[2][0]){
 		case 'i':
 			printf("%s\r\n", initMPU9250() ? "OK" : "FAIL");
-			printf("%f\t%f\t%f\r\n", accelBias[0], accelBias[1], accelBias[2]);
 			break;
 		case 'r':
 			printf("X\tY\tZ\r\n");

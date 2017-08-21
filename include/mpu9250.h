@@ -8,13 +8,12 @@
 
 #define MPU9250_ADDRESS     0x68
 
-extern float accelBias[3];
-
 // Functions
 bool initMPU9250(void);
 int16_t to_cms2(int16_t data);
-void readAccelData(int16_t * destination);
+bool readAccelData(int16_t * destination);
 void printMPU9250(void);
+bool mpuAlive(void);
 
 #define AFS_2G 			0
 #define AFS_4G			1

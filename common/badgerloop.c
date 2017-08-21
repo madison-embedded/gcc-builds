@@ -87,18 +87,24 @@ void battery_current(void) {
 
 }
 
+extern void assert_fault(const char *message);
+
 void badgerloop_update_data(void) {
 
 	int temp;
 
 	SET_STATUS(state_handle.curr_state);
 
-	/* strip count */
+	/* strip count: exti */
 	SET_SCOUNT(0);
 
-	/* combination of strips and accelerometer */
-	SET_ACCEL(0);
-	SET_VEL(0);
+	int16_t tempBuffer[3];
+	if (readAccelData(tempBuffer)) {
+		// TODO: rolling average w/ fifo reading
+		SET_ACCEL(tempBuffer[0]);
+	} else assert_fault("can't read MPU9250");
+
+	SET_VEL(0); // exti
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
 
 	/* I2C temp/pressure sensor */
