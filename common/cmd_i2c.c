@@ -43,7 +43,6 @@ command_status do_i2c(int argc, char *argv[]) {
 
 	if (!strcmp("mpu", argv[1])) {
 		int16_t data[3];
-		volatile uint32_t ts;
 
 		if (argc != 3) return USAGE;
 		switch (argv[2][0]){
@@ -52,14 +51,8 @@ command_status do_i2c(int argc, char *argv[]) {
 			break;
 		case 'r':
 			printf("X\tY\tZ\r\n");
-			ts = ticks;
-			while(ticks - ts < 10000) {
-				readAccelData(data);
-				printf("%-6d\t%-6d\t%-6d\r", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
-				fflush(stdout);
-				HAL_Delay(100);
-			}	
-			printf("\n");
+			readAccelData(data);
+			printf("%-6d\t%-6d\t%-6d\r\n", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
 			break;
 		case 'p': printMPU9250(); break;
 		default: return USAGE;
