@@ -160,12 +160,18 @@ uint16_t get_performanceITI(uint16_t(*func)(ADC_TypeDef *, uint8_t), ADC_TypeDef
 	return retval;
 }
 
-void I2C2_EV_IRQHandler(void)
-{
-  HAL_I2C_EV_IRQHandler(&hi2c);
+void I2C2_EV_IRQHandler(void) {
+	HAL_I2C_EV_IRQHandler(&hi2c);
 }
 
-void I2C2_ER_IRQHandler(void)
-{
-  HAL_I2C_ER_IRQHandler(&hi2c);
+void I2C2_ER_IRQHandler(void) {
+	HAL_I2C_ER_IRQHandler(&hi2c);
 }
+
+volatile uint8_t i2c2_flags = 0;
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c) { i2c2_flags |= I2C2_MEM_TX; printf("%s\r\n", __func__); }
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) { i2c2_flags |= I2C2_MEM_RX; printf("%s\r\n", __func__); }
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) { i2c2_flags |= I2C2_MASTER_TX; printf("%s\r\n", __func__); }
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) { i2c2_flags |= I2C2_MASTER_RX; printf("%s\r\n", __func__); }
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) { i2c2_flags |= I2C2_ERROR; printf("i2c2 error!\r\n"); }
+

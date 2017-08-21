@@ -4,7 +4,7 @@
 #include "cli.h"
 #include "badgerloop.h"
 
-#define BLOCK	0
+#define BLOCK	1
 
 stdio_target tar = USB_SERIAL;
 

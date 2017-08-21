@@ -2,91 +2,102 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hal/hal_conf.h"
+#include "config.h"
 #include "hal/stm32f7xx_hal_i2c.h"
 #include "cli.h"
 
 extern I2C_HandleTypeDef hi2c;
 
-
-char * getStatus(HAL_StatusTypeDef status){
-
-	switch (status){
-		case HAL_OK:
-			return "OK";
-		case HAL_ERROR:
-			return "ERROR";
-		case HAL_BUSY:
-			return "BUSY";
-		case HAL_TIMEOUT:
-			return "TIMEOUT";
-		default:
-			return "NOTGOOD";
+const char *HALstatusString(HAL_StatusTypeDef status) {
+	switch (status) {
+		case HAL_OK:		return "OK";
+		case HAL_ERROR:		return "ERROR";
+		case HAL_BUSY:		return "BUSY";
+		case HAL_TIMEOUT:	return "TIMEOUT";
 	}
 	return "NOTGOOD";
 }
 
 command_status do_i2c(int argc, char *argv[]) {
-	uint16_t address;
-	uint8_t pData;
-	uint8_t* pBuffer = NULL;
-	uint16_t MemAdd;
-	uint8_t numBytes;
+	uint16_t address, memAddr;
+	uint8_t numBytes, *dataBuffer = NULL;
 	int i;
+	HAL_StatusTypeDef stat;
 
-	/* one argument checks what devices are attached */
+	/* one argument polls attached devices */
 	if (argc == 1) {
-		for (address = 0; address < 128; address++){
-			printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000)));
-		}
+		for (address = 0; address < 128; address++)
+			if (HAL_I2C_IsDeviceReady(&hi2c, address << 1, 1, 500) == HAL_OK)
+				printf("0x%x: found\r\n", address);
 		return SUCCESS;
 	}
-
-	/*  */
-	if (argc < 3 || argc > 6)
-		return USAGE;
 
 	address = strtoul(argv[2], NULL, 16);
-
-	MemAdd = atoi((const char *) argv[3]);
-
-	if (strcmp(argv[1], "write") == 0) {
-
-		if (argc != 5)
-			return USAGE;
-		pData= strtoul(argv[4], NULL, 16);
-
-		if (HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000) != HAL_OK){
-			printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
-			return USAGE;
-		}
-		printf("%s\r\n",getStatus(HAL_I2C_Mem_Write(&hi2c, address<<1, MemAdd, 1, &pData, 1, 500)));
-		return SUCCESS;
+	if (address > 127) {
+		printf("Address out of range: 0x%x\r\n", address);
+		return USAGE;
 	}
-	if (strcmp(argv[1], "read") == 0) {
-		if (argc == 4){
+
+	stat = HAL_I2C_IsDeviceReady(&hi2c, address << 1, 1, 500);
+	if (stat != HAL_OK) {
+		printf("0x%x: %s\r\n", address, HALstatusString(stat));
+		return USAGE;
+	}
+
+	if (!strcmp(argv[1], "write")) {
+
+		memAddr = atoi((const char *) argv[3]);
+
+		if (argc != 5) return USAGE;
+
+		/* populate array of outgoing data */
+		dataBuffer = calloc(argc - 4, 1);
+		if (dataBuffer == NULL)
+			return FAIL;
+		for (i = 4; i < argc; i++)
+			dataBuffer[i - 4] = (uint8_t) strtoul(argv[i], NULL, 16);
+
+		printf("%s\r\n", HALstatusString(HAL_I2C_Mem_Write(&hi2c, address << 1, memAddr, (strlen(argv[2]) > 4) ? 2 : 1, dataBuffer, argc - 4, 500)));
+
+		free(dataBuffer);
+		return SUCCESS;
+
+	} else if (!strcmp(argv[1], "read")) {
+
+		/* not reading from a memory address */
+		if (argc == 4) {
+
 			numBytes = atoi((const char *) argv[3]);
+			dataBuffer = calloc(numBytes, 1);
 
-			printf("%s\r\n", getStatus(HAL_I2C_Master_Receive(&hi2c, address<<1, pBuffer , numBytes, 500)));
-
-			for (i = 0; i < numBytes; i ++)
-				printf("0x%x\r\n", (pBuffer[i]));
-
-
-			return SUCCESS;	
-
-		}
-		else if (argc == 5){
-
-			if (HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 5000) != HAL_OK){
-				printf("0x%x: %s\r\n", address, getStatus(HAL_I2C_IsDeviceReady(&hi2c, address<<1, 1, 500)));
-				return USAGE;
+			stat = HAL_I2C_Master_Receive(&hi2c, address << 1, dataBuffer, numBytes, 500);
+			if (stat != HAL_OK) {
+				printf("%s\r\n", HALstatusString(stat));
+				return FAIL;
 			}
 
-			printf("%s\r\n",getStatus(HAL_I2C_Mem_Read(&hi2c, address<<1, MemAdd, 1, &pData, 1, 500)));
-			printf("address: 0x%x Data: 0x%x\r\n", address, pData);
+			for (i = 0; i < numBytes; i ++)
+				printf("0x%x\r\n", (dataBuffer[i]));
 
-			return SUCCESS;
+			free(dataBuffer);
+			return SUCCESS;	
 		}
+
+		memAddr = atoi((const char *) argv[3]);
+		numBytes = atoi((const char *) argv[4]);
+		dataBuffer = calloc(numBytes, 1);
+
+		stat = HAL_I2C_Mem_Read(&hi2c, address << 1, memAddr, (strlen(argv[2]) > 4) ? 2 : 1, dataBuffer, numBytes, 500);
+		if (stat != HAL_OK) {
+			printf("%s\r\n", HALstatusString(stat));
+			return FAIL;
+		}
+
+		for (i = 0; i < numBytes; i ++)
+			printf("0x%x\r\n", (dataBuffer[i]));
+
+		free(dataBuffer);
+		return SUCCESS;
 	}
 	return USAGE;
 }

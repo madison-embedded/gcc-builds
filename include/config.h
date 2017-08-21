@@ -14,6 +14,24 @@
 #define HCLK	SystemCoreClock
 #define NEWLINE_GUARD   (curr == '\n' && prev != '\r') || (curr == '\r' && prev != '\n')
 
+extern volatile uint8_t i2c2_flags;
+#define I2C2_ERROR			0x1
+#define POLL_I2C2_ERROR		(i2c2_flags & I2C2_ERROR)
+#define CLR_I2C2_ERROR		i2c2_flags &= ~I2C2_ERROR
+#define I2C2_MASTER_RX		0x2
+#define POLL_I2C2_MASTER_RX	(i2c2_flags & I2C2_MASTER_RX)
+#define CLR_I2C2_MASTER_RX	i2c2_flags &= ~I2C2_MASTER_RX
+#define I2C2_MASTER_TX		0x4
+#define POLL_I2C2_MASTER_TX	(i2c2_flags & I2C2_MASTER_TX)
+#define CLR_I2C2_MASTER_TX	i2c2_flags &= ~I2C2_MASTER_TX
+#define I2C2_MEM_TX			0x8
+#define POLL_I2C2_MEM_TX	(i2c2_flags & I2C2_MEM_TX)
+#define CLR_I2C2_MEM_TX		i2c2_flags &= ~I2C2_MEM_TX
+#define I2C2_MEM_RX			0x10
+#define POLL_I2C2_MEM_RX	(i2c2_flags & I2C2_MEM_RX)
+#define CLR_I2C2_MEM_RX		i2c2_flags &= ~I2C2_MEM_RX
+#define I2C_TIMEOUT			1000
+
 typedef struct {
 	uint32_t produce_count, consume_count;
 	uint16_t buffer_SIZE, message_available;

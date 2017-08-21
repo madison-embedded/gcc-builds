@@ -27,9 +27,9 @@ else if (strcmp(argv[1], "accel") == 0){
 			printf("accel x: %04d, y: %04d, z: %04d,\r", accel[0], accel[1], accel[2]);
 		}
 	}
-}else if (strcmp(argv[1], "reg") == 0){
+} else if (strcmp(argv[1], "reg") == 0) {
 	for (i = 0; i < 127; i++){
-HAL_I2C_Mem_Read(&hi2c, MPU_ADDRESS<<1, i, 1, &pData, 1, 500);
+		HAL_I2C_Mem_Read(&hi2c, MPU_ADDRESS << 1, i, 1, &pData, 1, 500);
 		printf("0x%d Data: 0x%x\r\n", i, pData);
 
 	}

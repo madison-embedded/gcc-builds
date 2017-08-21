@@ -1,7 +1,7 @@
 #include "state_machine.h"
 #include "config.h"
 
-#define DEBUG	1
+#define DEBUG	0
 
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
