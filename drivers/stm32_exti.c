@@ -52,7 +52,8 @@ void exti_disable(GPIO_TypeDef * port, uint32_t pin) {
 		RCC->APB2ENR |= (1 << 14); 
 		SYSCFG->EXTICR[pin/4] &= ~((gpio_getGpioPortChar(port)-65) << (pin%4*4)); 	/* SYSCFG external interrupt configuration registers */
 		EXTI->IMR &= ~(0x1U << pin);
-	}
+}
+
 /*gets number of interrupts from given pin*/
 void getTimeStamps(int pin){
 		printf("pin %d has prev 0x%x curr 0x%x \r\n", pin, interLine[pin].prev, interLine[pin].curr);
@@ -60,6 +61,9 @@ void getTimeStamps(int pin){
 
 /*need to get time stamps*/
 void EXTI0_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR0) {
 		interLine[0].prev = interLine[0].curr;
 		interLine[0].curr = ticks;
@@ -72,6 +76,9 @@ void EXTI0_IRQHandler(void) {
 }
 
 void EXTI1_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR1) {
 		interLine[1].prev = interLine[1].curr;
 		interLine[1].curr = ticks;
@@ -84,6 +91,9 @@ void EXTI1_IRQHandler(void) {
 }
 
 void EXTI2_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR2) {
 		interLine[2].prev = interLine[2].curr;
 		interLine[2].curr = ticks;
@@ -96,6 +106,9 @@ void EXTI2_IRQHandler(void) {
 }
 
 void EXTI3_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR3) {
 		interLine[3].prev = interLine[3].curr;
 		interLine[3].curr = ticks;
@@ -108,6 +121,9 @@ void EXTI3_IRQHandler(void) {
 }
 
 void EXTI4_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR4) {
 		interLine[4].prev = interLine[4].curr;
 		interLine[4].curr = ticks;
@@ -120,6 +136,9 @@ void EXTI4_IRQHandler(void) {
 }
 
 void EXTI9_5_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR5) {
 		interLine[5].prev = interLine[5].curr;
 		interLine[5].curr = ticks;
@@ -165,10 +184,12 @@ void EXTI9_5_IRQHandler(void) {
 
 		EXTI->PR |= EXTI_PR_PR9;
 	}
-
 }
 
 void EXTI15_10_IRQHandler(void) {
+#if DEBUG
+	printf("%s: 0x%lx\r\n", __func__, EXTI->PR);
+#endif
 	if (EXTI->PR & EXTI_PR_PR10) {
 		interLine[10].prev = interLine[10].curr;
 		interLine[10].curr = ticks;
