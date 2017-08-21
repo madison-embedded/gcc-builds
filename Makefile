@@ -72,7 +72,7 @@ OBJECTS += drivers/$(PROC_PREFIX)exti.o
 OBJECTS += drivers/$(PROC_PREFIX)tim.o
 OBJECTS += drivers/mpu9250.c
 OBJECTS += drivers/retro.c
-OBJECTS += drivers/HWPressure.c
+OBJECTS += drivers/honeywell.o
 
 # HAL Drivers
 OBJECTS += drivers/hal/stm32f7xx_hal.o

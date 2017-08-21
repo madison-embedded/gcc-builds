@@ -44,7 +44,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f7xx_hal_def.h"  
+#include "hal/stm32f7xx_hal_def.h"  
 
 /** @addtogroup STM32F7xx_HAL_Driver
   * @{
@@ -515,7 +515,7 @@ typedef struct __I2C_HandleTypeDef
   */
 
 /* Include I2C HAL Extended module */
-#include "stm32f7xx_hal_i2c_ex.h"
+#include "hal/stm32f7xx_hal_i2c_ex.h"
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup I2C_Exported_Functions

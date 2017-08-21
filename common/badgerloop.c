@@ -9,7 +9,7 @@
 #include "state_machine.h"
 #include "adc.h"
 #include "mpu9250.h"
-#include "HWPressure.h"
+#include "honeywell.h"
 
 #ifndef DEBUG
 #define DEBUG	0
@@ -106,8 +106,8 @@ void badgerloop_update_data(void) {
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
 
 	/* I2C temp/pressure sensor */
-	SET_PAMP(15);
-	SET_TPOD(250);
+	SET_PAMP(honeywell_readPressure());
+	SET_TPOD(honeywell_readTemperature() * 10);
 
 	battery_voltage();
 	battery_current();

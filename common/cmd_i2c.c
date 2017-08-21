@@ -5,6 +5,7 @@
 #include "config.h"
 #include "hal/stm32f7xx_hal_i2c.h"
 #include "cli.h"
+#include "honeywell.h"
 
 extern I2C_HandleTypeDef hi2c;
 
@@ -29,6 +30,13 @@ command_status do_i2c(int argc, char *argv[]) {
 		for (address = 0; address < 128; address++)
 			if (HAL_I2C_IsDeviceReady(&hi2c, address << 1, 1, 500) == HAL_OK)
 				printf("0x%x: found\r\n", address);
+		return SUCCESS;
+	}
+
+	if (!strcmp("honeywell", argv[1])) {
+		if (honeywell_isAlive())
+			printf("Pressure:\t%d\r\nTemperature:\t%d\r\n", honeywell_readPressure(), honeywell_readTemperature());
+		else printf("Honeywell sensor not present at address 0x%x\r\n", HONEYWELL_I2C_ADDR);
 		return SUCCESS;
 	}
 
@@ -99,6 +107,7 @@ command_status do_i2c(int argc, char *argv[]) {
 		free(dataBuffer);
 		return SUCCESS;
 	}
+
 	return USAGE;
 }
 COMMAND_ENTRY("i2c", "i2c <read | write> <address HEX> <offset | num bytes> [value HEX]", "Perform live interaction with the i2c devices default list all devices", do_i2c)
