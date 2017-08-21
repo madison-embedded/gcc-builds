@@ -17,18 +17,18 @@ bool MPU_ready = false;
 uint8_t mpuBytes[14];
 
 void I2CRead(unsigned int addr, uint8_t subAddr, uint8_t* buffer, unsigned int rlen) {
-	HAL_I2C_Mem_Read_IT(&hi2c, addr<<1, subAddr, 1, buffer, rlen);
+	HAL_I2C_Mem_Read(&hi2c, addr<<1, subAddr, 1, buffer, rlen, 500);
 }
 
 void I2CWrite(unsigned int addr, uint8_t subAddr, uint8_t* buffer, unsigned int wlen) {
-	HAL_I2C_Mem_Write_IT(&hi2c, addr<<1, subAddr, 1, buffer, wlen);
+	HAL_I2C_Mem_Write(&hi2c, addr<<1, subAddr, 1, buffer, wlen, 500);
 }
 inline void startFIFOread(void) {
 	I2CRead(MPU_ADDRESS, FIFO_COUNTH, fifoCountBytes, 2);
 }
 
 bool MPUwriteReg(uint8_t reg, uint8_t value, bool block) {
-	return HAL_I2C_Mem_Write_IT(&hi2c, MPU_ADDRESS<<1, reg, 1, &value, 1);
+	return HAL_I2C_Mem_Write(&hi2c, MPU_ADDRESS<<1, reg, 1, &value, 1, 500);
 }
 
 inline void MPU_startSampling(void) {
