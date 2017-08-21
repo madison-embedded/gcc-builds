@@ -1,7 +1,7 @@
 #include "state_machine.h"
 #include "config.h"
 
-#define DEBUG	0
+#define DEBUG_STATE		0
 
 void initialize_state_machine(state_t *handle, STATE_NAME initial_state,
 							state_transition_t * const *to_states,
@@ -33,7 +33,7 @@ void state_machine_handler(state_t *handle) {
 
 	/* Enter state handler */
 	if(check_interval(handle->curr_state)) {
-#if DEBUG
+#if DEBUG_STATE
 		print_time();
 		printf("%s (message: %s)\r\n", state_strings[handle->curr_state], fault_message);
 #endif
@@ -49,7 +49,7 @@ void state_machine_handler(state_t *handle) {
 		if (handle->curr_state == handle->next_state)
 			return;
 
-#if DEBUG
+#if DEBUG_STATE
 		printf("%s -> %s\r\n",
 			state_strings[handle->next_state],
 			state_strings[handle->curr_state]);

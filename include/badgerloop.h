@@ -21,8 +21,8 @@
 
 /* Constant fields & utilities  */
 #define TEAM_ID			0x3
-#define DAQ_INT			2500
-#define TELEM_INT		5000
+#define DAQ_INT			500
+#define TELEM_INT		1000
 #define CHECK_THRESHOLD(get_macro, upper, lower)	\
 	(get_macro > upper || get_macro < lower)
 
@@ -110,23 +110,23 @@ extern uint16_t *pr_p1, *pr_p2, *br_p1, *br_p2, *br_p3;
 extern uint8_t *lim_states;
 #define PLIM1 0x1
 #define SET_PLIM1	*lim_states |= PLIM1
-#define CLR_PLIM1	*lim_states &= PLIM1
+#define CLR_PLIM1	*lim_states &= ~PLIM1
 #define GET_PLIM1	(*lim_states & PLIM1)
 #define PLIM2 0x2
 #define SET_PLIM2	*lim_states |= PLIM2
-#define CLR_PLIM2	*lim_states &= PLIM2
+#define CLR_PLIM2	*lim_states &= ~PLIM2
 #define GET_PLIM2	(*lim_states & PLIM2)
 #define BLIM1 0x4
 #define SET_BLIM1	*lim_states |= BLIM1
-#define CLR_BLIM1	*lim_states &= BLIM1
+#define CLR_BLIM1	*lim_states &= ~BLIM1
 #define GET_BLIM1	(*lim_states & BLIM1)
 #define BLIM2 0x8
 #define SET_BLIM2	*lim_states |= BLIM2
-#define CLR_BLIM2	*lim_states &= BLIM2
+#define CLR_BLIM2	*lim_states &= ~BLIM2
 #define GET_BLIM2	(*lim_states & BLIM2)
 #define DLIM 0x10
 #define SET_DLIM	*lim_states |= DLIM
-#define CLR_DLIM	*lim_states &= DLIM
+#define CLR_DLIM	*lim_states &= ~DLIM
 #define GET_DLIM	(*lim_states & DLIM)
 extern uint32_t plim1_ts, plim2_ts, blim1_ts, blim2_ts, dlim_ts;
 

@@ -46,6 +46,10 @@ extern int _write(int fd, const void *buf, size_t count);
 /******************************************************************************/
 /*                                   Globals                                  */
 /******************************************************************************/
+#ifndef DEBUG
+#define DEBUG	1
+#endif
+
 #define DEBUG_UART	USB_UART
 #define DEBUG_BAUD	115200
 #define USB_UART	USART3
