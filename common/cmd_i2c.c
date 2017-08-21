@@ -49,10 +49,6 @@ command_status do_i2c(int argc, char *argv[]) {
 		switch (argv[2][0]){
 		case 'i':
 			printf("%s\r\n", initMPU9250() ? "OK" : "FAIL");
-			break;
-		case 'c':
-			calibrateMPU9250(gyroBias, accelBias);
-			printf("%f\t%f\t%f\r\n", gyroBias[0], gyroBias[1], gyroBias[2]);
 			printf("%f\t%f\t%f\r\n", accelBias[0], accelBias[1], accelBias[2]);
 			break;
 		case 'r':
@@ -66,6 +62,7 @@ command_status do_i2c(int argc, char *argv[]) {
 			}	
 			printf("\n");
 			break;
+		case 'p': printMPU9250(); break;
 		default: return USAGE;
 		}
 		return SUCCESS;

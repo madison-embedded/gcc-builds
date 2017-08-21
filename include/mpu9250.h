@@ -8,13 +8,13 @@
 
 #define MPU9250_ADDRESS     0x68
 
-extern float gyroBias[3], accelBias[3];
+extern float accelBias[3];
 
 // Functions
 bool initMPU9250(void);
-void calibrateMPU9250(float * gyroBias, float * accelBias);
 int16_t to_cms2(int16_t data);
 void readAccelData(int16_t * destination);
+void printMPU9250(void);
 
 #define AFS_2G 			0
 #define AFS_4G			1
