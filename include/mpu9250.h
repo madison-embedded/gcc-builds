@@ -6,17 +6,28 @@
 #include "hal/stm32f7xx_hal.h"
 #include "hal/stm32f7xx_hal_i2c.h"
 
-#define MPU_ADDRESS     0x68
+#define MPU9250_ADDRESS     0x68
 
-extern uint8_t mpuBytes[14];
-bool MPU_ready;
+extern float gyroBias[3], accelBias[3];
 
 // Functions
-bool MPUinitialize(void);
-void MPUread(void);
-void printOffsets(void);
+bool initMPU9250(void);
+void calibrateMPU9250(float * gyroBias, float * accelBias);
+int16_t to_cms2(int16_t data);
 void readAccelData(int16_t * destination);
-int readAccelXData(void);
+
+#define AFS_2G 			0
+#define AFS_4G			1
+#define AFS_8G			2
+#define AFS_16G			3
+
+#define GFS_250DPS 	0
+#define GFS_500DPS		1
+#define GFS_1000DPS	2
+#define GFS_2000DPS	3
+
+#define MFS_14BITS		0
+#define MFS_16BITS		1
 
 // From SparkFun
 #define SELF_TEST_X_GYRO 0x00

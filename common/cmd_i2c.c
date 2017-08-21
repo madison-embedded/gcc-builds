@@ -6,6 +6,7 @@
 #include "hal/stm32f7xx_hal_i2c.h"
 #include "cli.h"
 #include "honeywell.h"
+#include "mpu9250.h"
 
 extern I2C_HandleTypeDef hi2c;
 
@@ -40,6 +41,36 @@ command_status do_i2c(int argc, char *argv[]) {
 		return SUCCESS;
 	}
 
+	if (!strcmp("mpu", argv[1])) {
+		int16_t data[3];
+		volatile uint32_t ts;
+
+		if (argc != 3) return USAGE;
+		switch (argv[2][0]){
+		case 'i':
+			printf("%s\r\n", initMPU9250() ? "OK" : "FAIL");
+			break;
+		case 'c':
+			calibrateMPU9250(gyroBias, accelBias);
+			printf("%f\t%f\t%f\r\n", gyroBias[0], gyroBias[1], gyroBias[2]);
+			printf("%f\t%f\t%f\r\n", accelBias[0], accelBias[1], accelBias[2]);
+			break;
+		case 'r':
+			printf("X\tY\tZ\r\n");
+			ts = ticks;
+			while(ticks - ts < 10000) {
+				readAccelData(data);
+				printf("%-6d\t%-6d\t%-6d\r", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
+				fflush(stdout);
+				HAL_Delay(100);
+			}	
+			printf("\n");
+			break;
+		default: return USAGE;
+		}
+		return SUCCESS;
+	}
+	
 	address = strtoul(argv[2], NULL, 16);
 	if (address > 127) {
 		printf("Address out of range: 0x%x\r\n", address);
