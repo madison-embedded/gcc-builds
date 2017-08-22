@@ -17,8 +17,10 @@ command_status do_badgerloop(int argc, char *argv[]) {
 			primary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
 		else if (!strcmp(argv[1], "sbrake"))
 			secondary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
-		else if (!strcmp(argv[1], "vbrake"))
+		else if (!strcmp(argv[1], "vpbrake"))
 			vent_primary_brakes(!strcmp(argv[2], "on"));
+		else if (!strcmp(argv[1], "vsbrake"))
+			vent_secondary_brakes(!strcmp(argv[2], "on"));
 		else if (!strcmp(argv[1], "thrust"))
 			thrusters(!strcmp(argv[2], "on"));
 		else if (!strcmp(argv[1], "vthrust"))
@@ -60,6 +62,13 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		break;
 	case 'q':
 		ret = get_performanceIV(query_Dashboard);
+		break;
+	case 'l':
+		printf("PLIM1:\t%s\r\n", GET_PLIM1 ? "Open" : "Pressed");
+		printf("PLIM2:\t%s\r\n", GET_PLIM2 ? "Open" : "Pressed");
+		printf("BLIM1:\t%s\r\n", GET_BLIM1 ? "Pressed" : "Open");
+		printf("BLIM2:\t%s\r\n", GET_BLIM2 ? "Pressed" : "Open");
+		printf("DLIM:\t%s\r\n", GET_DLIM ? "Open" : "Pressed");
 		break;
 	default: return USAGE;
 	}
