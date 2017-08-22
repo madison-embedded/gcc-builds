@@ -81,10 +81,30 @@ void battery_voltage(void) {
 	SET_VBATT(temp_adc2);	/* C3:   Analog5 - Primary Battery Voltage */
 }
 
+int thermistor_scalar(uint16_t reading) {
+	int retval = (int) reading;
+
+	// do math
+
+	return retval;
+}
+
 void battery_current(void) {
 
-	SET_IBATT(analogRead(ADC3, 3));	/* A3:   Analog1 - Primary Battery Current */
+	/* A3:   Analog1 - Primary Battery Current */
+	uint16_t temp = analogRead(ADC3, 3);
 
+	// do calc
+
+	SET_IBATT(temp);
+}
+
+uint16_t braking_sensor_scalar(uint16_t reading) {
+	uint16_t retval = reading;
+
+	// do calc
+
+	return retval;
 }
 
 extern void assert_fault(const char *message);
@@ -113,12 +133,26 @@ void badgerloop_update_data(void) {
 
 	battery_voltage();
 	battery_current();
-	SET_TBATT(analogRead(ADC1, 4));	/* A4:  Analog14 - Thermistor 1 */
-	SET_PRP1(analogRead(ADC3, 13));	/* C0:   Analog3 - Pressure 1 (CN5) */
-	SET_PRP2(analogRead(ADC3, 12));	/* C2:   Analog4 - Pressure 2 (CN5) */
-	SET_BRP1(analogRead(ADC3, 9));	/* F3:   Analog6 - Pressure 3 (CN5) */
-	SET_BRP2(analogRead(ADC3, 14));	/* F4:   Analog7 - Pressure 4 (CN5) */
-	SET_BRP3(analogRead(ADC3, 15));	/* F5:   Analog8 - Pressure 1 (CN6) */
+
+	/* A4:  Analog14 - Thermistor 1 */
+	SET_TBATT(thermistor_scalar(analogRead(ADC1, 4)));
+
+	/* C0:   Analog3 - Pressure 1 (CN5) */
+	// TODO: which sensor is this? Do appropriate math
+	SET_PRP1(analogRead(ADC3, 13));
+
+	/* C2:   Analog4 - Pressure 2 (CN5) */
+	// TODO: which sensor is this? Do appropriate math
+	SET_PRP2(analogRead(ADC3, 12));
+
+	/* F3:   Analog6 - Pressure 3 (CN5) */
+	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 9)));
+
+	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
+
+	/* F5:   Analog8 - Pressure 1 (CN6) */
+	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 15)));
 
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */
@@ -130,7 +164,6 @@ void badgerloop_update_data(void) {
 	/* A5:  Analog15 - Thermistor 2 */
 	/* F7:  Analog11 - Thermistor 3 */
 	/* F8:  Analog12 - Thermistor 4 */
-
 
 	/*************************************************************************/
 	/*                            digital I/O                                */
