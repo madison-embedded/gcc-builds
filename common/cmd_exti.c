@@ -6,6 +6,16 @@
 #include "gpio_alias.h"
 #include "retro.h"
 
+void printStamp (int pin, timeStamp stamp) {
+	int i;
+	printf("%-10s:%d\r\n", "Pin", pin);
+	printf("%-10s:%x\r\n", "Previous", stamp.prev);
+	printf("%-10s:%x\r\n", "Current", stamp.curr);
+	printf("%-10s:%x\r\n", "Count", stamp.count);
+	for(i = 0; i < AVERAGE_SIZE; i++)
+	printf("Filter[i]:%x\r\n", stamp.filter[i]);
+}
+
 command_status do_exti(int argc, char *argv[]) {
 	retroInit();
 	if (argc < 2) return USAGE;
@@ -13,17 +23,16 @@ command_status do_exti(int argc, char *argv[]) {
 	GPIO_TypeDef * port; 
 
 	if(hasGpioAlias(&port, &pin, argv[1])){
-		getTimeStamps(pin);
+		printStamp(pin, getTimeStamps(pin));
 		printf("Velocity %d cm/s\r\n", getVelocity());
 		return SUCCESS;
 	}
 
 	pin = atoi((const char *) argv[1]);
  	
-	getTimeStamps(pin);
+	printStamp(pin, getTimeStamps(pin));
 	printf("Velocity %d cm/s\r\n", getVelocity());
 
 	return SUCCESS;
 }
 COMMAND_ENTRY("exti", "exti <pin>", "Prints current and previous time stamp of the External Interrpt. Only on interrupt per pin number", do_exti)
-

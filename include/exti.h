@@ -17,6 +17,6 @@ typedef struct{
 }timeStamp;
 
 void exti_config(GPIO_TypeDef * port, uint32_t pin, bool rtsr, bool ftsr, bool ie);
-void getTimeStamps(int pin);
+timeStamp getTimeStamps(int pin);
 
 #endif
