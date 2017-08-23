@@ -11,7 +11,7 @@
 
 /* Packet sizes */
 #define SPACEXP_SIZ		34
-#define DASHBOARDP_SIZ	51
+#define DASHBOARDP_SIZ	59
 
 /* Dashboard query parameters */
 #define OUTGOING_QUERY	1
@@ -26,6 +26,7 @@
 #define CHECK_THRESHOLD(get_macro, upper, lower)	\
 	(get_macro > upper || get_macro < lower)
 
+#define SOC_INITIAL		1013760
 #define CM_PER_STRIP	3048
 
 /*****************************************************************************/
@@ -133,6 +134,9 @@ extern uint32_t plim1_ts, plim2_ts, blim1_ts, blim2_ts, dlim_ts;
 extern int *stopping_distance;
 #define SET_STOPD(val)	*stopping_distance = htonl(val)
 #define GET_STOPD		((int) ntohl(*stopping_distance))
+
+#define SET_CHARGE_PERC(val)	*percentage = htonl(val)
+#define SET_TIME_REMAINING(val)	*time_remaining = htonl(val)
 
 /* Exposed functions */
 int badgerloop_init(void);
