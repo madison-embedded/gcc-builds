@@ -58,7 +58,7 @@ int *stopping_distance = (int *) &telemetry_buffer[47];
 /* State of Charge */
 uint32_t *percentage = (uint32_t *) &telemetry_buffer[51];
 uint32_t *time_remaining = (uint32_t *) &telemetry_buffer[55];
-uint32_t soc = 1013760, curr_draw = 0; /* 12.8V * 22A * 360s */
+uint32_t soc = SOC_INITIAL, curr_draw = 0; /* 12.8V * 22A * 360s */
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -444,7 +444,7 @@ void application_handler(void) {
 		curr_draw = (GET_VBATT * GET_IBATT) / 1000000;
 		soc -= (curr_draw);
 		SET_CHARGE_PERC((soc * 100) / SOC_INITIAL);
-		SET_TIME_REMAINING(SOC_INITIAL / curr_draw);
+		SET_TIME_REMAINING(soc / curr_draw);
 	}
 
 	state_machine_handler(&state_handle);
