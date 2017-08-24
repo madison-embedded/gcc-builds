@@ -10,6 +10,7 @@
 #include "adc.h"
 #include "mpu9250.h"
 #include "honeywell.h"
+#include "retro.h"
 
 /*****************************************************************************/
 /*                                 Data Buffer                               */
@@ -124,7 +125,7 @@ void badgerloop_update_data(void) {
 	SET_STATUS(state_handle.curr_state);
 
 	/* strip count: exti */
-	SET_SCOUNT(0);
+	SET_SCOUNT(mainRetro.count);
 
 	int16_t tempBuffer[3];
 	if (readAccelData(tempBuffer)) {
@@ -132,7 +133,7 @@ void badgerloop_update_data(void) {
 		SET_ACCEL(tempBuffer[0]);
 	} else assert_fault("can't read MPU9250");
 
-	SET_VEL(0); // exti
+	SET_VEL(getVelocity()); // exti
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
 
 	/* I2C temp/pressure sensor */
