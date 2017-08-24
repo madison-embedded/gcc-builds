@@ -70,6 +70,9 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		printf("BLIM2:\t%s\r\n", GET_BLIM2 ? "Open" : "Pressed");
 		printf("DLIM:\t%s\r\n", GET_DLIM ? "Open" : "Pressed");
 		break;
+	case 'f':
+		printf("%s\r\n", fault_message);
+		break;
 	default: return USAGE;
 	}
 	printf("returned %d\r\n", ret);
