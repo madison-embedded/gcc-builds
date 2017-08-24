@@ -107,9 +107,12 @@ void battery_current(void) {
 uint16_t braking_sensor_scalar(uint16_t reading) {
 	uint16_t retval = reading;
 
-	// do calc
+	retval *= 16;
+	retval /= 11;
 
-	return retval;
+	retval = (retval * 3) + (retval / 5);
+
+	return retval / 8;
 }
 
 extern void assert_fault(const char *message);
@@ -142,27 +145,28 @@ void badgerloop_update_data(void) {
 	/* A4:  Analog14 - Thermistor 1 */
 	SET_TBATT(thermistor_scalar(analogRead(ADC1, 4)));
 
-	/* C0:   Analog3 - Pressure 1 (CN5) */
-	// TODO: which sensor is this? Do appropriate math
-	SET_PRP1(analogRead(ADC3, 13));
+	/* F5:   Analog8 - Pressure 1 (CN6) */
+	/*  */
+	SET_PRP1(analogRead(ADC3, 15));
 
 	/* C2:   Analog4 - Pressure 2 (CN5) */
-	// TODO: which sensor is this? Do appropriate math
+	/* 24V 5k absolute pressure sensor (1-4V output) */
 	SET_PRP2(analogRead(ADC3, 12));
 
 	/* F3:   Analog6 - Pressure 3 (CN5) */
+	/* */
 	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 9)));
 
 	/* F4:   Analog7 - Pressure 4 (CN5) */
 	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
 
-	/* F5:   Analog8 - Pressure 1 (CN6) */
-	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 15)));
+	/* F10:  Analog9 - Pressure 2 (CN6) */
+	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 8)));
 
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */
 
-	/* F10:  Analog9 - Pressure 2 (CN6) */
+	/* C0:   Analog3 - Pressure 1 (CN5) */
 
 	/* F6:  Analog10 - Accelerometer X */
 
