@@ -109,6 +109,7 @@ uint16_t braking_sensor_scalar(uint16_t reading) {
 
 extern void assert_fault(const char *message);
 
+int16_t tempBuffer[3]; /* can't be a stack variable */
 void badgerloop_update_data(void) {
 
 	int temp;
@@ -119,7 +120,6 @@ void badgerloop_update_data(void) {
 	/* strip count: exti */
 	SET_SCOUNT(mainRetro.count);
 
-	int16_t tempBuffer[3];
 	if (readAccelData(tempBuffer)) {
 		// TODO: rolling average w/ fifo reading
 		SET_ACCEL(tempBuffer[0]);
@@ -133,13 +133,17 @@ void badgerloop_update_data(void) {
 	SET_TPOD(honeywell_readTemperature() * 10);
 
 	battery_voltage();
-	SET_IBATT((adc_to_mv(analogRead(ADC3, 3), 120) * 1000) / 40);
 
-	/* A4:  Analog14 - Thermistor 1 */
-	SET_TBATT(thermistor_scalar(analogRead(ADC1, 4)));
+	/* battery current */
+	adc_temp = analogRead(ADC3, 3);
+	adc_temp -= adc_temp > 120 ? 120 : adc_temp;
+	adc_temp = (adc_temp * 3) + (adc_temp / 5);
+	SET_IBATT((adc_temp * 1000) / 37);
+
+	/* A4:  Analog14 - Thermistor 2 */
+	SET_TBATT(thermistor_scalar(analogRead(ADC3, 6)));
 
 	/* F5:   Analog6 - Pressure 1 (CN6) */
-	/*  */
 	adc_temp = analogRead(ADC3, 9);
 	adc_temp = adc_to_mv(adc_temp, 107);
 	adc_temp *= 5;
