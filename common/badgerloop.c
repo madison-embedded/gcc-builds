@@ -89,10 +89,17 @@ void battery_voltage(void) {
 
 int thermistor_scalar(uint16_t reading) {
 	int retval = (int) reading;
+	int To = 60 + 273;
+	int Ro = 2760; //at 60 Celsius the resitance is 2760 ohms
+	int B = 3984;
 
-	// do math
-
-	return retval;
+	/* volts */
+	retval = reading * 1024 / 3.3;
+	/* ohm */
+	retval = 33000/retval  - 10000;
+	/* 1 / retval */
+	retval = 1.0 / To + (1.0 / B) * log(ohm / Ro);
+    return (int) 1 / inverKelvin - 273;
 }
 
 static uint16_t adc_to_mv(uint16_t reading, uint16_t offset) {
