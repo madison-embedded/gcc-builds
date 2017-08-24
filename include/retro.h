@@ -8,8 +8,8 @@ extern timeStamp * interLine;
 timeStamp mainRetro;
 #define TIMER_FREQ 	250000
 
-#define FRONT 		interLine[9]
-#define MIDDLE 		interLine[11]
+#define FRONT 		interLine[11]
+#define MIDDLE 		interLine[9]
 #define REAR		interLine[13]
 
 #define  MAINFILTERINDEX 	mainRetro.count % AVERAGE_SIZE
