@@ -94,25 +94,16 @@ int thermistor_scalar(uint16_t reading) {
 	return retval;
 }
 
-void battery_current(void) {
-
-	/* A3:   Analog1 - Primary Battery Current */
-	uint16_t temp = analogRead(ADC3, 3);
-
-	// do calc
-
-	SET_IBATT(temp);
+static uint16_t adc_to_mv(uint16_t reading, uint16_t offset) {
+	uint16_t adc_temp = reading;
+	adc_temp -= adc_temp > offset ? offset : adc_temp;
+	adc_temp *= 16;
+	adc_temp /= 11;
+	return (adc_temp * 3) + (adc_temp / 5);
 }
 
 uint16_t braking_sensor_scalar(uint16_t reading) {
-	uint16_t retval = reading;
-
-	retval *= 16;
-	retval /= 11;
-
-	retval = (retval * 3) + (retval / 5);
-
-	return retval / 8;
+	return adc_to_mv(reading, 107) / 8;
 }
 
 extern void assert_fault(const char *message);
@@ -120,6 +111,7 @@ extern void assert_fault(const char *message);
 void badgerloop_update_data(void) {
 
 	int temp;
+	uint16_t adc_temp;
 
 	SET_STATUS(state_handle.curr_state);
 
@@ -140,22 +132,31 @@ void badgerloop_update_data(void) {
 	SET_TPOD(honeywell_readTemperature() * 10);
 
 	battery_voltage();
-	battery_current();
+	SET_IBATT((adc_to_mv(analogRead(ADC3, 3), 120) * 1000) / 40);
 
 	/* A4:  Analog14 - Thermistor 1 */
 	SET_TBATT(thermistor_scalar(analogRead(ADC1, 4)));
 
-	/* F5:   Analog8 - Pressure 1 (CN6) */
+	/* F5:   Analog6 - Pressure 1 (CN6) */
 	/*  */
-	SET_PRP1(analogRead(ADC3, 15));
+	adc_temp = analogRead(ADC3, 9);
+	adc_temp = adc_to_mv(adc_temp, 107);
+	adc_temp *= 5;
+	adc_temp /= 4;
+	adc_temp += 15; /* not an absolute sensor */
+	SET_PRP1(adc_temp);
 
 	/* C2:   Analog4 - Pressure 2 (CN5) */
 	/* 24V 5k absolute pressure sensor (1-4V output) */
-	SET_PRP2(analogRead(ADC3, 12));
+	adc_temp = analogRead(ADC3, 12);
+	adc_temp = adc_to_mv(adc_temp, 213);
+	adc_temp *= 5;
+	adc_temp /= 3;
+	SET_PRP2(adc_temp);
 
-	/* F3:   Analog6 - Pressure 3 (CN5) */
+	/* F3:   Analog8 - Pressure 3 (CN5) */
 	/* */
-	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 9)));
+	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 15)));
 
 	/* F4:   Analog7 - Pressure 4 (CN5) */
 	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
@@ -250,7 +251,7 @@ struct udp_pcb *udp_spacex, *udp_dashboard;
 struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 /* Globals */
-uint32_t last_telem_timestamp, last_daq_timestamp;
+uint32_t last_telem_timestamp, last_daq_timestamp, last_batt_timestamp;
 state_t state_handle;
 const char *fault_message = "INITIAL_VAL";
 static err_t lwip_error = ERR_OK;
@@ -444,11 +445,12 @@ void application_handler(void) {
 	}
 
 	/* state of charge calculations */
-	if (!(ticks % 1000)) {
+	if (!(ticks % 1000) && last_batt_timestamp != ticks) {
+		last_batt_timestamp = ticks;
 		curr_draw = (GET_VBATT * GET_IBATT) / 1000000;
 		soc -= (curr_draw);
 		SET_CHARGE_PERC((soc * 100) / SOC_INITIAL);
-		SET_TIME_REMAINING(soc / curr_draw);
+		SET_TIME_REMAINING((curr_draw == 0) ? 1012651 : soc / curr_draw);
 	}
 
 	state_machine_handler(&state_handle);
