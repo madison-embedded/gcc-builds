@@ -35,7 +35,7 @@
 #define VBATT_UPPER			14500	/* mV			*/
 #define VBATT_LOWER			12500	/* mV			*/
 #define IBATT_UPPER			12000	/* mA			*/
-#define IBATT_LOWER			4000	/* mA			*/
+#define IBATT_LOWER			0		/* mA			*/
 #define TBATT_UPPER			400		/* 1/10 deg C	*/
 #define TBATT_LOWER			150		/* 1/10 deg C	*/
 
@@ -153,6 +153,8 @@ void vent_primary_brakes(bool open);
 void vent_secondary_brakes(bool open);
 void thrusters(bool on);
 void vent_thrusters(bool open);
+
+void change_state(STATE_NAME state);
 
 #endif
 

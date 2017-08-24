@@ -35,7 +35,7 @@ void state_machine_handler(state_t *handle) {
 	if(check_interval(handle->curr_state)) {
 #if DEBUG_STATE
 		print_time();
-		printf("%s (message: %s)\r\n", state_strings[handle->curr_state], fault_message);
+		printf("%s (message: %s)\r\n", state_strings[handle->curr_state], (handle->curr_state == FAULT) ? fault_message : "none");
 #endif
 		handle->in_state_table[handle->curr_state](handle->flags);
 	}

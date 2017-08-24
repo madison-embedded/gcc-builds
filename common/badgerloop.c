@@ -12,6 +12,8 @@
 #include "honeywell.h"
 #include "retro.h"
 
+#define DEBUG_IO	1
+
 /*****************************************************************************/
 /*                                 Data Buffer                               */
 /*****************************************************************************/
@@ -104,7 +106,7 @@ static uint16_t adc_to_mv(uint16_t reading, uint16_t offset) {
 }
 
 uint16_t braking_sensor_scalar(uint16_t reading) {
-	return adc_to_mv(reading, 107) / 8;
+	return (adc_to_mv(reading, 107) * 75) / 1000;
 }
 
 extern void assert_fault(const char *message);
@@ -120,10 +122,16 @@ void badgerloop_update_data(void) {
 	/* strip count: exti */
 	SET_SCOUNT(mainRetro.count);
 
-	if (readAccelData(tempBuffer)) {
+	__disable_irq();
+	if (!readAccelData(tempBuffer)) {
 		// TODO: rolling average w/ fifo reading
 		SET_ACCEL(tempBuffer[0]);
+		if (!strcmp("can't read MPU9250", fault_message) && state_handle.curr_state == FAULT) {
+			change_state(IDLE);
+			fault_message = "INITIAL_VAL";
+		}
 	} else assert_fault("can't read MPU9250");
+	__enable_irq();
 
 	SET_VEL(getVelocity()); // exti
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
@@ -335,7 +343,9 @@ int send_telemetry_to_SpaceX(void) {
 	spacex_payload = pbuf_alloc(PBUF_TRANSPORT, SPACEXP_SIZ, PBUF_POOL);
 	if (spacex_payload == NULL) return -1;
 
+	__disable_irq();
 	memcpy(spacex_payload->payload, telemetry_buffer, SPACEXP_SIZ);
+	__enable_irq();
 
 	last_telem_timestamp = ticks;
 
@@ -350,7 +360,9 @@ int send_telemetry_to_Dashboard(void) {
 	dashboard_payload = pbuf_alloc(PBUF_TRANSPORT, DASHBOARDP_SIZ, PBUF_POOL);
 	if (dashboard_payload == NULL) return -1;
 
+	__disable_irq();
 	memcpy(dashboard_payload->payload, telemetry_buffer, DASHBOARDP_SIZ);
+	__enable_irq();
 
 	last_telem_timestamp = ticks;
 
@@ -468,47 +480,55 @@ void application_handler(void) {
 static int primary_intensity = -1, secondary_intensity = -1;
 
 void primary_brakes(int intensity) {
-#if DEBUG
-	printf("primary brakes %d\r\n", intensity);
+#if DEBUG_IO
+	printf("primary brakes %d (%s)\r\n", intensity, intensity ? "not driven" : "driven");
 #endif
 	if (intensity != primary_intensity) {
-		// Do actuation
+		gpio_writePin(GPIOD, 6, (intensity == 0) ? true : false);
+		// TODO: bit field
 	}
 	primary_intensity = intensity;
 }
 
 void secondary_brakes(int intensity) {
-#if DEBUG
-	printf("secondary brakes %d\r\n", intensity);
+#if DEBUG_IO
+	printf("secondary brakes %d (%s)\r\n", intensity, intensity ? "driven" : "not driven");
 #endif
 	if (intensity != secondary_intensity) {
-		// Do actuation
+		gpio_writePin(GPIOE, 14, (intensity == 0) ? false : true);
+		// TODO: bit field
 	}
 	secondary_intensity = intensity;
 }
 
 void vent_primary_brakes(bool open) {
-#if DEBUG
-	printf("vent primary brakes %s\r\n", open ? "on" : "off");
+#if DEBUG_IO
+	printf("vent primary brakes %s\r\n", open ? "not driven" : "driven");
 #endif
+	gpio_writePin(GPIOB, 11, !open);
 }
 
 void vent_secondary_brakes(bool open) {
-#if DEBUG
-	printf("vent secondary brakes %s\r\n", open ? "on" : "off");
+#if DEBUG_IO
+	printf("vent secondary brakes %s\r\n", open ? "not driven" : "driven");
 #endif
+	gpio_writePin(GPIOF, 12, !open);
 }
 
 void thrusters(bool on) {
-#if DEBUG
-	printf("thrust %s\r\n", on ? "on" : "off");
+#if DEBUG_IO
+	printf("thrust %s\r\n", on ? "driven" : "not driven");
 #endif
+	gpio_writePin(GPIOD, 4, on);
+	gpio_writePin(GPIOA, 0, on);
 }
 
 void vent_thrusters(bool open) {
-#if DEBUG
-	printf("vent thrust %s\r\n", open ? "on" : "off");
+#if DEBUG_IO
+	printf("vent thrust %s\r\n", open ? "not driven" : "driven");
 #endif
+	gpio_writePin(GPIOB, 10, !open);
+	gpio_writePin(GPIOD, 7, !open);
 }
 /*****************************************************************************/
 /*****************************************************************************/

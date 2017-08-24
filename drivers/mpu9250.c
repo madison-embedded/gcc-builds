@@ -4,7 +4,7 @@
 extern I2C_HandleTypeDef hi2c;
 
 static bool readBytes(uint8_t addr, uint8_t subAddr, uint8_t numBytes, uint8_t * buffer) {
-	return HAL_I2C_Mem_Read(&hi2c, addr << 1, subAddr, 1, buffer, numBytes, 500) == HAL_OK ? true : false;
+	return (HAL_I2C_Mem_Read(&hi2c, addr << 1, subAddr, 1, buffer, numBytes, 500) == HAL_OK) ? false : true;
 }
 
 static uint8_t readByte(uint8_t addr, uint8_t subAddr) {
