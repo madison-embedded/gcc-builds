@@ -35,54 +35,63 @@ bool verify_DAQ(void) {
 	/* Check battery voltage */
 	if (CHECK_THRESHOLD(GET_VBATT, VBATT_UPPER, VBATT_LOWER)) {
 		assert_fault("primary battery voltage OOR\r\n");
+		bad_value = GET_VBATT;
 		return false;
 	}
 
 	/* Check battery current */
 	if (CHECK_THRESHOLD(GET_IBATT, IBATT_UPPER, IBATT_LOWER)) {
 		assert_fault("primary battery current OOR\r\n");
+		bad_value = GET_IBATT;
 		return false;
 	}
 
 	/* Check battery temperature */
 	if (CHECK_THRESHOLD(GET_TBATT, TBATT_UPPER, TBATT_LOWER)) {
 		assert_fault("primary battery temperature OOR\r\n");
+		bad_value = GET_TBATT;
 		return false;
 	}
 
 	/* Check braking pressure 1, upstream? */
 	if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
 		assert_fault("Low braking pressure 1\r\n");
+		bad_value = GET_BRP1;
 		return false;
 	}
 
 	/* Check braking pressure 2, upstream? */
 	if (CHECK_THRESHOLD(GET_BRP2, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
 		assert_fault("Low braking pressure 2\r\n");
+		bad_value = GET_BRP2;
 		return false;
 	}
 
 	/* Check braking pressure 3, downstream? */
 	if (CHECK_THRESHOLD(GET_BRP3, BRAKING_OFF_P_UPPER, BRAKING_OFF_P_LOWER)) {
 		assert_fault("High braking pressure 3\r\n");
+		bad_value = GET_BRP3;
 		return false;
 	}
 
 	/* Check accelerometer */
 	if (CHECK_THRESHOLD(GET_ACCEL, ACCEL_UPPER_IDLE, ACCEL_LOWER_IDLE)) {
 		assert_fault("Accelerating\r\n");
+		bad_value = GET_ACCEL;
 		return false;
 	}
 
 	/* Check velocity */
 	if (CHECK_THRESHOLD(GET_VEL, 5, -5)) {
 		assert_fault("Velocity not zero\r\n");
+		bad_value = GET_VEL;
 		return false;
 	}
 
 	/* Check position */
 	if (CHECK_THRESHOLD(GET_POS, 0, 0)) {
 		assert_fault("Position not zero\r\n");
+		bad_value = GET_POS;
 		return false;
 	}
 
