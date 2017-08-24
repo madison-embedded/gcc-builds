@@ -66,8 +66,8 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	case 'l':
 		printf("PLIM1:\t%s\r\n", GET_PLIM1 ? "Open" : "Pressed");
 		printf("PLIM2:\t%s\r\n", GET_PLIM2 ? "Open" : "Pressed");
-		printf("BLIM1:\t%s\r\n", GET_BLIM1 ? "Pressed" : "Open");
-		printf("BLIM2:\t%s\r\n", GET_BLIM2 ? "Pressed" : "Open");
+		printf("BLIM1:\t%s\r\n", GET_BLIM1 ? "Open" : "Pressed");
+		printf("BLIM2:\t%s\r\n", GET_BLIM2 ? "Open" : "Pressed");
 		printf("DLIM:\t%s\r\n", GET_DLIM ? "Open" : "Pressed");
 		break;
 	default: return USAGE;
