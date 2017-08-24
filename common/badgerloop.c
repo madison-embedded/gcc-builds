@@ -108,6 +108,7 @@ uint16_t braking_sensor_scalar(uint16_t reading) {
 
 extern void assert_fault(const char *message);
 
+int16_t tempBuffer[3]; /* can't be a stack variable */
 void badgerloop_update_data(void) {
 
 	int temp;
@@ -118,7 +119,6 @@ void badgerloop_update_data(void) {
 	/* strip count: exti */
 	SET_SCOUNT(0);
 
-	int16_t tempBuffer[3];
 	if (readAccelData(tempBuffer)) {
 		// TODO: rolling average w/ fifo reading
 		SET_ACCEL(tempBuffer[0]);
