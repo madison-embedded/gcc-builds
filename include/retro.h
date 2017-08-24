@@ -16,6 +16,6 @@ timeStamp mainRetro;
 
 #define MAIN_INTERVAL       mainRetro.filter[MAINFILTERINDEX]
 
-void retroInit(void);
+void initRetro(void);
 int getVelocity(void);
 #endif /* _RETR0_H*/

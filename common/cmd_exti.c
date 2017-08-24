@@ -17,7 +17,7 @@ void printStamp (int pin, timeStamp stamp) {
 }
 
 command_status do_exti(int argc, char *argv[]) {
-	retroInit();
+	initRetro();
 	if (argc < 2) return USAGE;
 	uint8_t pin = 0;
 	GPIO_TypeDef * port; 
