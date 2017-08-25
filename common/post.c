@@ -28,9 +28,11 @@ void print_post_info(void) {
 	case 1: printf("Single-Precision"); break;
 	case 2: printf("Double-Precision"); break;
 	}
+#if NETWORKING
 	printf("\r\nMAC (Prog.):\t%02X:%02X:%02X:%02X:%02X:%02X\r\n",
 		MAC0, MAC1, MAC2, MACAddr[0], MACAddr[1], MACAddr[2]);
 	printf("Link Status:\t%s\r\n", eth_check_link() ? "Up" : "Down");
+#endif
 	printf("Flash Size:\t%uK\r\n\n", *((const unsigned int*) FLASHSIZE_BASE) & 0xffff);
 
 	printf("Oscillator Settings:\r\n");
