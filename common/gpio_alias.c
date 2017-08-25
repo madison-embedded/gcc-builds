@@ -118,7 +118,7 @@ const GPIO GPIO_TABLE[] = {
 	/* Retro2 */
 	FILL_AFIO("FRONT",		GPIOE, 11, ALT, 1, LOW_SPEED, NONE, true, RETRO)
 	/* Retro3 */
-	FILL_AFIO("BACK",		GPIOE, 13, ALT, 1, LOW_SPEED, NONE, true, RETRO)
+	FILL_AFIO("REAR",		GPIOE, 13, ALT, 1, LOW_SPEED, NONE, true, RETRO)
 
 	/* Application I2C */
 	FILL_AFIO("SDA",		GPIOF, 0, ALT, 4, LOW_SPEED, NONE, true, I2C)

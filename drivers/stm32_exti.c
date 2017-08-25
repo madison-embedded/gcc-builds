@@ -1,7 +1,5 @@
 #include "exti.h"
 
-timeStamp interLine[NUMBER_INTERUPT_PINS];
-
 /* gets interupt vecotor number for pin */
 static IRQn_Type exti_get_irq_num(uint32_t pin) {
 	switch(pin) {
@@ -55,8 +53,8 @@ void exti_disable(GPIO_TypeDef * port, uint32_t pin) {
 }
 
 /*gets number of interrupts from given pin*/
-timeStamp getTimeStamps(int pin){
-	return interLine[pin];
+timeStamp * getTimeStamps(int pin){
+	return &interLine[pin];
 }
 
 /*need to get time stamps*/

@@ -9,14 +9,17 @@
 #define NUMBER_INTERUPT_PINS 16
 #define AVERAGE_SIZE		 3
 
+
 typedef struct{
 	int prev;
 	int curr;
 	int count;
-	int filter[AVERAGE_SIZE];
+	uint32_t filter[AVERAGE_SIZE];
 }timeStamp;
 
+timeStamp interLine[NUMBER_INTERUPT_PINS];
+
 void exti_config(GPIO_TypeDef * port, uint32_t pin, bool rtsr, bool ftsr, bool ie);
-timeStamp getTimeStamps(int pin);
+timeStamp * getTimeStamps(int pin);
 
 #endif

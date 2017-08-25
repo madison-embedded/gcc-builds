@@ -127,7 +127,7 @@ void badgerloop_update_data(void) {
 	SET_STATUS(state_handle.curr_state);
 
 	/* strip count: exti */
-	SET_SCOUNT(mainRetro.count);
+	SET_SCOUNT(mainRetro->count);
 
 	__disable_irq();
 	if (!readAccelData(tempBuffer)) {

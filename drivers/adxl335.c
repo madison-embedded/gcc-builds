@@ -12,7 +12,5 @@ int readAccelAdc(void) {
 	int retval = analogRead(ADC3, 4);
 	retval -= bias;
 	retval *= 11;	
-	return 1;
+	return retval;
 }
-
-

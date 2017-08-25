@@ -34,7 +34,7 @@ command_status do_ar(int argc, char *argv[]) {
 		uint32_t ts = ticks;
 		printf("Accel: \r\n");
 		do {
-			printf("%d\r", readAccelAdc());
+			printf("%5d\r", readAccelAdc());
 			fflush(stdout);
 		} while (ticks - ts < 5000);
 
