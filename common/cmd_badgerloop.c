@@ -42,6 +42,13 @@ command_status do_badgerloop(int argc, char *argv[]) {
 
 	switch (argv[1][0]) {
 	/* test dashboard functionality */
+#if NETWORKING
+	case 'p':
+		set_stdio_target(UDP);
+		break;
+	case 'q':
+		ret = get_performanceIV(query_Dashboard);
+		break;
 	case 'd':
 		ret = get_performanceIV(send_telemetry_to_Dashboard);
 		break;
@@ -49,6 +56,7 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	case 's':
 		ret = get_performanceIV(send_telemetry_to_SpaceX);
 		break;
+#endif
 	/* perform DAQ / update values */
 	case 'r':
 		get_performanceVV(badgerloop_update_data);
@@ -56,12 +64,6 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	case 'm':
 		if (argc < 3) return USAGE;
 		ret = send_message_to_Dashboard(argv[2], strlen(argv[2]));
-		break;
-	case 'p':
-		set_stdio_target(UDP);
-		break;
-	case 'q':
-		ret = get_performanceIV(query_Dashboard);
 		break;
 	case 'l':
 		printf("PLIM1:\t%s\r\n", GET_PLIM1 ? "Open" : "Pressed");

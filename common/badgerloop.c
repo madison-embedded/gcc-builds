@@ -303,6 +303,7 @@ void udp_echo_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p,
 
 int badgerloop_init(void) {
 
+#if NETWORKING
 	/* don't initialize twice, only query dashboard */
 	if (udp_spacex != NULL && udp_dashboard != NULL) {
 		if (eth_check_link() && query_Dashboard())
@@ -330,15 +331,16 @@ int badgerloop_init(void) {
 
 	udp_recv(udp_dashboard, udp_echo_recv, NULL);
 
-	/* default values */
-	*team_id = TEAM_ID;
-
 	if (eth_check_link() && query_Dashboard())
 		set_stdio_target(UDP);
+#endif
 
 	initialize_state_machine(&state_handle, IDLE,
 		to_handlers, in_handlers, from_handlers,
 		state_event_timestamps, state_intervals);
+
+	/* default values */
+	*team_id = TEAM_ID;
 
 	/* initial capture */
 	badgerloop_update_data();
@@ -451,6 +453,7 @@ void application_handler(void) {
 	}
 
 	/* do telemetry */
+#if NETWORKING
 	if (!(ticks % TELEM_INT) && last_telem_timestamp != ticks) {
 		last_telem_timestamp = ticks;
 		if (gnetif.flags & NETIF_FLAG_LINK_UP) {
@@ -468,6 +471,7 @@ void application_handler(void) {
 				state_handle.flags |= RETRY_INIT;
 		}
 	}
+#endif
 
 	/* state of charge calculations */
 	if (!(ticks % 1000) && last_batt_timestamp != ticks) {

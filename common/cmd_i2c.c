@@ -23,6 +23,7 @@ const char *HALstatusString(HAL_StatusTypeDef status) {
 command_status do_i2c(int argc, char *argv[]) {
 	uint16_t address, memAddr;
 	uint8_t numBytes, *dataBuffer = NULL;
+	uint32_t mpu_ts;
 	int i;
 	HAL_StatusTypeDef stat;
 
@@ -50,9 +51,20 @@ command_status do_i2c(int argc, char *argv[]) {
 			printf("%s\r\n", initMPU9250() ? "OK" : "FAIL");
 			break;
 		case 'r':
+#if NETWORKING
 			printf("X\tY\tZ\r\n");
 			readAccelData(data);
 			printf("%-6d\t%-6d\t%-6d\r\n", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
+#else
+			mpu_ts = ticks;
+			printf("X\tY\tZ\r\n");
+			do {
+				readAccelData(data);
+				printf("%-6d\t%-6d\t%-6d\r", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
+				fflush(stdout);
+			} while(mpu_ts - ticks < 2000);
+#endif
+			printf("\n");
 			break;
 		case 'p': printMPU9250(); break;
 		default: return USAGE;

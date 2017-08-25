@@ -87,9 +87,10 @@ void early_init(void) {
 	HAL_I2C_Init(&hi2c);
 
 	/* Networking */
+#if NETWORKING
 	lwip_init();
-
 	Netif_Config();
+#endif
 
 	/* warning: this will re-target printf */
 	badgerloop_init();

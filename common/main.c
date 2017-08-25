@@ -28,7 +28,9 @@ int main(void) {
 		check_input();
 
 		/* check network interface */
+#if NETWORKING
 		lwip_loop_handler();
+#endif
 
 		/* Badgerloop: DAQ, telemetry, state machine */
 		application_handler();
