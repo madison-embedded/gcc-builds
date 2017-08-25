@@ -10,10 +10,12 @@
 
 // Functions
 bool initMPU9250(void);
+void calibrate_mpu9250(void);
 int16_t to_cms2(int16_t data);
 bool readAccelData(int16_t * destination);
 void printMPU9250(void);
 bool mpuAlive(void);
+bool mpu9250_handler(int16_t * destination);
 
 #define AFS_2G 			0
 #define AFS_4G			1

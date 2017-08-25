@@ -129,16 +129,8 @@ void badgerloop_update_data(void) {
 	/* strip count: exti */
 	SET_SCOUNT(mainRetro->count);
 
-	__disable_irq();
-	if (!readAccelData(tempBuffer)) {
-		// TODO: rolling average w/ fifo reading
+	if (mpu9250_handler(tempBuffer))
 		SET_ACCEL(tempBuffer[0]);
-		if (!strcmp("can't read MPU9250", fault_message) && state_handle.curr_state == FAULT) {
-			change_state(IDLE);
-			fault_message = "INITIAL_VAL";
-		}
-	} else assert_fault("can't read MPU9250");
-	__enable_irq();
 
 	SET_VEL(getVelocity()); // exti
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
@@ -343,7 +335,7 @@ int badgerloop_init(void) {
 	*team_id = TEAM_ID;
 
 	/* initial capture */
-	badgerloop_update_data();
+	//badgerloop_update_data();
 
 	return 0;
 }
