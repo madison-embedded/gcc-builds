@@ -1,6 +1,6 @@
 #include "retro.h"
 
-void retroInit(void) {
+void initRetro(void) {
 	mainRetro = FRONT;
 }
 
