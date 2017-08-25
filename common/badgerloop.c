@@ -343,7 +343,7 @@ int badgerloop_init(void) {
 	*team_id = TEAM_ID;
 
 	/* initial capture */
-	badgerloop_update_data();
+	//badgerloop_update_data();
 
 	return 0;
 }

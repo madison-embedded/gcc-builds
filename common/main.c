@@ -33,7 +33,7 @@ int main(void) {
 #endif
 
 		/* Badgerloop: DAQ, telemetry, state machine */
-		application_handler();
+		//application_handler();
 
 		/* Blink Red LED */
 		blink_handler(curr, prev);

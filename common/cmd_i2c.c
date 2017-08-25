@@ -60,13 +60,16 @@ command_status do_i2c(int argc, char *argv[]) {
 			printf("X\tY\tZ\r\n");
 			do {
 				readAccelData(data);
-				printf("%-6d\t%-6d\t%-6d\r", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
+				__disable_irq();
+				printf("%-6d\t%-6d\t%-6d\r\n", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
+				__enable_irq();
 				fflush(stdout);
-			} while(mpu_ts - ticks < 2000);
-#endif
+			} while(ticks - mpu_ts < 5000);
 			printf("\n");
+#endif
 			break;
 		case 'p': printMPU9250(); break;
+		case 'c': calibrate_mpu9250(); break;
 		default: return USAGE;
 		}
 		return SUCCESS;

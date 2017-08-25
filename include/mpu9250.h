@@ -10,6 +10,7 @@
 
 // Functions
 bool initMPU9250(void);
+void calibrate_mpu9250(void);
 int16_t to_cms2(int16_t data);
 bool readAccelData(int16_t * destination);
 void printMPU9250(void);
