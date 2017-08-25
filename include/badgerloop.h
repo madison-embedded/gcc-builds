@@ -28,7 +28,7 @@
 
 #define SOC_INITIAL		1013760
 #define CM_PER_STRIP	3048
-#define ACCEL_BUF_SIZ	5
+#define ACCEL_BUF_SIZ	25
 
 /*****************************************************************************/
 /*                          Error checking parameters                        */

@@ -6,22 +6,12 @@ void initRetro(void) {
 }
 
 void badRetro(void){
-
-	if (&mainRetro->count == &FRONT.count) {
-		if (FRONT.count != MIDDLE.count && MIDDLE.count == REAR.count && MIDDLE.count > FRONT.count)
-			mainRetro = &MIDDLE;
-	}
-	else if (&mainRetro->count == &MIDDLE.count) {
-		if (MIDDLE.count < REAR.count)
-			mainRetro = &REAR;
-	}
-	else {
-		if (FRONT.count > REAR.count && FRONT.count > MIDDLE.count)
-			mainRetro = &FRONT;
-		else if (MIDDLE.count > REAR.count && MIDDLE.count > FRONT.count)
-			mainRetro = &MIDDLE;
-	}
-
+	if (FRONT.count == MIDDLE.count)
+		mainRetro = &FRONT;
+	else if (MIDDLE.count == REAR.count)
+		mainRetro = &MIDDLE;
+	else if (FRONT.count == REAR.count)
+		mainRetro = &FRONT;
 }
 
 int getVelocity(void) {
