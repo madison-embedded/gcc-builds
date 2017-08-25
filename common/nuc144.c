@@ -11,6 +11,7 @@
 #include "badgerloop.h"
 #include "cli.h"
 #include "mpu9250.h"
+#include "retro.h"
 
 #define I2C_TIMING        0x00400E40 
 I2C_HandleTypeDef hi2c;
@@ -98,6 +99,7 @@ void early_init(void) {
 	process_input("i2c");
 	if (mpuAlive())
 		initMPU9250();
+	initRetro();
 
 }
 
