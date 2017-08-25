@@ -1,7 +1,6 @@
 #include "kalmanFilter.h"
 
-double realMeas, correctedMeas;
-kalman_state myKalman;
+int realMeas, correctedMeas;
 
 /*****************************	
 	q process noise covariance
@@ -24,22 +23,19 @@ One Dimension Simplified Kalman Filter
     x = 0 
 ******************************/
 
-kalman_state kalman_init(double q, double r, double p, double intial_value)
-{
+kalman_state kalman_init(int q, int r, int p, int intial_value) {
   kalman_state result;
   result.q = q;
   result.r = r;
   result.p = p;
   result.x = intial_value;
-
   return result;
 }
 
 
-double kalman_update(kalman_state* state, double measurement)
-{
+int kalman_update(kalman_state* state, int measurement) {
+
   //prediction update
-  
   state->p = state->p + state->q;
 
   //measurement update
@@ -48,16 +44,4 @@ double kalman_update(kalman_state* state, double measurement)
   state->p = (1 - state->k) * state->p;
   return state->x;
 }
-
-
-//Might want to put this in a loop within the entire measuring time period
-void kalmanFunc(void){
-
-	myKalman = kalman_init(0.125,32,1023,0);
-
-	/********Loop********************************
-	realMeas = MPU_readAcceData;	//keep reading from MPU to get x axis value
-	correctedMeas =  kalman_update(myKalman, realMeas);
-	*********Loop*******************************/
-} 
 

@@ -28,6 +28,7 @@
 
 #define SOC_INITIAL		1013760
 #define CM_PER_STRIP	3048
+#define ACCEL_BUF_SIZ	5
 
 /*****************************************************************************/
 /*                          Error checking parameters                        */
@@ -53,6 +54,9 @@
 #define TARGET_END_POS		125000
 
 #define BRAKING_COUNT_THRS	5
+
+#define DONT_BRAKE_TO		8000
+#define MUST_BRAKE_TO		17000
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -156,6 +160,8 @@ void thrusters(bool on);
 void vent_thrusters(bool open);
 
 void change_state(STATE_NAME state);
+
+extern bool manual_update;
 
 #endif
 

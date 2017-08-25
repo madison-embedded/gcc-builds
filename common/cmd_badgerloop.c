@@ -11,6 +11,35 @@ command_status do_badgerloop(int argc, char *argv[]) {
 
 	if (argc == 1) return USAGE;
 
+	if (!strcmp("accel", argv[1])) {
+		SET_ACCEL(strtol(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("position", argv[1])) {
+		SET_POS(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("velocity", argv[1])) {
+		SET_VEL(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("strip", argv[1])) {
+		SET_SCOUNT(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("bls", argv[1])) {
+		SET_BRP1(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("blp", argv[1])) {
+		SET_BRP2(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("bpp", argv[1])) {
+		SET_BRP3(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("pl", argv[1])) {
+		SET_PRP1(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	} else if (!strcmp("ps", argv[1])) {
+		SET_PRP2(strtoul(argv[2], NULL, 10));
+		return SUCCESS;
+	}
+
 	/* actuation functions */
 	if (argc == 3) {
 		if (!strcmp(argv[1], "pbrake"))
@@ -36,6 +65,14 @@ command_status do_badgerloop(int argc, char *argv[]) {
 			default: return USAGE;
 			}
 			state_handle.change_state = true;
+		} else if (!strcmp("override", argv[1])) {
+			if (!strcmp("on", argv[2])) {
+				printf("data override on\r\n");
+				manual_update = true;
+			} else if (!strcmp("off", argv[2])) {
+				printf("data override off\r\n");
+				manual_update = false;
+			} else return FAIL;
 		} else return USAGE;
 		return SUCCESS;
 	}

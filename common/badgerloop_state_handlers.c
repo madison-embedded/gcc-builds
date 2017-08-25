@@ -20,6 +20,7 @@ void change_state(STATE_NAME state) {
 
 void assert_fault(const char *message) {
 	change_state(FAULT);
+	printf("%s: %s\r\n", __func__, message);
 	fault_message = message;
 }
 
@@ -185,7 +186,7 @@ void to_ready(STATE_NAME from, uint32_t flags) {
 void in_ready(uint32_t flags) {
 
 	/* Push phase condition: either pusher limit switch */
-	if (GET_PLIM1 || GET_PLIM2)
+	if (!(GET_PLIM1 && GET_PLIM2) && GET_ACCEL > 300)
 		change_state(PUSHING);
 
 }
@@ -200,16 +201,22 @@ void from_ready(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 /*                               Pushing Handlers                            */
 /*****************************************************************************/
-void to_pushing(STATE_NAME from, uint32_t flags) {
+uint32_t pushing_start_ts = 0;
 
+void to_pushing(STATE_NAME from, uint32_t flags) {
+	pushing_start_ts = ticks;
 }
+
 
 void in_pushing(uint32_t flags) {
 
 	/* Coast phase condition: limit switches + delay */
-	if (!GET_PLIM1 && !GET_PLIM2)
+	if (GET_PLIM1 && GET_PLIM2)
 		if (ticks - ((plim1_ts > plim2_ts) ? plim1_ts : plim2_ts) > 1000)
 			change_state(COAST);
+
+	if (ticks - pushing_start_ts > MUST_BRAKE_TO)
+		change_state(BRAKE);
 
 }
 
@@ -224,9 +231,9 @@ void from_pushing(STATE_NAME to, uint32_t flags) {
 /*                                 Coast Handlers                            */
 /*****************************************************************************/
 void to_coast(STATE_NAME from, uint32_t flags) {
-
-	thrusters(100);
-
+	if (from != BRAKING)
+		thrusters(100);
+	else vent_thrusters(true);
 }
 
 void in_coast(uint32_t flags) {
@@ -253,7 +260,9 @@ void from_coast(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 void to_braking(STATE_NAME from, uint32_t flags) {
 
-	primary_brakes(100);
+	if ((ticks - pushing_start_ts < DONT_BRAKE_TO))
+		change_state(COAST);
+	else primary_brakes(100);
 
 }
 

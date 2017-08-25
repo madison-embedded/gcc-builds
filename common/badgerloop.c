@@ -24,7 +24,11 @@ uint8_t *team_id = &telemetry_buffer[0];
 uint8_t *status = &telemetry_buffer[1];
 
 /* Position, Velocity, Acceleration */
+int16_t accelBuffer[3]; /* holds raw values */
+int accelRollingBuffer[ACCEL_BUF_SIZ];
+int accelCount = 0, accelSum = 0;
 int *acceleration = (int *) &telemetry_buffer[2],
+
 	*position = (int *) &telemetry_buffer[6],
 	*velocity = (int *) &telemetry_buffer[10],
 
@@ -72,7 +76,7 @@ int calculate_stopping_distance(int velocity, int target_decel) {
 		return -1;
 
 	velocity *= velocity;
-	return velocity / target_decel;
+	return -(velocity / target_decel);
 
 }
 
@@ -118,74 +122,17 @@ uint16_t braking_sensor_scalar(uint16_t reading) {
 
 extern void assert_fault(const char *message);
 
-int16_t tempBuffer[3]; /* can't be a stack variable */
-void badgerloop_update_data(void) {
+
+void badgerloop_forced_data(void) {
 
 	int temp;
 	uint16_t adc_temp;
 
-	SET_STATUS(state_handle.curr_state);
-
-	/* strip count: exti */
-	SET_SCOUNT(mainRetro->count);
-
-	if (mpu9250_handler(tempBuffer))
-		SET_ACCEL(tempBuffer[0]);
-
-	SET_VEL(getVelocity()); // exti
-	SET_POS(CM_PER_STRIP * GET_SCOUNT);
-
-	/* I2C temp/pressure sensor */
-	SET_PAMP(honeywell_readPressure());
-	SET_TPOD(honeywell_readTemperature() * 10);
-
-	battery_voltage();
-
-	/* battery current */
-	adc_temp = analogRead(ADC3, 3);
-	adc_temp -= adc_temp > 120 ? 120 : adc_temp;
-	adc_temp = (adc_temp * 3) + (adc_temp / 5);
-	SET_IBATT((adc_temp * 1000) / 37);
-
-	/* A4:  Analog14 - Thermistor 2 */
-	SET_TBATT(thermistor_scalar(analogRead(ADC3, 6)) * 10);
-
-	/* F5:   Analog6 - Pressure 1 (CN6) */
-	adc_temp = analogRead(ADC3, 9);
-	adc_temp = adc_to_mv(adc_temp, 107);
-	adc_temp *= 5;
-	adc_temp /= 4;
-	adc_temp += 15; /* not an absolute sensor */
-	SET_PRP1(adc_temp);
-
-	/* C2:   Analog4 - Pressure 2 (CN5) */
-	/* 24V 5k absolute pressure sensor (1-4V output) */
-	adc_temp = analogRead(ADC3, 12);
-	adc_temp = adc_to_mv(adc_temp, 213);
-	adc_temp *= 5;
-	adc_temp /= 3;
-	SET_PRP2(adc_temp);
-
-	/* F3:   Analog8 - Pressure 3 (CN5) */
-	/* */
-	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 15)));
-
-	/* F4:   Analog7 - Pressure 4 (CN5) */
-	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
-
-	/* F10:  Analog9 - Pressure 2 (CN6) */
-	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 8)));
-
-	/* B1:   Analog2 - Secondary Battery Voltage */
-	/* F9:  Analog13 - Secondary Battery Current */
-
-	/* C0:   Analog3 - Pressure 1 (CN5) */
-
-	/* F6:  Analog10 - Accelerometer X */
-
-	/* A5:  Analog15 - Thermistor 2 */
-	/* F7:  Analog11 - Thermistor 3 */
-	/* F8:  Analog12 - Thermistor 4 */
+	/* When not braking, accel is a "guess", when braking accel is literal */
+	if (state_handle.curr_state != BRAKING)
+		SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
+	else /* todo, can we trust the accelerometer 100% of the time? */
+		SET_STOPD(calculate_stopping_distance(GET_VEL, GET_ACCEL));
 
 	/*************************************************************************/
 	/*                            digital I/O                                */
@@ -247,14 +194,83 @@ void badgerloop_update_data(void) {
 	/*************************************************************************/
 	/*************************************************************************/
 
-	/* When not braking, accel is a "guess", when braking accel is literal */
-	if (state_handle.curr_state != BRAKING)
-		SET_STOPD(calculate_stopping_distance(GET_VEL, TARGET_DECEL));
-	else /* todo, can we trust the accelerometer 100% of the time? */
-		SET_STOPD(calculate_stopping_distance(GET_VEL, GET_ACCEL));
+	SET_STATUS(state_handle.curr_state);
+
+	/* I2C temp/pressure sensor */
+	SET_PAMP(honeywell_readPressure());
+	SET_TPOD(honeywell_readTemperature() * 10);
+
+	battery_voltage();
+
+	/* battery current */
+	adc_temp = analogRead(ADC3, 3);
+	adc_temp -= adc_temp > 120 ? 120 : adc_temp;
+	adc_temp = (adc_temp * 3) + (adc_temp / 5);
+	SET_IBATT((adc_temp * 1000) / 37);
+
+	/* A4:  Analog14 - Thermistor 2 */
+	SET_TBATT(thermistor_scalar(analogRead(ADC3, 6)) * 10);
 
 	if (CHECK_THRESHOLD(GET_POS, TARGET_END_POS, -1))
 		state_handle.flags |= RUN_OVER;
+}
+
+/* data can be overidden */
+void badgerloop_update_data(void) {
+
+	uint16_t adc_temp;
+
+	/* strip count: exti */
+	SET_SCOUNT(mainRetro->count);
+
+	if (mpu9250_handler(accelBuffer)) {
+		accelSum -= accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
+		accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = (int) accelBuffer[0];
+		accelSum += (int) accelBuffer[0];
+		accelCount++;
+		SET_ACCEL(accelSum / ACCEL_BUF_SIZ);
+	}
+
+	SET_VEL(getVelocity()); // exti
+	SET_POS(CM_PER_STRIP * GET_SCOUNT);
+
+	/* F5:   Analog6 - Pressure 1 (CN6) */
+	adc_temp = analogRead(ADC3, 9);
+	adc_temp = adc_to_mv(adc_temp, 107);
+	adc_temp *= 5;
+	adc_temp /= 4;
+	adc_temp += 15; /* not an absolute sensor */
+	SET_PRP1(adc_temp);
+
+	/* C2:   Analog4 - Pressure 2 (CN5) */
+	/* 24V 5k absolute pressure sensor (1-4V output) */
+	adc_temp = analogRead(ADC3, 12);
+	adc_temp = adc_to_mv(adc_temp, 213);
+	adc_temp *= 5;
+	adc_temp /= 3;
+	SET_PRP2(adc_temp);
+
+	/* F3:   Analog8 - Pressure 3 (CN5) */
+	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 15)));
+
+	/* F4:   Analog7 - Pressure 4 (CN5) */
+	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
+
+	/* F10:  Analog9 - Pressure 2 (CN6) */
+	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 8)));
+
+	/* B1:   Analog2 - Secondary Battery Voltage */
+	/* F9:  Analog13 - Secondary Battery Current */
+
+	/* C0:   Analog3 - Pressure 1 (CN5) */
+
+	/* F6:  Analog10 - Accelerometer X */
+
+	/* A5:  Analog15 - Thermistor 2 */
+	/* F7:  Analog11 - Thermistor 3 */
+	/* F8:  Analog12 - Thermistor 4 */
+
+	badgerloop_forced_data();
 }
 
 /* Networking */
@@ -331,11 +347,10 @@ int badgerloop_init(void) {
 		to_handlers, in_handlers, from_handlers,
 		state_event_timestamps, state_intervals);
 
+	memset(accelRollingBuffer, 0x00, sizeof(int) * ACCEL_BUF_SIZ);
+
 	/* default values */
 	*team_id = TEAM_ID;
-
-	/* initial capture */
-	//badgerloop_update_data();
 
 	return 0;
 }
@@ -436,13 +451,15 @@ int query_Dashboard(void) {
 	return 0;
 }
 
+bool manual_update = false;
 void application_handler(void) {
 
 	/* do DAQ */
-	if (!(ticks % DAQ_INT) && last_daq_timestamp != ticks) {
+	if (!(ticks % DAQ_INT) && last_daq_timestamp != ticks && !manual_update) {
 		last_daq_timestamp = ticks;
 		badgerloop_update_data();
-	}
+	} else if (manual_update)
+		badgerloop_forced_data();
 
 	/* do telemetry */
 #if NETWORKING

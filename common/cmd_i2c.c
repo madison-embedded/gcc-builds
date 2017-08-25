@@ -23,8 +23,10 @@ const char *HALstatusString(HAL_StatusTypeDef status) {
 command_status do_i2c(int argc, char *argv[]) {
 	uint16_t address, memAddr;
 	uint8_t numBytes, *dataBuffer = NULL;
-	uint32_t mpu_ts;
 	int i;
+#if !NETWORKING
+	uint32_t mpu_ts;
+#endif
 	HAL_StatusTypeDef stat;
 
 	/* one argument polls attached devices */
