@@ -6,6 +6,7 @@
 #include "gpio.h"
 #include "gpio_alias.h"
 #include "config.h"
+#include "adxl335.h"
 
 uint16_t get_performanceITI(uint16_t(*func)(ADC_TypeDef *, uint8_t), ADC_TypeDef * adc, uint8_t pin);
 
@@ -26,6 +27,18 @@ command_status do_ar(int argc, char *argv[]) {
 			else
 				printf("Result: %d\r\n", analogRead(ADC_LUT[i].adc, ADC_LUT[i].channel));
 		}
+		return SUCCESS;
+	}
+
+	if(strcmp("accel", argv[1]) == 0) {
+		uint32_t ts = ticks;
+		printf("Accel: \r\n");
+		do {
+			printf("%d\r", readAccelAdc());
+			fflush(stdout);
+		} while (ticks - ts < 5000);
+
+		printf("\n");
 		return SUCCESS;
 	}
 

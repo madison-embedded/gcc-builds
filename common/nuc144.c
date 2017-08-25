@@ -12,6 +12,7 @@
 #include "cli.h"
 #include "mpu9250.h"
 #include "retro.h"
+#include "adxl335.h"
 
 #define I2C_TIMING        0x00400E40 
 I2C_HandleTypeDef hi2c;
@@ -101,6 +102,7 @@ void early_init(void) {
 	if (mpuAlive())
 		initMPU9250();
 	initRetro();
+	initAccelAdc();
 
 }
 

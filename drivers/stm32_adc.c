@@ -132,10 +132,9 @@ bool adc_init(ADC_TypeDef *adc) {
 	adc->CR1 |= ADC_CR1_RES_0; /* 10-bit accuracy */
 	adc->CR2 |= ADC_CR2_ADON;
 	while (curr_tick == ticks) {;} /* stabilization? */
-	for (i = 0; i < 2; i++) {
-		for (ii = 0; ii < 16; ii++) {
-			count[i][ii] = 0;
-			average[i][ii] = 0;
+	for (i = 0; i < 16; i++) {
+		for(ii = 0; ii < AVERAGE_SIZE; ii++){
+			analogRead(adc, i);
 		}
 	}
 
