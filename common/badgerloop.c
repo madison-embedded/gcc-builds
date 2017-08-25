@@ -168,13 +168,13 @@ void badgerloop_update_data(void) {
 
 	/* F3:   Analog8 - Pressure 3 (CN5) */
 	/* */
-	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 15)));
+	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 15)));
 
 	/* F4:   Analog7 - Pressure 4 (CN5) */
 	SET_BRP2(braking_sensor_scalar(analogRead(ADC3, 14)));
 
 	/* F10:  Analog9 - Pressure 2 (CN6) */
-	SET_BRP3(braking_sensor_scalar(analogRead(ADC3, 8)));
+	SET_BRP1(braking_sensor_scalar(analogRead(ADC3, 8)));
 
 	/* B1:   Analog2 - Secondary Battery Voltage */
 	/* F9:  Analog13 - Secondary Battery Current */

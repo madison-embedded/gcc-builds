@@ -1,4 +1,5 @@
 #include "retro.h"
+#include "badgerloop.h"
 
 void initRetro(void) {
 	mainRetro = &FRONT;
@@ -24,13 +25,14 @@ void badRetro(void){
 }
 
 int getVelocity(void) {
-	double velocity;
+	float velocity;
 
 	badRetro();
 	if (!MAIN_INTERVAL) return 0;
-	velocity = 100.0/MAIN_INTERVAL; /*feet/ms*/
-	velocity = velocity * 30 + velocity / 2.0; /*cm/ms*/
-	velocity = velocity/1000.0; /*cm/s*/
+	if (CHECK_THRESHOLD(MAIN_INTERVAL, 203, 0)) {
+		return 15000; /* TODO may subtract stip */
+	}
+	velocity = 3048000 / MAIN_INTERVAL;
 
 	return velocity;
 }

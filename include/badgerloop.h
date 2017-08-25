@@ -21,8 +21,8 @@
 
 /* Constant fields & utilities  */
 #define TEAM_ID			0x3
-#define DAQ_INT			500
-#define TELEM_INT		1000
+#define DAQ_INT			10
+#define TELEM_INT		500
 #define CHECK_THRESHOLD(get_macro, upper, lower)	\
 	(get_macro > upper || get_macro < lower)
 

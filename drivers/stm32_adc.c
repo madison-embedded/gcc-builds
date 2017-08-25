@@ -20,7 +20,7 @@ const ADC_INFO ADC_LUT[] = {
 	//FILL_ADC(ADC1, 6,  GPIOA, 6)  /* A6:  Analog16 - */
 };
 
-#define AVERAGE_SIZE 3
+#define AVERAGE_SIZE 100
 int filter[2][16][AVERAGE_SIZE];
 uint32_t count[2][16];
 int average[2][16];
