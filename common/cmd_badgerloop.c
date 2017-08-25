@@ -71,7 +71,7 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		printf("DLIM:\t%s\r\n", GET_DLIM ? "Open" : "Pressed");
 		break;
 	case 'f':
-		printf("%s\r\n", fault_message);
+		printf("%s: %d\r\n", fault_message, bad_value);
 		break;
 	default: return USAGE;
 	}

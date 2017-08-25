@@ -90,18 +90,18 @@ void battery_voltage(void) {
 }
 
 int thermistor_scalar(uint16_t reading) {
-	int retval = (int) reading;
-	int To = 60 + 273;
-	int Ro = 2760; //at 60 Celsius the resitance is 2760 ohms
-	int B = 3984;
+	float retval = (float) reading;
+	float To = 60.0 + 273.0;
+	float Ro = 2760.0; //at 60 Celsius the resitance is 2760 ohms
+	float B = 3435.0;
 
 	/* volts */
-	retval = reading * 1024 / 3.3;
+	retval = reading * (3.3 / 1024.0);
 	/* ohm */
-	retval = 33000/retval  - 10000;
+	retval = (33000.0 / retval)  - 10000.0;
 	/* 1 / retval */
-	retval = 1.0 / To + (1.0 / B) * log(ohm / Ro);
-    return (int) 1 / inverKelvin - 273;
+	retval = (1.0 / To) + ((1.0 / B) * log(retval / Ro));
+    return (int) ((1 / retval) - 273);
 }
 
 static uint16_t adc_to_mv(uint16_t reading, uint16_t offset) {
@@ -156,7 +156,7 @@ void badgerloop_update_data(void) {
 	SET_IBATT((adc_temp * 1000) / 37);
 
 	/* A4:  Analog14 - Thermistor 2 */
-	SET_TBATT(thermistor_scalar(analogRead(ADC3, 6)));
+	SET_TBATT(thermistor_scalar(analogRead(ADC3, 6)) * 10);
 
 	/* F5:   Analog6 - Pressure 1 (CN6) */
 	adc_temp = analogRead(ADC3, 9);
@@ -272,6 +272,7 @@ struct pbuf *spacex_payload, *dashboard_payload, *message_payload;
 
 /* Globals */
 uint32_t last_telem_timestamp, last_daq_timestamp, last_batt_timestamp;
+int bad_value = 0;
 state_t state_handle;
 const char *fault_message = "INITIAL_VAL";
 static err_t lwip_error = ERR_OK;
@@ -519,7 +520,7 @@ void vent_secondary_brakes(bool open) {
 #if DEBUG_IO
 	printf("vent secondary brakes %s\r\n", open ? "not driven" : "driven");
 #endif
-	gpio_writePin(GPIOF, 12, !open);
+	gpio_writePin(GPIOA, 0, !open);
 }
 
 void thrusters(bool on) {
@@ -527,7 +528,7 @@ void thrusters(bool on) {
 	printf("thrust %s\r\n", on ? "driven" : "not driven");
 #endif
 	gpio_writePin(GPIOD, 4, on);
-	gpio_writePin(GPIOA, 0, on);
+	gpio_writePin(GPIOF, 12, on);
 }
 
 void vent_thrusters(bool open) {
