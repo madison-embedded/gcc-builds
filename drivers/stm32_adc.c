@@ -20,6 +20,11 @@ const ADC_INFO ADC_LUT[] = {
 	//FILL_ADC(ADC1, 6,  GPIOA, 6)  /* A6:  Analog16 - */
 };
 
+#define AVERAGE_SIZE 3
+int filter[2][16][AVERAGE_SIZE];
+uint32_t count[2][16];
+int average[2][16];
+
 const uint8_t NUM_ADC = sizeof(ADC_LUT)/sizeof(ADC_INFO);
 
 uint32_t adcFreq = 0;
@@ -94,12 +99,30 @@ uint16_t analogRead(ADC_TypeDef *adc, uint8_t channel) {
 	/* turn off ADC */
 	//adc->CR2 &= ~ADC_CR2_ADON;
 
+	if (adc == ADC3) {
+		average[0][channel] -= filter[0][channel][count[0][channel] % AVERAGE_SIZE];
+		average[0][channel] += retval;
+		filter[0][channel][count[0][channel] % AVERAGE_SIZE] = retval;
+
+		count[0][channel]++;
+
+		/* return data */
+		return average[0][channel] / AVERAGE_SIZE;
+	}
+	average[1][channel] -= filter[1][channel][count[1][channel] % AVERAGE_SIZE];
+	average[1][channel] += retval;
+	filter[1][channel][count[1][channel] % AVERAGE_SIZE] = retval;
+
+	count[1][channel]++;
+
 	/* return data */
-	return retval;
+	return average[1][channel] / AVERAGE_SIZE;
 }
+
 
 bool adc_init(ADC_TypeDef *adc) {
 	uint32_t curr_tick = (uint32_t) ticks;
+	uint8_t i, ii;
 
 	/* initialize if necessary */
 	if (!adc_init_clk(adc))
@@ -109,6 +132,12 @@ bool adc_init(ADC_TypeDef *adc) {
 	adc->CR1 |= ADC_CR1_RES_0; /* 10-bit accuracy */
 	adc->CR2 |= ADC_CR2_ADON;
 	while (curr_tick == ticks) {;} /* stabilization? */
+	for (i = 0; i < 2; i++) {
+		for (ii = 0; ii < 16; ii++) {
+			count[i][ii] = 0;
+			average[i][ii] = 0;
+		}
+	}
 
 	return true;
 }

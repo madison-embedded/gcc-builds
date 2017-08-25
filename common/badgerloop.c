@@ -12,7 +12,7 @@
 #include "honeywell.h"
 #include "retro.h"
 
-#define DEBUG_IO	1
+#define DEBUG_IO	0
 
 /*****************************************************************************/
 /*                                 Data Buffer                               */

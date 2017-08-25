@@ -8,11 +8,14 @@ const unsigned int *UID = (const unsigned int *) UID_BASE;
 
 void print_post_info(void) {
 	int i;
+
+#if NETWORKING
 	uint8_t MACAddr[3];
 
     MACAddr[0] = (UID[0] & 0x00ff0000) >> 16;
     MACAddr[1] = (UID[0] & 0x0000ff00) >> 8;
     MACAddr[2] = (UID[0] & 0x000000ff);
+#endif /* NEWTORKING */
 
 	printf("\r\n----------------------------------------------------------------------\r\n");
 	printf("-        University of Wisconsin-Madison Embedded Engineering        -\r\n");
@@ -32,7 +35,7 @@ void print_post_info(void) {
 	printf("\r\nMAC (Prog.):\t%02X:%02X:%02X:%02X:%02X:%02X\r\n",
 		MAC0, MAC1, MAC2, MACAddr[0], MACAddr[1], MACAddr[2]);
 	printf("Link Status:\t%s\r\n", eth_check_link() ? "Up" : "Down");
-#endif
+#endif /* NEWTORKING */
 	printf("Flash Size:\t%uK\r\n\n", *((const unsigned int*) FLASHSIZE_BASE) & 0xffff);
 
 	printf("Oscillator Settings:\r\n");
