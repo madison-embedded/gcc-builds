@@ -195,7 +195,7 @@ void to_ready(STATE_NAME from, uint32_t flags) {
 void in_ready(uint32_t flags) {
 
 	/* Push phase condition: either pusher limit switch */
-	if (!(GET_PLIM1 && GET_PLIM2) && (GET_ACCEL > ACCEL_IMPULSE)) // || (GET_SCOUNT > 0)
+	if (!(GET_PLIM1 && GET_PLIM2) && (GET_ACCEL > 300)) // || (GET_SCOUNT > 0)
 		change_state(PUSHING);
 
 }
