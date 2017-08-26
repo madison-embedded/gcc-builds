@@ -216,6 +216,9 @@ void badgerloop_forced_data(void) {
 
 	if (CHECK_THRESHOLD(GET_POS, TARGET_END_POS, -1))
 		state_handle.flags |= RUN_OVER;
+
+	if (ticks - pushing_start_ts > MUST_BRAKE_TO)
+		change_state(BRAKING);
 }
 
 /* data can be overidden */
