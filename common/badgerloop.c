@@ -68,7 +68,7 @@ uint32_t *time_remaining = (uint32_t *) &telemetry_buffer[55];
 uint32_t soc = SOC_INITIAL, curr_draw = 0; /* 12.8V * 22A * 360s */
 
 /* Configurable */
-uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250, TARGET_END_POS = 125000, CM_PER_STRIP = 3048;
+uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250, TARGET_END_POS = 125000, CM_PER_STRIP = 3048, INTERPOLATE = 1;
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -76,7 +76,7 @@ int calculate_stopping_distance(int velocity, int target_decel) {
 
 	/* must be moving forward, want to move backward */
 	if (velocity <= 0 || target_decel >= 0)
-		return -1;
+		return TARGET_END_POS;
 
 	velocity *= velocity;
 	return -(velocity / target_decel);
@@ -247,19 +247,16 @@ void badgerloop_update_data(void) {
 		SET_ACCEL(-(accelSum / ACCEL_BUF_SIZ));
 
 		/* interpolate */
-		if (state_handle.curr_state != IDLE && state_handle.curr_state != READY)
+		if (INTERPOLATE && state_handle.curr_state != IDLE && state_handle.curr_state != READY && state_handle.curr_state != FAULT)
 			SET_VEL(GET_VEL + (-(accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
 	}
 
 	if (prev_scount < mainRetro->count) {
 		prev_scount = GET_SCOUNT;
 		SET_VEL(getVelocity()); // exti
-	} else if ((ticks - mainRetro->curr) > MAIN_INTERVAL) {
+	} else if (((ticks - mainRetro->curr) > MAIN_INTERVAL) && GET_SCOUNT > 2) {
 		__disable_irq();
-		mainRetro->filter[MAINFILTERINDEX] = ticks - mainRetro->curr;
-		mainRetro->prev = mainRetro->curr;
-		mainRetro->curr = ticks;
-		SET_VEL(getVelocity()); // exti
+		SET_VEL((1000 * CM_PER_STRIP) / (ticks - mainRetro->curr));
 		__enable_irq();
 	}
 

@@ -105,7 +105,15 @@ command_status do_badgerloop(int argc, char *argv[]) {
 				printf("battery charging off\r\n");
 				charging = false;
 			} else return FAIL;
-		}else return USAGE;
+		} else if (!strcmp("interpolate", argv[1])) {
+			if (!strcmp("on", argv[2])) {
+				printf("interpolating on\r\n");
+				INTERPOLATE = 1;
+			} else if (!strcmp("off", argv[2])) {
+				printf("interpolating off\r\n");
+				INTERPOLATE = 0;
+			} else return FAIL;
+		} else return USAGE;
 		return SUCCESS;
 	}
 
@@ -133,6 +141,7 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		printf("ACCEL_IMPULSE:\t%lu\r\n", ACCEL_IMPULSE);
 		printf("TARGET_END_POS:\t%lu\r\n", TARGET_END_POS);
 		printf("CM_PER_STRIP:\t%lu\r\n", CM_PER_STRIP);
+		printf("INTERPOLATE:\t%lu\r\n", INTERPOLATE);
 		break;
 	/* perform DAQ / update values */
 	case 'r':

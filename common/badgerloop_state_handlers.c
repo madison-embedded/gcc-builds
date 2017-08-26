@@ -195,7 +195,7 @@ void to_ready(STATE_NAME from, uint32_t flags) {
 void in_ready(uint32_t flags) {
 
 	/* Push phase condition: either pusher limit switch */
-	if (!(GET_PLIM1 && GET_PLIM2) && (GET_ACCEL < ACCEL_IMPULSE)) // || (GET_SCOUNT > 0)
+	if (!(GET_PLIM1 && GET_PLIM2) && (GET_ACCEL > ACCEL_IMPULSE)) // || (GET_SCOUNT > 0)
 		change_state(PUSHING);
 
 }
@@ -293,7 +293,7 @@ void in_braking(uint32_t flags) {
 	   OR curr_pos + stopd > target_pos */
 	if (((CHECK_THRESHOLD(GET_BRP3, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)
 		&& (GET_BLIM1 && GET_BLIM2)) ||
-		(GET_STOPD != -1 && ((GET_STOPD + GET_POS) > TARGET_END_POS)))
+		(GET_STOPD != TARGET_END_POS && ((GET_STOPD + GET_POS) > TARGET_END_POS)))
 		&& ++primary_low_count > BRAKING_COUNT_THRS && (ticks - pushing_start_ts > DONT_BRAKE_TO)) {
 		secondary_brakes(100);
 	}
