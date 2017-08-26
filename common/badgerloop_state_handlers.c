@@ -265,6 +265,9 @@ void in_coast(uint32_t flags) {
 	else if (GET_STOPD == -1)
 		assert_fault("Unknown stopping distance");
 
+	if (ticks - pushing_start_ts > MUST_BRAKE_TO)
+		change_state(BRAKING);
+
 	if (ticks - coast_ts > THRUST_TO)
 		thrusters(100);
 }
