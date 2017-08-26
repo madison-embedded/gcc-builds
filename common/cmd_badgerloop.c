@@ -11,38 +11,50 @@ command_status do_badgerloop(int argc, char *argv[]) {
 
 	if (argc == 1) return USAGE;
 
-	if (!strcmp("accel", argv[1])) {
-		SET_ACCEL(strtol(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("position", argv[1])) {
-		SET_POS(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("velocity", argv[1])) {
-		SET_VEL(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("strip", argv[1])) {
-		SET_SCOUNT(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("bls", argv[1])) {
-		SET_BRP1(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("blp", argv[1])) {
-		SET_BRP2(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("bpp", argv[1])) {
-		SET_BRP3(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("pl", argv[1])) {
-		SET_PRP1(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	} else if (!strcmp("ps", argv[1])) {
-		SET_PRP2(strtoul(argv[2], NULL, 10));
-		return SUCCESS;
-	}
-
-	/* actuation functions */
 	if (argc == 3) {
-		if (!strcmp(argv[1], "pbrake"))
+		/* variable set functions */
+		if (!strcmp("accel", argv[1])) {
+			SET_ACCEL(strtol(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("position", argv[1])) {
+			SET_POS(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("velocity", argv[1])) {
+			SET_VEL(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("strip", argv[1])) {
+			SET_SCOUNT(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("bls", argv[1])) {
+			SET_BRP1(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("blp", argv[1])) {
+			SET_BRP2(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("bpp", argv[1])) {
+			SET_BRP3(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("pl", argv[1])) {
+			SET_PRP1(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		} else if (!strcmp("ps", argv[1])) {
+			SET_PRP2(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
+		}
+
+		/* configurable fields */
+		else if (!strcmp("DBTO", argv[1])) {
+			DONT_BRAKE_TO = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("MBTO", argv[1])) {
+			MUST_BRAKE_TO = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("BCT", argv[1])) {
+			BRAKING_COUNT_THRS = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("ACCEL", argv[1])) {
+			ACCEL_IMPULSE = strtoul(argv[2], NULL, 10);
+		}
+
+		/* actuation functions */
+		else if (!strcmp(argv[1], "pbrake"))
 			primary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
 		else if (!strcmp(argv[1], "sbrake"))
 			secondary_brakes(!strcmp(argv[2], "on") ? 100 : 0);
@@ -94,6 +106,11 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		ret = get_performanceIV(send_telemetry_to_SpaceX);
 		break;
 #endif
+	case 'c':
+		printf("DONT_BRAKE_TO:\t\t%lu\r\n", DONT_BRAKE_TO);
+		printf("MUST_BRAKE_TO:\t\t%lu\r\n", MUST_BRAKE_TO);
+		printf("BRAKING_COUNT_THRS:\t%lu\r\n", BRAKING_COUNT_THRS);
+		break;
 	/* perform DAQ / update values */
 	case 'r':
 		get_performanceVV(badgerloop_update_data);

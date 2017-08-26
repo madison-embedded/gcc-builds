@@ -11,9 +11,7 @@
 
 
 typedef struct{
-	int prev;
-	int curr;
-	int count;
+	uint32_t prev, curr, count;
 	uint32_t filter[AVERAGE_SIZE];
 }timeStamp;
 

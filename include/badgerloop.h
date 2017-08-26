@@ -22,13 +22,13 @@
 /* Constant fields & utilities  */
 #define TEAM_ID			0x3
 #define DAQ_INT			10
-#define TELEM_INT		500
+#define TELEM_INT		300
 #define CHECK_THRESHOLD(get_macro, upper, lower)	\
 	(get_macro > upper || get_macro < lower)
 
 #define SOC_INITIAL		1013760
 #define CM_PER_STRIP	3048
-#define ACCEL_BUF_SIZ	25
+#define ACCEL_BUF_SIZ	10
 
 /*****************************************************************************/
 /*                          Error checking parameters                        */
@@ -53,10 +53,7 @@
 #define TARGET_DECEL		-981
 #define TARGET_END_POS		125000
 
-#define BRAKING_COUNT_THRS	5
-
-#define DONT_BRAKE_TO		8000
-#define MUST_BRAKE_TO		17000
+extern uint32_t DONT_BRAKE_TO, MUST_BRAKE_TO, BRAKING_COUNT_THRS, ACCEL_IMPULSE;
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -72,6 +69,7 @@ typedef enum asdf {
 } STATE_NAME;
 extern const char *fault_message;
 extern int bad_value;
+extern uint32_t pushing_start_ts;
 
 extern uint8_t *status;
 #define SET_STATUS(val)	\

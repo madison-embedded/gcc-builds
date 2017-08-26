@@ -20,14 +20,15 @@ void exti_config(GPIO_TypeDef * port, uint32_t pin, bool rtsr, bool ftsr, bool i
 	interLine[pin].prev = 0;
 	interLine[pin].curr = 0;
 	interLine[pin].count = 0;
+	memset(interLine[pin].filter, 0x00, AVERAGE_SIZE*sizeof(uint32_t));
 
 	gpio_setMode(port, pin, INPUT);
 	GPIOC->OSPEEDR |= (0x03<< (2 * pin));    // high speed
 	RCC->APB2ENR |= (1 << 14); 
 
-	SYSCFG->EXTICR[pin/4] |= (gpio_getGpioPortChar(port)-65) << (pin%4*4); 	/* SYSCFG external interrupt configuration registers */
+	SYSCFG->EXTICR[pin / 4] |= (gpio_getGpioPortChar(port) - 65) << (pin % 4 * 4); 	/* SYSCFG external interrupt configuration registers */
 	
-	EXTI->PR=0xffff;
+	EXTI->PR = 0xffff;
 	EXTI->IMR |= 0x1U << pin;
 
 	if (rtsr)
@@ -53,7 +54,7 @@ void exti_disable(GPIO_TypeDef * port, uint32_t pin) {
 }
 
 /*gets number of interrupts from given pin*/
-timeStamp * getTimeStamps(int pin){
+timeStamp * getTimeStamps(int pin) {
 	return &interLine[pin];
 }
 

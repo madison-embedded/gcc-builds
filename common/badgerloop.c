@@ -66,6 +66,9 @@ int *stopping_distance = (int *) &telemetry_buffer[47];
 uint32_t *percentage = (uint32_t *) &telemetry_buffer[51];
 uint32_t *time_remaining = (uint32_t *) &telemetry_buffer[55];
 uint32_t soc = SOC_INITIAL, curr_draw = 0; /* 12.8V * 22A * 360s */
+
+/* Configurable */
+uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250;
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -216,22 +219,39 @@ void badgerloop_forced_data(void) {
 }
 
 /* data can be overidden */
+uint32_t curr_accel_ts = 0, prev_accel_ts = 0;
 void badgerloop_update_data(void) {
 
 	uint16_t adc_temp;
+	static uint32_t prev_scount = 0;
 
 	/* strip count: exti */
 	SET_SCOUNT(mainRetro->count);
 
 	if (mpu9250_handler(accelBuffer)) {
-		accelSum -= accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
-		accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = (int) accelBuffer[0];
-		accelSum += (int) accelBuffer[0];
+		prev_accel_ts = curr_accel_ts;
+		curr_accel_ts = ticks;
+		int diff = 0, prev = accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
+		accelSum -= prev;
+		diff = ((int) accelBuffer[0] - prev > 0) ? (int) (accelBuffer[0] - prev) : (int) (prev - accelBuffer[0]);
+		if (diff > ACCEL_IMPULSE) {
+			accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = (accelBuffer[0] - prev > 0) ? prev + ACCEL_IMPULSE : prev - ACCEL_IMPULSE;
+			accelSum += (int) accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
+		} else {
+			accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = accelBuffer[0];
+			accelSum += (int) accelBuffer[0];
+		}
 		accelCount++;
 		SET_ACCEL(accelSum / ACCEL_BUF_SIZ);
+		if (GET_SCOUNT > 0)
+			SET_VEL(GET_VEL + ((accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
 	}
 
-	SET_VEL(getVelocity()); // exti
+	if (prev_scount < mainRetro->count) {
+		prev_scount = GET_SCOUNT;
+		SET_VEL(getVelocity()); // exti
+	}
+
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);
 
 	/* F5:   Analog6 - Pressure 1 (CN6) */
@@ -492,6 +512,8 @@ void application_handler(void) {
 	}
 
 	state_machine_handler(&state_handle);
+
+	/* check long timeout for braking */
 
 }
 

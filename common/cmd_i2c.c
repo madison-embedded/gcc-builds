@@ -8,6 +8,8 @@
 #include "honeywell.h"
 #include "mpu9250.h"
 
+#include "badgerloop.h"
+
 extern I2C_HandleTypeDef hi2c;
 
 const char *HALstatusString(HAL_StatusTypeDef status) {
@@ -46,7 +48,10 @@ command_status do_i2c(int argc, char *argv[]) {
 
 	if (!strcmp("mpu", argv[1])) {
 		int16_t data[3];
-
+#if !NETWORKING
+		int accelRollingBuffer[ACCEL_BUF_SIZ];
+		int accelCount = 0, accelSum = 0;
+#endif
 		if (argc != 3) return USAGE;
 		switch (argv[2][0]){
 		case 'i':
@@ -60,12 +65,25 @@ command_status do_i2c(int argc, char *argv[]) {
 #else
 			mpu_ts = ticks;
 			printf("X\tY\tZ\r\n");
+			memset(accelRollingBuffer, 0x00, sizeof(int)*ACCEL_BUF_SIZ);
 			do {
-				readAccelData(data);
-				__disable_irq();
-				printf("%-6d\t%-6d\t%-6d\r\n", to_cms2(data[0]), to_cms2(data[1]), to_cms2(data[2]));
-				__enable_irq();
-				fflush(stdout);
+				if (mpu9250_handler(data)) {
+					int diff = 0, prev = accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
+					accelSum -= prev;
+					diff = ((int) data[0] - prev > 0) ? (int) (data[0] - prev) : (int) (prev - data[0]);
+					if (diff > ACCEL_IMPULSE) {
+						accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = (data[0] - prev > 0) ? prev + ACCEL_IMPULSE : prev - ACCEL_IMPULSE;
+						accelSum += (int) accelRollingBuffer[accelCount % ACCEL_BUF_SIZ];
+					} else {
+						accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = data[0];
+						accelSum += (int) data[0];
+					}
+					accelCount++;
+					__disable_irq();
+					printf("%-6d\r", to_cms2(accelSum / ACCEL_BUF_SIZ));
+					__enable_irq();
+					fflush(stdout);
+				}
 			} while(ticks - mpu_ts < 5000);
 			printf("\n");
 #endif

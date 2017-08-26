@@ -15,11 +15,11 @@ void badRetro(void){
 }
 
 int getVelocity(void) {
-	float velocity;
+	int velocity;
 
-	badRetro();
+	//badRetro();
 	if (!MAIN_INTERVAL) return 0;
-	if (CHECK_THRESHOLD(MAIN_INTERVAL, 203, 0)) {
+	if (!CHECK_THRESHOLD(MAIN_INTERVAL, 203, 0)) {
 		return 15000; /* TODO may subtract stip */
 	}
 	velocity = 3048000 / MAIN_INTERVAL;

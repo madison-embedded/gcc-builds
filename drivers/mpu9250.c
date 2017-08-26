@@ -97,6 +97,7 @@ static void average_fifo_data(int16_t *buffer) {
 	buffer[0] = (avg_count[0] / (int32_t) packet_count) - swx;
 	buffer[1] = (avg_count[1] / (int32_t) packet_count) - swy;
 	buffer[2] = (avg_count[2] / (int32_t) packet_count) - swz;
+
 }
 
 void fifo_begin_mpu9250(void) {
@@ -112,7 +113,7 @@ void fifo_read_mpu9250(int16_t * destination) {
 
 bool mpu_gathering = false;
 uint32_t mpu_ts;
-#define MPU_INT		50
+#define MPU_INT		250
 bool mpu9250_handler(int16_t * destination) {
 	if (!mpu_gathering) {
 		fifo_begin_mpu9250();

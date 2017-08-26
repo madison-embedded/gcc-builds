@@ -5,12 +5,12 @@
 #include <stdio.h>
 
 const unsigned int state_intervals[] = {
-	2500,	/* FAULT		*/
-	1000,	/* IDLE			*/
-	2500,	/* READY		*/
-	2500,	/* PUSHING		*/
-	2500,	/* COAST		*/
-	1000	/* BRAKING		*/
+	250,	/* FAULT		*/
+	100,	/* IDLE			*/
+	250,	/* READY		*/
+	250,	/* PUSHING		*/
+	250,	/* COAST		*/
+	100		/* BRAKING		*/
 };
 
 void change_state(STATE_NAME state) {
@@ -106,8 +106,19 @@ bool verify_DAQ(void) {
 void to_fault(STATE_NAME from, uint32_t flags) {
 
 	/* Lord have mercy */
-	if (from == BRAKING)
-		secondary_brakes(100);
+	if (from == BRAKING) {
+		if (ticks - pushing_start_ts > DONT_BRAKE_TO) {
+			primary_brakes(100);
+			secondary_brakes(100);
+		} else change_state(BRAKING);
+	}
+
+	else if (from == PUSHING)
+		change_state(COAST);
+	else if (from == COAST)
+		change_state(BRAKING);
+	else if (from == READY)
+		change_state(IDLE);
 
 }
 
@@ -144,10 +155,10 @@ void in_idle(uint32_t flags) {
 
 	/* Initial state */
 	if (flags & POWER_ON) {
-		primary_brakes(1); /* don't drive, save power */
+		primary_brakes(0); /* don't drive, save power */
 		secondary_brakes(0);
 		thrusters(0);
-		vent_primary_brakes(true);
+		vent_primary_brakes(false);
 		vent_secondary_brakes(false);
 		vent_thrusters(false);
 		clear_flag(POWER_ON);
@@ -163,9 +174,7 @@ void in_idle(uint32_t flags) {
 		return;
 	}
 
-	if (!verify_DAQ())
-		set_flag(RETRY_INIT);
-
+	verify_DAQ();
 }
 
 void from_idle(STATE_NAME to, uint32_t flags) {
@@ -179,14 +188,14 @@ void from_idle(STATE_NAME to, uint32_t flags) {
 /*                             Ready Handlers                                */
 /*****************************************************************************/
 void to_ready(STATE_NAME from, uint32_t flags) {
-		vent_primary_brakes(false);
-		primary_brakes(0);
+		//vent_primary_brakes(false);
+		//primary_brakes(0);
 }
 
 void in_ready(uint32_t flags) {
 
 	/* Push phase condition: either pusher limit switch */
-	if (!(GET_PLIM1 && GET_PLIM2) && GET_ACCEL > 300)
+	if (!(GET_PLIM1 && GET_PLIM2) && (GET_ACCEL > 300)) // || (GET_SCOUNT > 0)
 		change_state(PUSHING);
 
 }
@@ -216,7 +225,7 @@ void in_pushing(uint32_t flags) {
 			change_state(COAST);
 
 	if (ticks - pushing_start_ts > MUST_BRAKE_TO)
-		change_state(BRAKE);
+		change_state(BRAKING);
 
 }
 
@@ -231,8 +240,18 @@ void from_pushing(STATE_NAME to, uint32_t flags) {
 /*                                 Coast Handlers                            */
 /*****************************************************************************/
 void to_coast(STATE_NAME from, uint32_t flags) {
-	if (from != BRAKING)
-		thrusters(100);
+	if (from != BRAKING && from != FAULT) {
+		/* Check braking pressure 1, upstream? */
+		if (CHECK_THRESHOLD(GET_BRP1, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
+			assert_fault("Low braking pressure 1\r\n");
+			bad_value = GET_BRP1;
+			vent_thrusters(true);
+		} else if (CHECK_THRESHOLD(GET_BRP2, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)) {
+			assert_fault("Low braking pressure 2\r\n");
+			bad_value = GET_BRP2;
+			vent_thrusters(true);
+		} else thrusters(100);
+	}
 	else vent_thrusters(true);
 }
 
@@ -260,7 +279,7 @@ void from_coast(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 void to_braking(STATE_NAME from, uint32_t flags) {
 
-	if ((ticks - pushing_start_ts < DONT_BRAKE_TO))
+	if (ticks - pushing_start_ts < DONT_BRAKE_TO)
 		change_state(COAST);
 	else primary_brakes(100);
 
@@ -273,10 +292,14 @@ void in_braking(uint32_t flags) {
 	/* Check downstream primary is too low and one of limit switches is open
 	   OR curr_pos + stopd > target_pos */
 	if (((CHECK_THRESHOLD(GET_BRP3, BRAKING_ON_P_UPPER, BRAKING_ON_P_LOWER)
-		&& (!GET_BLIM1 && !GET_BLIM2)) ||
+		&& (GET_BLIM1 && GET_BLIM2)) ||
 		(GET_STOPD != -1 && ((GET_STOPD + GET_POS) > TARGET_END_POS)))
-		&& ++primary_low_count > BRAKING_COUNT_THRS)
+		&& ++primary_low_count > BRAKING_COUNT_THRS && (ticks - pushing_start_ts > DONT_BRAKE_TO)) {
 		secondary_brakes(100);
+	}
+
+	if (ticks - pushing_start_ts > DONT_BRAKE_TO)
+		primary_brakes(100);
 
 	/* check stopping distance threshold for secondary */
 
