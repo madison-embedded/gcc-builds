@@ -257,6 +257,7 @@ void badgerloop_update_data(void) {
 	} else if (((ticks - mainRetro->curr) > MAIN_INTERVAL) && GET_SCOUNT > 2) {
 		__disable_irq();
 		SET_VEL((1000 * CM_PER_STRIP) / (ticks - mainRetro->curr));
+		SET_POS(GET_POS + (GET_VEL*DAQ_INT)/1000);
 		__enable_irq();
 	}
 

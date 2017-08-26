@@ -305,6 +305,9 @@ void in_braking(uint32_t flags) {
 	if (ticks - pushing_start_ts > DONT_BRAKE_TO)
 		primary_brakes(100);
 
+	if ((flags & RUN_OVER) && GET_VEL < 10)
+		change_state(IDLE);
+
 	/* check stopping distance threshold for secondary */
 
 	/* if secondary on & braking fast, turn off? */
@@ -312,12 +315,10 @@ void in_braking(uint32_t flags) {
 }
 
 void from_braking(STATE_NAME to, uint32_t flags) {
-
 	if (to != FAULT) {
 		primary_brakes(0);
 		secondary_brakes(0);
 	}
-
 }
 /*****************************************************************************/
 /*****************************************************************************/
