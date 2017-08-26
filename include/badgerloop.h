@@ -51,7 +51,7 @@
 
 #define TARGET_DECEL		-981
 
-extern uint32_t DONT_BRAKE_TO, MUST_BRAKE_TO, BRAKING_COUNT_THRS, ACCEL_IMPULSE, TARGET_END_POS, CM_PER_STRIP;
+extern uint32_t DONT_BRAKE_TO, MUST_BRAKE_TO, BRAKING_COUNT_THRS, ACCEL_IMPULSE, TARGET_END_POS, CM_PER_STRIP, soc;
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -157,7 +157,7 @@ void vent_thrusters(bool open);
 
 void change_state(STATE_NAME state);
 
-extern bool manual_update;
+extern bool manual_update, charging;
 
 #endif
 

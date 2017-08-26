@@ -244,19 +244,23 @@ void badgerloop_update_data(void) {
 		}
 
 		accelCount++;
-		SET_ACCEL(accelSum / ACCEL_BUF_SIZ);
+		SET_ACCEL(-(accelSum / ACCEL_BUF_SIZ));
 
 		/* interpolate */
-		//if (GET_SCOUNT > 0 || (state_handle.curr_state != IDLE && state_handle.curr_state != READY))
-		//	SET_VEL(GET_VEL + ((accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
+		if (state_handle.curr_state != IDLE && state_handle.curr_state != READY)
+			SET_VEL(GET_VEL + (-(accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
 	}
 
 	if (prev_scount < mainRetro->count) {
 		prev_scount = GET_SCOUNT;
 		SET_VEL(getVelocity()); // exti
 	} else if ((ticks - mainRetro->curr) > MAIN_INTERVAL) {
-		// TODO: decay
-		/* && !CHECK_THRESHOLD((ticks - mainRetro->), 203, 0)) */
+		__disable_irq();
+		mainRetro->filter[MAINFILTERINDEX] = ticks - mainRetro->curr;
+		mainRetro->prev = mainRetro->curr;
+		mainRetro->curr = ticks;
+		SET_VEL(getVelocity()); // exti
+		__enable_irq();
 	}
 
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);

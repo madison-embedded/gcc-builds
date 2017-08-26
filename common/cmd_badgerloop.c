@@ -43,6 +43,9 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		} else if (!strcmp("stopd", argv[1])) {
 			SET_STOPD(strtoul(argv[2], NULL, 10));
 			return SUCCESS;
+		} else if (!strcmp("soc", argv[1])) {
+			soc = strtoul(argv[2], NULL, 10);
+			return SUCCESS;
 		}
 
 		/* configurable fields */
@@ -84,6 +87,8 @@ command_status do_badgerloop(int argc, char *argv[]) {
 			default: return USAGE;
 			}
 			state_handle.change_state = true;
+
+		/* Utilities */
 		} else if (!strcmp("override", argv[1])) {
 			if (!strcmp("on", argv[2])) {
 				printf("data override on\r\n");
@@ -92,7 +97,15 @@ command_status do_badgerloop(int argc, char *argv[]) {
 				printf("data override off\r\n");
 				manual_update = false;
 			} else return FAIL;
-		} else return USAGE;
+		} else if (!strcmp("battery", argv[1])) {
+			if (!strcmp("on", argv[2])) {
+				printf("battery charging on\r\n");
+				charging = true;
+			} else if (!strcmp("off", argv[2])) {
+				printf("battery charging off\r\n");
+				charging = false;
+			} else return FAIL;
+		}else return USAGE;
 		return SUCCESS;
 	}
 
