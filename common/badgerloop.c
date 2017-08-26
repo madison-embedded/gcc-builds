@@ -247,8 +247,8 @@ void badgerloop_update_data(void) {
 		SET_ACCEL(accelSum / ACCEL_BUF_SIZ);
 
 		/* interpolate */
-		if (GET_SCOUNT > 0 || (state_handle.curr_state != IDLE && state_handle.curr_state != READY))
-			SET_VEL(GET_VEL + ((accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
+		//if (GET_SCOUNT > 0 || (state_handle.curr_state != IDLE && state_handle.curr_state != READY))
+		//	SET_VEL(GET_VEL + ((accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
 	}
 
 	if (prev_scount < mainRetro->count) {
@@ -478,7 +478,7 @@ int query_Dashboard(void) {
 	return 0;
 }
 
-bool manual_update = false;
+bool manual_update = false, charging = false;
 void application_handler(void) {
 
 	/* do DAQ */
@@ -513,6 +513,11 @@ void application_handler(void) {
 	if (!(ticks % 1000) && last_batt_timestamp != ticks) {
 		last_batt_timestamp = ticks;
 		curr_draw = (GET_VBATT * GET_IBATT) / 1000000;
+		if (charging) {
+			if (curr_draw < ((3000 * GET_VBATT) / 1000000))
+				curr_draw = 0;
+			else curr_draw -= (3000 * GET_VBATT) / 1000000;
+		}
 		soc -= (curr_draw);
 		SET_CHARGE_PERC((soc * 100) / SOC_INITIAL);
 		SET_TIME_REMAINING((curr_draw == 0) ? 1012651 : soc / curr_draw);

@@ -40,6 +40,9 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		} else if (!strcmp("ps", argv[1])) {
 			SET_PRP2(strtoul(argv[2], NULL, 10));
 			return SUCCESS;
+		} else if (!strcmp("stopd", argv[1])) {
+			SET_STOPD(strtoul(argv[2], NULL, 10));
+			return SUCCESS;
 		}
 
 		/* configurable fields */
@@ -141,13 +144,13 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	printf("returned %d\r\n", ret);
 	return SUCCESS;
 }
-COMMAND_ENTRY("badgerloop", "badgerloop\
-	DBTO  - Don't brake timeout\
-	MBTO  - Must brake timeout\
-	BCT   - Braking count threshold\
-	ACCEL - Accelerometer impulse cap\
-	TEP   - Target end position\
-	CMPS  - Centimeters per strip\
-	override [ on | off ] - stop DAQ and override sensor data\
+COMMAND_ENTRY("badgerloop", "badgerloop\r\n\
+	DBTO  - Don't brake timeout\r\n\
+	MBTO  - Must brake timeout\r\n\
+	BCT   - Braking count threshold\r\n\
+	ACCEL - Accelerometer impulse cap\r\n\
+	TEP   - Target end position\r\n\
+	CMPS  - Centimeters per strip\r\n\
+	override [ on | off ] - stop DAQ and override sensor data\r\n\
 	fault - print current fault message",
 	"Debug Badgerloop Networking etc.", do_badgerloop)
