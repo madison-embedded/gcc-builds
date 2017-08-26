@@ -68,7 +68,7 @@ uint32_t *time_remaining = (uint32_t *) &telemetry_buffer[55];
 uint32_t soc = SOC_INITIAL, curr_draw = 0; /* 12.8V * 22A * 360s */
 
 /* Configurable */
-uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250, TARGET_END_POS = 125000, CM_PER_STRIP = 3048, INTERPOLATE = 1;
+uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250, TARGET_END_POS = 125000, CM_PER_STRIP = 3048, INTERPOLATE = 1, THRUST_TO = 3000;
 /*****************************************************************************/
 /*****************************************************************************/
 

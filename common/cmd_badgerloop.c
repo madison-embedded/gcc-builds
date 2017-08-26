@@ -61,6 +61,8 @@ command_status do_badgerloop(int argc, char *argv[]) {
 			TARGET_END_POS = strtoul(argv[2], NULL, 10);
 		} else if (!strcmp("CMPS", argv[1])) {
 			CM_PER_STRIP = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("TTO", argv[1])) {
+			THRUST_TO = strtoul(argv[2], NULL, 10);
 		}
 
 		/* actuation functions */
@@ -142,6 +144,7 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		printf("TARGET_END_POS:\t%lu\r\n", TARGET_END_POS);
 		printf("CM_PER_STRIP:\t%lu\r\n", CM_PER_STRIP);
 		printf("INTERPOLATE:\t%lu\r\n", INTERPOLATE);
+		printf("THRUST_TO:\t%lu\r\n", THRUST_TO);
 		break;
 	/* perform DAQ / update values */
 	case 'r':

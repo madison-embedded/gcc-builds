@@ -239,6 +239,7 @@ void from_pushing(STATE_NAME to, uint32_t flags) {
 /*****************************************************************************/
 /*                                 Coast Handlers                            */
 /*****************************************************************************/
+uint32_t coast_ts = 0;
 void to_coast(STATE_NAME from, uint32_t flags) {
 	if (from != BRAKING && from != FAULT) {
 		/* Check braking pressure 1, upstream? */
@@ -250,9 +251,10 @@ void to_coast(STATE_NAME from, uint32_t flags) {
 			assert_fault("Low braking pressure 2\r\n");
 			bad_value = GET_BRP2;
 			vent_thrusters(true);
-		} else thrusters(100);
+		}
 	}
 	else vent_thrusters(true);
+	coast_ts = ticks;
 }
 
 void in_coast(uint32_t flags) {
@@ -263,6 +265,8 @@ void in_coast(uint32_t flags) {
 	else if (GET_STOPD == -1)
 		assert_fault("Unknown stopping distance");
 
+	if (ticks - coast_ts > THRUST_TO)
+		thrusters(100);
 }
 
 void from_coast(STATE_NAME to, uint32_t flags) {
