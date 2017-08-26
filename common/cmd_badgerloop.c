@@ -51,6 +51,10 @@ command_status do_badgerloop(int argc, char *argv[]) {
 			BRAKING_COUNT_THRS = strtoul(argv[2], NULL, 10);
 		} else if (!strcmp("ACCEL", argv[1])) {
 			ACCEL_IMPULSE = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("TEP", argv[1])) {
+			TARGET_END_POS = strtoul(argv[2], NULL, 10);
+		} else if (!strcmp("CMPS", argv[1])) {
+			CM_PER_STRIP = strtoul(argv[2], NULL, 10);
 		}
 
 		/* actuation functions */
@@ -110,6 +114,9 @@ command_status do_badgerloop(int argc, char *argv[]) {
 		printf("DONT_BRAKE_TO:\t\t%lu\r\n", DONT_BRAKE_TO);
 		printf("MUST_BRAKE_TO:\t\t%lu\r\n", MUST_BRAKE_TO);
 		printf("BRAKING_COUNT_THRS:\t%lu\r\n", BRAKING_COUNT_THRS);
+		printf("ACCEL_IMPULSE:\t%lu\r\n", ACCEL_IMPULSE);
+		printf("TARGET_END_POS:\t%lu\r\n", TARGET_END_POS);
+		printf("CM_PER_STRIP:\t%lu\r\n", CM_PER_STRIP);
 		break;
 	/* perform DAQ / update values */
 	case 'r':
@@ -134,5 +141,13 @@ command_status do_badgerloop(int argc, char *argv[]) {
 	printf("returned %d\r\n", ret);
 	return SUCCESS;
 }
-COMMAND_ENTRY("badgerloop", "badgerloop <init>", "Debug Badgerloop Networking etc.", do_badgerloop)
-
+COMMAND_ENTRY("badgerloop", "badgerloop\
+	DBTO  - Don't brake timeout\
+	MBTO  - Must brake timeout\
+	BCT   - Braking count threshold\
+	ACCEL - Accelerometer impulse cap\
+	TEP   - Target end position\
+	CMPS  - Centimeters per strip\
+	override [ on | off ] - stop DAQ and override sensor data\
+	fault - print current fault message",
+	"Debug Badgerloop Networking etc.", do_badgerloop)

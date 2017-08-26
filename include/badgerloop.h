@@ -16,8 +16,8 @@
 /* Dashboard query parameters */
 #define OUTGOING_QUERY	1
 #define DASH_RESPONSE	2
-#define QUERY_TO		7000
-#define QUERY_RETRY		1000
+#define QUERY_TO		10000
+#define QUERY_RETRY		500
 
 /* Constant fields & utilities  */
 #define TEAM_ID			0x3
@@ -27,7 +27,6 @@
 	(get_macro > upper || get_macro < lower)
 
 #define SOC_INITIAL		1013760
-#define CM_PER_STRIP	3048
 #define ACCEL_BUF_SIZ	10
 
 /*****************************************************************************/
@@ -51,9 +50,8 @@
 #define ACCEL_LOWER_IDLE	-100	/* cm/s^2	*/
 
 #define TARGET_DECEL		-981
-#define TARGET_END_POS		125000
 
-extern uint32_t DONT_BRAKE_TO, MUST_BRAKE_TO, BRAKING_COUNT_THRS, ACCEL_IMPULSE;
+extern uint32_t DONT_BRAKE_TO, MUST_BRAKE_TO, BRAKING_COUNT_THRS, ACCEL_IMPULSE, TARGET_END_POS, CM_PER_STRIP;
 /*****************************************************************************/
 /*****************************************************************************/
 

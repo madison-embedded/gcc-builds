@@ -1,4 +1,5 @@
 #include "exti.h"
+#include <string.h>
 
 /* gets interupt vecotor number for pin */
 static IRQn_Type exti_get_irq_num(uint32_t pin) {

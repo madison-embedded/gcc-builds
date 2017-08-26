@@ -68,7 +68,7 @@ uint32_t *time_remaining = (uint32_t *) &telemetry_buffer[55];
 uint32_t soc = SOC_INITIAL, curr_draw = 0; /* 12.8V * 22A * 360s */
 
 /* Configurable */
-uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250;
+uint32_t DONT_BRAKE_TO = 8000, MUST_BRAKE_TO = 30000, BRAKING_COUNT_THRS = 5, ACCEL_IMPULSE = 250, TARGET_END_POS = 125000, CM_PER_STRIP = 3048;
 /*****************************************************************************/
 /*****************************************************************************/
 
@@ -228,6 +228,7 @@ void badgerloop_update_data(void) {
 	/* strip count: exti */
 	SET_SCOUNT(mainRetro->count);
 
+	/* impulse capped at configurable value */
 	if (mpu9250_handler(accelBuffer)) {
 		prev_accel_ts = curr_accel_ts;
 		curr_accel_ts = ticks;
@@ -241,15 +242,21 @@ void badgerloop_update_data(void) {
 			accelRollingBuffer[accelCount % ACCEL_BUF_SIZ] = accelBuffer[0];
 			accelSum += (int) accelBuffer[0];
 		}
+
 		accelCount++;
 		SET_ACCEL(accelSum / ACCEL_BUF_SIZ);
-		if (GET_SCOUNT > 0)
+
+		/* interpolate */
+		if (GET_SCOUNT > 0 || (state_handle.curr_state != IDLE && state_handle.curr_state != READY))
 			SET_VEL(GET_VEL + ((accelSum / ACCEL_BUF_SIZ)*((int)(curr_accel_ts - prev_accel_ts)))/1000);
 	}
 
 	if (prev_scount < mainRetro->count) {
 		prev_scount = GET_SCOUNT;
 		SET_VEL(getVelocity()); // exti
+	} else if ((ticks - mainRetro->curr) > MAIN_INTERVAL) {
+		// TODO: decay
+		/* && !CHECK_THRESHOLD((ticks - mainRetro->), 203, 0)) */
 	}
 
 	SET_POS(CM_PER_STRIP * GET_SCOUNT);

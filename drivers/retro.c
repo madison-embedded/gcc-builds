@@ -22,7 +22,7 @@ int getVelocity(void) {
 	if (!CHECK_THRESHOLD(MAIN_INTERVAL, 203, 0)) {
 		return 15000; /* TODO may subtract stip */
 	}
-	velocity = 3048000 / MAIN_INTERVAL;
+	velocity = (1000 * CM_PER_STRIP) / MAIN_INTERVAL;
 
 	return velocity;
 }
